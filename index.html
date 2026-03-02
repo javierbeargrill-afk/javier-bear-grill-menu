@@ -15,7 +15,7 @@
   }
   body { background: var(--bg); color: var(--text); font-family: 'Nunito', sans-serif; min-height: 100vh; padding-bottom: 50px; }
 
-  /* CINTILLO Y POPUP */
+  /* ALERTAS Y HORARIOS */
   #closedBanner { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.96); z-index: 9999; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 30px; }
   #closedBanner.show { display: flex; }
   .closed-hours { margin: 20px 0; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 15px; font-size: 15px; }
@@ -29,25 +29,27 @@
   .closed-bar .dot { background: var(--red); }
   @keyframes pulse { 0% {opacity:1} 50% {opacity:0.4} 100% {opacity:1} }
 
-  header { text-align: center; padding: 30px 20px; background: linear-gradient(180deg, #1a0a00 0%, #0f0f0f 100%); }
-  .header-title { font-family: 'Oswald', sans-serif; font-size: 32px; color: var(--yellow); text-transform: uppercase; }
+  /* DISEÑO MENU */
+  header { text-align: center; padding: 25px 20px; background: linear-gradient(180deg, #1a0a00 0%, #0f0f0f 100%); }
+  .header-title { font-family: 'Oswald', sans-serif; font-size: 32px; color: var(--yellow); text-transform: uppercase; letter-spacing: 1px; }
   
   .category-block { margin: 10px 14px; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
   .category-toggle { width: 100%; padding: 15px; background: var(--surface); border: none; color: var(--yellow); font-family: 'Oswald', sans-serif; text-align: left; font-size: 16px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
-  .category-body { display: none; padding: 10px; background: var(--bg); grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; }
+  .category-body { display: none; padding: 10px; background: var(--bg); grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 10px; }
   .category-body.open { display: grid; }
   
-  .card { background: var(--surface); padding: 16px; border-radius: 12px; border: 1px solid var(--border); display: flex; flex-direction: column; }
-  .card-name { font-weight: 700; font-size: 16px; color: #fff; margin-bottom: 4px; }
-  .card-desc { font-size: 12px; color: var(--muted); margin-bottom: 12px; line-height: 1.4; flex-grow: 1; }
-  .card-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border); pt: 10px; margin-top: auto; padding-top: 10px; }
-  .card-price { color: var(--yellow); font-family: 'Oswald'; font-size: 18px; font-weight: 600; }
+  .card { background: var(--surface); padding: 14px; border-radius: 12px; border: 1px solid var(--border); display: flex; flex-direction: column; }
+  .card-name { font-weight: 700; font-size: 15px; color: #fff; margin-bottom: 4px; line-height: 1.2; }
+  .card-desc { font-size: 12px; color: var(--muted); margin-bottom: 12px; line-height: 1.3; flex-grow: 1; }
+  .card-footer { display: flex; justify-content: space-between; align-items: center; padding-top: 10px; border-top: 1px solid var(--border); }
+  .card-price { color: var(--yellow); font-family: 'Oswald'; font-size: 17px; font-weight: 600; }
   
-  .qty-controls { display: flex; align-items: center; background: var(--surface2); border-radius: 20px; border: 1px solid var(--border); height: 34px; }
-  .qty-btn { width: 34px; height: 34px; border: none; background: none; color: var(--yellow); font-weight: bold; cursor: pointer; font-size: 18px; }
+  .qty-controls { display: flex; align-items: center; background: var(--surface2); border-radius: 20px; border: 1px solid var(--border); height: 32px; }
+  .qty-btn { width: 32px; height: 32px; border: none; background: none; color: var(--yellow); font-weight: bold; cursor: pointer; font-size: 18px; }
   .qty-btn.plus { background: var(--yellow); color: #000; border-radius: 0 20px 20px 0; }
-  .qty-val { width: 30px; text-align: center; font-weight: 700; font-size: 14px; }
+  .qty-val { width: 28px; text-align: center; font-weight: 700; font-size: 14px; }
 
+  /* CARRITO FORM */
   #carrito { padding: 20px; background: var(--surface); margin: 20px 14px 100px; border-radius: 15px; border: 1px solid var(--border); }
   .form-group { margin-bottom: 12px; }
   .form-group label { display: block; font-size: 11px; color: var(--muted); text-transform: uppercase; margin-bottom: 4px; font-weight: 700; }
@@ -63,8 +65,8 @@
 
 <div id="closedBanner">
   <div style="font-size: 50px;">😴</div>
-  <h2 style="font-family:'Oswald'; color:var(--yellow); margin-top:10px;">LOCAL CERRADO</h2>
-  <div id="nextOpeningPopup" class="closed-hours">Calculando próxima apertura...</div>
+  <h2 style="font-family:'Oswald'; color:var(--yellow); margin-top:10px;">¡CERRADO AHORA!</h2>
+  <div id="nextOpeningPopup" class="closed-hours">Calculando...</div>
   <button onclick="cerrarPopup()" style="background:none; border:2px solid var(--yellow); color:var(--yellow); padding:10px 20px; border-radius:30px; font-family:'Oswald'; cursor:pointer;">VER MENÚ</button>
 </div>
 
@@ -75,7 +77,7 @@
 
 <header>
   <h1 class="header-title">Javier Bear Grill</h1>
-  <p style="color:var(--muted); font-size: 11px; letter-spacing: 3px; font-weight: 700;">LA CHORRERA, PANAMÁ</p>
+  <p style="color:var(--muted); font-size: 10px; letter-spacing: 3px; font-weight: 700;">LA VALDEZA, CHORRERA</p>
 </header>
 
 <div id="menuContainer"></div>
@@ -94,7 +96,7 @@
     </div>
   </div>
   
-  <div class="form-group"><label>Tu Nombre</label><input type="text" id="nombre"></div>
+  <div class="form-group"><label>Nombre Completo</label><input type="text" id="nombre"></div>
   <div class="form-group">
     <label>Zona de Entrega</label>
     <select id="zona" onchange="actualizarResumen()">
@@ -103,10 +105,10 @@
       <option value="Las Praderas">Las Praderas ($1.25)</option>
       <option value="Valle Bonito">Valle Bonito ($1.25)</option>
       <option value="Peñas Blancas">Peñas Blancas ($1.25)</option>
-      <option value="Fuera de zona">Fuera de zona (Coord. por WA)</option>
+      <option value="Fuera de zona">Fuera de zona (A coordinar)</option>
     </select>
   </div>
-  <div class="form-group"><label>Notas Especiales</label><input type="text" id="notas" placeholder="Ej. Sin ketchup, tocar timbre..."></div>
+  <div class="form-group"><label>Instrucciones</label><input type="text" id="notas" placeholder="Ej. Sin cebolla, casa cerca de..."></div>
   
   <button class="btn-send" id="btnEnviar" onclick="enviarPedido()">PEDIR POR WHATSAPP</button>
 </div>
@@ -120,29 +122,100 @@ const HORARIOS = {
 
 const CATEGORIAS = [
   { nombre: "🥳 Promociones", items: [
-    {n:"Smash para compartir", p:11.99, d:"Incluye 2 Burger Smash (pan brioche, carne smash, cebolla, queso cheddar, salsa de la casa) + Papas grandes."},
-    {n:"Las tres Smash Burgers", p:11.99, d:"Llevate 3 de nuestras famosas Smash Burgers con carne de alta calidad y queso fundido."},
-    {n:"Promo Brutalito", p:5.75, d:"Hamburguesa Brutalito con carne asada, papas fritas y soda lata."}
+    {n:"Smash para compartir", p:11.99, d:"2 Burger Smash (pan brioche, carne, cebolla, queso cheddar, salsa de la casa) + Papas grandes."},
+    {n:"Las tres Smash Burgers", p:11.99, d:"3 Smash Burgers de la casa al precio de una oferta."},
+    {n:"Promo Brutalito", p:5.75, d:"Hamburguesa Brutalito + Papas + Soda."}
   ]},
   { nombre: "🍗 Pollos Asados", items: [
-    {n:"1 pollo entero", p:9.00, d:"Pollo fresco marinado con nuestra receta secreta y asado al carbón."},
-    {n:"COMBO POLLO ENTERO", p:13.00, d:"1 Pollo entero + 2 acompañamientos grandes (Papas, yuca o patacón) + Soda 1.5L."}
+    {n:"1 pollo entero", p:9.00, d:"Pollo fresco marinado asado al carbón."},
+    {n:"1/2 pollo asado", p:5.00, d:"Medio pollo asado al carbón."},
+    {n:"1/4 de pollo asado", p:2.75, d:"Un cuarto de pollo asado."},
+    {n:"COMBO 1/4 DE POLLO", p:5.00, d:"1/4 de pollo + Papas o Patacones + Soda."},
+    {n:"COMBO MEDIO POLLO", p:7.50, d:"1/2 pollo + Papas o Patacones + Soda."},
+    {n:"COMBO POLLO ENTERO", p:13.00, d:"Pollo entero + 2 acompañamientos + Soda 1.5L."}
   ]},
   { nombre: "🍔 Combos de Hamburguesas", items: [
-    {n:"COMBO LA GARRA", p:10.99, d:"Nuestra hamburguesa insignia con doble carne, tocino, queso, huevo y vegetales + Papas + Soda."},
-    {n:"Combo La Tableña", p:7.50, d:"Hamburguesa con sabor criollo, carne asada, queso blanco y vegetales + Papas + Soda."},
-    {n:"Combo La Rompe Yema", p:6.49, d:"Carne jugosa, huevo frito con yema blanda, queso y salsa Bear + Papas + Soda."}
+    {n:"COMBO HAMBURGUESA LA GARRA", p:10.99, d:"Doble carne, tocino, queso, huevo y vegetales + Papas + Soda."},
+    {n:"COMBO HAMBURGUESA SENCILLA", p:5.25, d:"Carne asada, vegetales y salsa + Papas + Soda."},
+    {n:"COMBO DOBLE HAMBURGUESA", p:6.75, d:"Doble carne, vegetales y salsa + Papas + Soda."},
+    {n:"COMBO TRIPLE HAMBURGUESA", p:10.25, d:"Triple carne, vegetales y salsa + Papas + Soda."},
+    {n:"Queso Hamburguesa Combo", p:5.75, d:"Cheeseburger clásica + Papas + Soda."},
+    {n:"Combo La Rompe Yema", p:6.49, d:"Carne, huevo frito con yema blanda + Papas + Soda."},
+    {n:"Combo La Tableña", p:7.50, d:"Sabor criollo con queso blanco + Papas + Soda."}
+  ]},
+  { nombre: "🍔 Hamburguesas", items: [
+    {n:"Hamburguesa Clásica", p:3.00, d:"Carne asada, pan brioche y vegetales."},
+    {n:"Doble hamburguesa", p:4.75, d:"Doble carne asada, pan brioche y vegetales."},
+    {n:"Triple hamburguesa", p:7.75, d:"Triple carne asada, pan brioche y vegetales."},
+    {n:"La Garra", p:8.50, d:"Doble carne, tocino, queso y huevo frito."},
+    {n:"Queso Hamburguesa", p:3.50, d:"Carne asada con extra queso cheddar."},
+    {n:"La Rompe Yema", p:3.99, d:"Carne con huevo de yema blanda."},
+    {n:"La Tableña Smash", p:4.99, d:"Smash con queso blanco nacional."}
+  ]},
+  { nombre: "🥩 Carnes y Cerdo", items: [
+    {n:"Bistec de cinta asado", p:4.50, d:"Corte de cinta marinado y asado."},
+    {n:"Costillita de cerdo asada", p:4.50, d:"Costillas de cerdo en su punto."},
+    {n:"Costillas BBQ con arepas y patacón", p:8.75, d:"Costillas bañadas en BBQ con acompañamientos."},
+    {n:"COMBO PUERCO AHUMADO", p:6.50, d:"Puerco ahumado + Acompañante + Soda."},
+    {n:"COMBO CARNE AHUMADA", p:6.50, d:"Carne ahumada + Acompañante + Soda."}
   ]},
   { nombre: "🍖 Picadas", items: [
-    {n:"Picada mixta para dos", p:15.99, d:"Pollo, carne, chorizo, papas, yuca y patacones. Ideal para compartir."},
-    {n:"Picada mixta fiesta", p:59.99, d:"Bandeja gigante con todas nuestras carnes y acompañamientos. Para 6-8 personas."}
+    {n:"Picada personal", p:9.75, d:"Variedad de carnes y frituras para uno."},
+    {n:"Picada mixta para dos", p:15.99, d:"Ideal para compartir en pareja."},
+    {n:"Picada mixta para cuatro", p:29.99, d:"Bandeja grande para amigos o familia."},
+    {n:"Picada mixta fiesta", p:59.99, d:"Nuestra bandeja más grande para eventos."}
   ]},
   { nombre: "🌭 Salchipapas y Hotdogs", items: [
-    {n:"Salchipapas cargadas", p:10.50, d:"Cama de papas fritas con mucha salchicha, pollo, carne, queso fundido y salsas."},
-    {n:"Carnipapas", p:10.50, d:"Papas fritas crujientes cubiertas con generosos trozos de carne asada y salsas de la casa."},
-    {n:"Hotdog Brutal", p:4.50, d:"Salchicha jumbo, cebolla caramelizada, papas hilo, queso y nuestras salsas especiales."}
+    {n:"Salchipapas gratinadas", p:6.50, d:"Papas, salchicha y mucho queso derretido."},
+    {n:"Salchipapas con pollo", p:8.25, d:"Papas con salchicha y trozos de pollo asado."},
+    {n:"Salchipapas mini", p:3.50, d:"Versión pequeña para antojos rápidos."},
+    {n:"Salchipapas cargadas", p:10.50, d:"Pollo, carne, salchicha y salsas."},
+    {n:"Carnipapas", p:10.50, d:"Papas fritas con trozos generosos de carne."},
+    {n:"Choripapas", p:7.75, d:"Papas con chorizo criollo asado."},
+    {n:"Hotdog Brutal", p:4.50, d:"Jumbo con toppings especiales."},
+    {n:"Combo Hotdog Brutal", p:6.75, d:"Hotdog Brutal + Papas + Soda."},
+    {n:"Hotdog clásico", p:2.50, d:"Salchicha clásica y salsas."},
+    {n:"Combo Hotdog clásico", p:5.00, d:"Hotdog + Papas + Soda."}
+  ]},
+  { nombre: "🌭 Chorizos", items: [
+    {n:"Chorizo criollo asado", p:1.75, d:"Un chorizo criollo artesanal."},
+    {n:"COMBO CHORIZOS", p:5.25, d:"Tres chorizos asados + acompañamiento."},
+    {n:"Paquete de Chorizo", p:6.50, d:"Para llevar y asar en casa."},
+    {n:"Chorizo crudo", p:1.25, d:"Unidad de chorizo crudo."}
+  ]},
+  { nombre: "🍟 Acompañantes", items: [
+    {n:"Papas fritas", p:1.75, d:"Porción individual crujiente."},
+    {n:"Papas asadas con mojo de ajo", p:1.75, d:"Papas naturales asadas con salsa de ajo."},
+    {n:"Patacones", p:1.75, d:"Plátano frito al momento."},
+    {n:"Yuca frita", p:1.75, d:"Yuca crujiente."},
+    {n:"Yuca al mojo", p:1.75, d:"Yuca hervida con aceite de ajo."},
+    {n:"Arroz con pollo", p:2.50, d:"Receta casera panameña."},
+    {n:"Arepas rellenas", p:2.25, d:"Relleno del día."}
+  ]},
+  { nombre: "➕ Extras", items: [
+    {n:"Tocino ahumado", p:0.50, d:"Extra de tocino."},
+    {n:"Queso mozarella extra", p:0.50, d:"Capa extra de queso."},
+    {n:"Topping Pollo", p:1.50, d:"Adicional de pollo asado."}
+  ]},
+  { nombre: "🥤 Bebidas", items: [
+    {n:"Cocacola", p:1.25, d:"Lata 355ml."},
+    {n:"Agua en botella", p:1.00, d:"Agua purificada."},
+    {n:"Jugos naturales", p:1.50, d:"Frutas de temporada."},
+    {n:"Sodas Variadas", p:1.00, d:"Sabores disponibles."},
+    {n:"Litro Soda Cocacola", p:2.75, d:"Botella 1L."},
+    {n:"Fresca 1lt", p:2.75, d:"Botella 1L."},
+    {n:"Soda manzana mini", p:1.00, d:"Envase pequeño."}
+  ]},
+  { nombre: "🥫 Salsas Extras", items: [
+    {n:"Ketchup", p:0.50, d:"Porción extra."},
+    {n:"Mostaza dulce", p:0.50, d:"Porción extra."},
+    {n:"Mostaza", p:0.50, d:"Porción extra."},
+    {n:"Mayonesa", p:0.50, d:"Porción extra."},
+    {n:"Salsa de ajo", p:0.50, d:"Salsa de la casa."}
+  ]},
+  { nombre: "👶 Niños", items: [
+    {n:"Combo nugget", p:5.50, d:"Nuggets de pollo + Papas + Jugo."}
   ]}
-  // ... Se pueden seguir añadiendo más descripciones aquí según el enlace
 ];
 
 let carrito = {};
@@ -156,7 +229,6 @@ function checkSchedule() {
   const hora = ahora.getHours();
   const hoy = HORARIOS[dia];
   const isOpen = hoy && hora >= hoy.open && hora < hoy.close;
-
   const bar = document.getElementById('scheduleBar');
   const txt = document.getElementById('scheduleText');
   const btn = document.getElementById('btnEnviar');
@@ -164,16 +236,14 @@ function checkSchedule() {
 
   if (isOpen) {
     bar.className = "open-bar";
-    txt.innerText = `🟢 ABIERTO AHORA · Cerramos a las ${formatHora(hoy.close)}`;
+    txt.innerText = `🟢 ABIERTO · Cerramos a las ${formatHora(hoy.close)}`;
     btn.disabled = false;
     banner.classList.remove('show');
   } else {
     bar.className = "closed-bar";
-    txt.innerText = `🔴 LOCAL CERRADO ACTUALMENTE`;
+    txt.innerText = `🔴 CERRADO ACTUALMENTE`;
     btn.disabled = true;
     if (!popupForzado) banner.classList.add('show');
-    
-    // Calcular próxima apertura
     for(let i=0; i<7; i++){
       let dNext = (dia + i) % 7;
       if(HORARIOS[dNext]){
@@ -191,17 +261,14 @@ function renderMenu() {
   CATEGORIAS.forEach(cat => {
     const block = document.createElement('div');
     block.className = 'category-block';
-    block.innerHTML = `
-      <button class="category-toggle" onclick="this.nextElementSibling.classList.toggle('open')">
-        ${cat.nombre} <span>▼</span>
-      </button>
+    block.innerHTML = `<button class="category-toggle" onclick="this.nextElementSibling.classList.toggle('open')">${cat.nombre} <span>▼</span></button>
       <div class="category-body">
         ${cat.items.map(item => {
-          const id = item.n.replace(/\s/g, '');
+          const id = item.n.replace(/[^a-zA-Z0-9]/g, '');
           return `
           <div class="card">
             <span class="card-name">${item.n}</span>
-            <p class="card-desc">${item.d || "Sin descripción disponible."}</p>
+            <p class="card-desc">${item.d}</p>
             <div class="card-footer">
               <span class="card-price">$${item.p.toFixed(2)}</span>
               <div class="qty-controls">
@@ -244,8 +311,8 @@ function actualizarResumen() {
 
 function enviarPedido() {
   const nombre = document.getElementById('nombre').value;
-  if (!nombre || Object.keys(carrito).length === 0) { alert("Completa tu nombre y el pedido."); return; }
-  let msg = `🔥 *NUEVO PEDIDO - Javier Bear Grill* 🔥%0A%0A`;
+  if (!nombre || Object.keys(carrito).length === 0) { alert("Completa tu nombre y elige tus productos."); return; }
+  let msg = `🔥 *PEDIDO - Javier Bear Grill* 🔥%0A%0A`;
   Object.values(carrito).forEach(i => msg += `• ${i.name} (x${i.qty})%0A`);
   msg += `%0A👤 *Cliente:* ${nombre}%0A📍 *Zona:* ${document.getElementById('zona').value}%0A📝 *Notas:* ${document.getElementById('notas').value}%0A%0A💰 *TOTAL:* ${document.getElementById('totalVal').innerText}`;
   window.open(`https://wa.me/50765738924?text=${msg}`);
