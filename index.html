@@ -3,254 +3,232 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Javier Bear Grill | Menú Oficial</title>
-<meta name="description" content="Menú oficial de Javier Bear Grill en Panamá. Hamburguesas smash, pollos asados, picadas y delivery propio.">
+<title>Menú Javier Bear Grill</title>
 
 <style>
-:root {
-  --primary: #ffcc00;
-  --dark: #0f0f0f;
-  --card: #1a1a1a;
+body{
+    font-family: Arial, sans-serif;
+    margin:0;
+    padding:0;
+    background:#111;
+    color:white;
 }
 
-* { box-sizing: border-box; }
-
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background: var(--dark);
-  color: white;
+h1{
+    text-align:center;
+    padding:20px;
 }
 
-header {
-  background: black;
-  padding: 20px;
-  text-align: center;
-  position: sticky;
-  top: 0;
-  z-index: 1000;
+.menu{
+    padding:20px;
 }
 
-h1 {
-  margin: 0;
-  color: var(--primary);
+.producto{
+    background:#1e1e1e;
+    padding:15px;
+    margin-bottom:15px;
+    border-radius:10px;
 }
 
-.menu-container {
-  padding: 20px;
-  display: grid;
-  gap: 15px;
+.producto h3{
+    margin:0;
 }
 
-.product {
-  background: var(--card);
-  padding: 15px;
-  border-radius: 10px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+.precio{
+    color:#ffcc00;
+    font-weight:bold;
 }
 
-.product button {
-  background: var(--primary);
-  border: none;
-  padding: 8px 12px;
-  border-radius: 6px;
-  font-weight: bold;
-  cursor: pointer;
+.cantidad-control{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin:10px 0;
 }
 
-.cart-button {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  background: var(--primary);
-  color: black;
-  padding: 15px;
-  border-radius: 50px;
-  font-weight: bold;
-  cursor: pointer;
+.cantidad-control button{
+    background:#ffcc00;
+    border:none;
+    padding:5px 10px;
+    font-size:16px;
+    font-weight:bold;
+    border-radius:5px;
+    cursor:pointer;
 }
 
-.cart-panel {
-  position: fixed;
-  right: -100%;
-  top: 0;
-  width: 90%;
-  max-width: 400px;
-  height: 100%;
-  background: #111;
-  padding: 20px;
-  transition: 0.3s;
-  overflow-y: auto;
-  z-index: 2000;
+.agregar-btn{
+    background:#25D366;
+    border:none;
+    padding:8px 15px;
+    border-radius:5px;
+    cursor:pointer;
+    font-weight:bold;
 }
 
-.cart-panel.active { right: 0; }
-
-.cart-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 10px;
+.carrito{
+    position:fixed;
+    bottom:0;
+    width:100%;
+    background:#000;
+    padding:15px;
+    border-top:2px solid #ffcc00;
 }
 
-.qty-controls button {
-  background: var(--primary);
-  border: none;
-  padding: 3px 8px;
-  margin: 0 3px;
-  cursor: pointer;
+.carrito h2{
+    margin-top:0;
 }
 
-.remove-btn {
-  background: red;
-  border: none;
-  color: white;
-  padding: 3px 6px;
-  cursor: pointer;
-  margin-left: 5px;
+.item-carrito{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:8px;
 }
 
-.checkout-btn {
-  background: var(--primary);
-  border: none;
-  padding: 12px;
-  width: 100%;
-  font-weight: bold;
-  cursor: pointer;
-  margin-top: 15px;
+.item-carrito button{
+    background:red;
+    border:none;
+    color:white;
+    padding:3px 6px;
+    border-radius:5px;
+    cursor:pointer;
 }
 
-@media(min-width:768px){
-  .menu-container{
-    grid-template-columns: repeat(2,1fr);
-  }
+.total{
+    font-size:18px;
+    font-weight:bold;
+    margin-top:10px;
+}
+
+.enviar-btn{
+    margin-top:10px;
+    width:100%;
+    background:#25D366;
+    border:none;
+    padding:10px;
+    font-weight:bold;
+    border-radius:5px;
+    cursor:pointer;
 }
 </style>
 </head>
 
 <body>
 
-<header>
-  <h1>Javier Bear Grill</h1>
-  <p>Smash Burgers · Pollos · Picadas</p>
-</header>
+<h1>🔥 Javier Bear Grill 🔥</h1>
 
-<main class="menu-container">
+<div class="menu">
 
-  <div class="product">
-    <div>
-      <strong>Hamburguesa Clásica</strong><br>
-      PAB 3.00
-    </div>
-    <button onclick="addToCart('Hamburguesa Clásica',3)">Agregar</button>
-  </div>
+<div class="producto" data-nombre="Hamburguesa La Rompe Yema" data-precio="3.99">
+<h3>La Rompe Yema</h3>
+<p class="precio">$3.99</p>
 
-  <div class="product">
-    <div>
-      <strong>La Rompe Yema</strong><br>
-      PAB 3.99
-    </div>
-    <button onclick="addToCart('La Rompe Yema',3.99)">Agregar</button>
-  </div>
-
-</main>
-
-<div class="cart-button" onclick="toggleCart()">
-  🛒 (<span id="cart-count">0</span>)
+<div class="cantidad-control">
+<button onclick="cambiarCantidad(this,-1)">-</button>
+<span class="cantidad">1</span>
+<button onclick="cambiarCantidad(this,1)">+</button>
 </div>
 
-<div class="cart-panel" id="cart">
-  <div style="display:flex; justify-content:space-between; align-items:center;">
-    <h2 style="margin:0;">Tu Pedido</h2>
-    <button onclick="toggleCart()" style="background:none;border:none;color:white;font-size:22px;cursor:pointer;">✕</button>
-  </div>
+<button class="agregar-btn" onclick="agregarDesdeMenu(this)">Agregar</button>
+</div>
 
-  <div id="cart-items"></div>
-  <h3>Total: PAB <span id="cart-total">0.00</span></h3>
-  <button class="checkout-btn" onclick="checkout()">Enviar por WhatsApp</button>
+
+<div class="producto" data-nombre="Combo La Rompe Yema" data-precio="6.49">
+<h3>Combo La Rompe Yema</h3>
+<p class="precio">$6.49</p>
+
+<div class="cantidad-control">
+<button onclick="cambiarCantidad(this,-1)">-</button>
+<span class="cantidad">1</span>
+<button onclick="cambiarCantidad(this,1)">+</button>
+</div>
+
+<button class="agregar-btn" onclick="agregarDesdeMenu(this)">Agregar</button>
+</div>
+
+</div>
+
+<div class="carrito">
+<h2>🛒 Carrito</h2>
+<div id="lista-carrito"></div>
+<div class="total">Total: $<span id="total">0.00</span></div>
+<button class="enviar-btn" onclick="enviarWhatsApp()">Enviar por WhatsApp</button>
 </div>
 
 <script>
-let cart = [];
 
-function addToCart(name, price){
-  let existing = cart.find(item => item.name === name);
-  if(existing){
-    existing.qty += 1;
-  } else {
-    cart.push({name, price, qty:1});
-  }
-  updateCart();
+let carrito = [];
+
+function cambiarCantidad(btn, cambio){
+    const contenedor = btn.parentElement;
+    const span = contenedor.querySelector(".cantidad");
+    let cantidad = parseInt(span.innerText);
+    cantidad += cambio;
+    if(cantidad < 1) cantidad = 1;
+    span.innerText = cantidad;
 }
 
-function updateCart(){
-  document.getElementById("cart-count").innerText =
-    cart.reduce((sum,item)=>sum+item.qty,0);
+function agregarDesdeMenu(btn){
+    const producto = btn.closest(".producto");
+    const nombre = producto.dataset.nombre;
+    const precio = parseFloat(producto.dataset.precio);
+    const cantidad = parseInt(producto.querySelector(".cantidad").innerText);
 
-  let container = document.getElementById("cart-items");
-  container.innerHTML = "";
-  let total = 0;
+    agregarAlCarrito(nombre, precio, cantidad);
 
-  cart.forEach((item,index)=>{
-    total += item.price * item.qty;
-    container.innerHTML += `
-      <div class="cart-item">
-        <div>
-          <strong>${item.name}</strong><br>
-          <div class="qty-controls">
-            <button onclick="changeQty(${index},-1)">-</button>
-            ${item.qty}
-            <button onclick="changeQty(${index},1)">+</button>
-          </div>
+    producto.querySelector(".cantidad").innerText = "1";
+}
+
+function agregarAlCarrito(nombre, precio, cantidad){
+    const existente = carrito.find(item => item.nombre === nombre);
+    if(existente){
+        existente.cantidad += cantidad;
+    }else{
+        carrito.push({nombre, precio, cantidad});
+    }
+    actualizarCarrito();
+}
+
+function actualizarCarrito(){
+    const lista = document.getElementById("lista-carrito");
+    lista.innerHTML = "";
+    let total = 0;
+
+    carrito.forEach((item,index)=>{
+        total += item.precio * item.cantidad;
+
+        lista.innerHTML += `
+        <div class="item-carrito">
+            <span>${item.nombre} x${item.cantidad}</span>
+            <button onclick="eliminarItem(${index})">X</button>
         </div>
-        <div>
-          PAB ${(item.price*item.qty).toFixed(2)}
-          <button class="remove-btn" onclick="removeItem(${index})">X</button>
-        </div>
-      </div>
-    `;
-  });
+        `;
+    });
 
-  document.getElementById("cart-total").innerText = total.toFixed(2);
+    document.getElementById("total").innerText = total.toFixed(2);
 }
 
-function changeQty(index,amount){
-  cart[index].qty += amount;
-  if(cart[index].qty <= 0){
-    cart.splice(index,1);
-  }
-  updateCart();
+function eliminarItem(index){
+    carrito.splice(index,1);
+    actualizarCarrito();
 }
 
-function removeItem(index){
-  cart.splice(index,1);
-  updateCart();
+function enviarWhatsApp(){
+    if(carrito.length === 0){
+        alert("El carrito está vacío");
+        return;
+    }
+
+    let mensaje = "Hola, quiero hacer este pedido:%0A";
+    carrito.forEach(item=>{
+        mensaje += `${item.nombre} x${item.cantidad} - $${(item.precio*item.cantidad).toFixed(2)}%0A`;
+    });
+
+    mensaje += `%0ATotal: $${document.getElementById("total").innerText}`;
+
+    window.open(`https://wa.me/50765738924?text=${mensaje}`);
 }
 
-function toggleCart(){
-  document.getElementById("cart").classList.toggle("active");
-}
-
-function checkout(){
-  if(cart.length === 0){
-    alert("Tu carrito está vacío");
-    return;
-  }
-
-  let message = "Hola Javier Bear Grill 🍔%0A%0ANuevo pedido:%0A";
-  let total = 0;
-
-  cart.forEach(item=>{
-    message += `- ${item.name} x${item.qty} PAB ${(item.price*item.qty).toFixed(2)}%0A`;
-    total += item.price*item.qty;
-  });
-
-  message += `%0ATotal: PAB ${total.toFixed(2)}`;
-
-  window.open(`https://wa.me/50765738924?text=${message}`,"_blank");
-}
 </script>
 
 </body>
