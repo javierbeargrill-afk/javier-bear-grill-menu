@@ -3,47 +3,115 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Menú Javier Bear Grill | Hamburguesas Smash en Panamá</title>
-<meta name="description" content="Menú oficial de Javier Bear Grill en Panamá. Hamburguesas smash artesanales, pollos asados y picadas al mejor precio.">
+<title>Javier Bear Grill | Menú Oficial</title>
+<meta name="description" content="Menú oficial de Javier Bear Grill en Panamá. Hamburguesas smash, pollos asados, picadas y delivery propio.">
 
 <style>
+:root {
+  --primary: #ffcc00;
+  --dark: #0f0f0f;
+  --card: #1a1a1a;
+}
+
+* {
+  box-sizing: border-box;
+}
+
 body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background-color: #0f0f0f;
-    color: white;
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: var(--dark);
+  color: white;
 }
+
 header {
-    background: #111;
-    text-align: center;
-    padding: 30px 20px;
+  background: black;
+  padding: 20px;
+  text-align: center;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
 }
+
 h1 {
-    color: #ffcc00;
-    margin: 0;
+  margin: 0;
+  color: var(--primary);
 }
-.section {
-    padding: 30px 20px;
+
+.menu-container {
+  padding: 20px;
+  display: grid;
+  gap: 15px;
 }
-h2 {
-    color: #ffcc00;
+
+.product {
+  background: var(--card);
+  padding: 15px;
+  border-radius: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
-.item {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 10px;
-    border-bottom: 1px solid #333;
-    padding-bottom: 5px;
+
+.product button {
+  background: var(--primary);
+  border: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
 }
-.price {
-    color: #ffcc00;
-    font-weight: bold;
+
+.cart-button {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: var(--primary);
+  color: black;
+  padding: 15px;
+  border-radius: 50px;
+  font-weight: bold;
+  cursor: pointer;
 }
-footer {
-    text-align: center;
-    padding: 20px;
-    background: #111;
-    font-size: 14px;
+
+.cart-panel {
+  position: fixed;
+  right: -100%;
+  top: 0;
+  width: 90%;
+  max-width: 400px;
+  height: 100%;
+  background: #111;
+  padding: 20px;
+  transition: 0.3s;
+  overflow-y: auto;
+  z-index: 2000;
+}
+
+.cart-panel.active {
+  right: 0;
+}
+
+.cart-item {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.checkout-btn {
+  background: var(--primary);
+  border: none;
+  padding: 12px;
+  width: 100%;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 15px;
+}
+
+@media(min-width: 768px){
+  .menu-container{
+    grid-template-columns: repeat(2,1fr);
+  }
 }
 </style>
 </head>
@@ -51,33 +119,94 @@ footer {
 <body>
 
 <header>
-    <h1>Javier Bear Grill</h1>
-    <p>Hamburguesas Smash · Pollos Asados · Picadas · Panamá</p>
+  <h1>Javier Bear Grill</h1>
+  <p>Smash Burgers · Pollos · Picadas</p>
 </header>
 
-<div class="section">
-    <h2>🍔 Hamburguesas</h2>
+<main class="menu-container">
 
-    <div class="item">
-        <span>Hamburguesa Clásica</span>
-        <span class="price">PAB 3.00</span>
+  <div class="product">
+    <div>
+      <strong>Hamburguesa Clásica</strong><br>
+      PAB 3.00
     </div>
+    <button onclick="addToCart('Hamburguesa Clásica',3)">Agregar</button>
+  </div>
 
-    <div class="item">
-        <span>Doble Hamburguesa</span>
-        <span class="price">PAB 4.75</span>
+  <div class="product">
+    <div>
+      <strong>La Rompe Yema</strong><br>
+      PAB 3.99
     </div>
+    <button onclick="addToCart('La Rompe Yema',3.99)">Agregar</button>
+  </div>
 
-    <div class="item">
-        <span>La Rompe Yema</span>
-        <span class="price">PAB 3.99</span>
-    </div>
+</main>
 
+<div class="cart-button" onclick="toggleCart()">
+  🛒 Carrito (<span id="cart-count">0</span>)
 </div>
 
-<footer>
-    © 2026 Javier Bear Grill - Panamá
-</footer>
+<div class="cart-panel" id="cart">
+  <h2>Tu Pedido</h2>
+  <div id="cart-items"></div>
+  <h3>Total: PAB <span id="cart-total">0.00</span></h3>
+  <button class="checkout-btn" onclick="checkout()">Enviar por WhatsApp</button>
+</div>
+
+<script>
+let cart = [];
+
+function addToCart(name, price){
+  cart.push({name, price});
+  updateCart();
+}
+
+function updateCart(){
+  document.getElementById("cart-count").innerText = cart.length;
+
+  let itemsContainer = document.getElementById("cart-items");
+  itemsContainer.innerHTML = "";
+
+  let total = 0;
+
+  cart.forEach(item=>{
+    total += item.price;
+    itemsContainer.innerHTML += `
+      <div class="cart-item">
+        <span>${item.name}</span>
+        <span>PAB ${item.price.toFixed(2)}</span>
+      </div>
+    `;
+  });
+
+  document.getElementById("cart-total").innerText = total.toFixed(2);
+}
+
+function toggleCart(){
+  document.getElementById("cart").classList.toggle("active");
+}
+
+function checkout(){
+  if(cart.length === 0){
+    alert("Tu carrito está vacío");
+    return;
+  }
+
+  let message = "Hola Javier Bear Grill 🍔%0A%0AQuiero hacer este pedido:%0A";
+
+  let total = 0;
+
+  cart.forEach(item=>{
+    message += `- ${item.name} PAB ${item.price.toFixed(2)}%0A`;
+    total += item.price;
+  });
+
+  message += `%0ATotal: PAB ${total.toFixed(2)}`;
+
+  window.open(`https://wa.me/50765738924?text=${message}`,"_blank");
+}
+</script>
 
 </body>
 </html>
