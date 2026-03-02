@@ -6,236 +6,297 @@
 <title>Javier Bear Grill</title>
 
 <style>
-:root{
---bg:#0f0f0f;
---card:#1a1a1a;
---accent:#ff6b00;
---text:#fff;
---muted:#999;
+body{
+  margin:0;
+  font-family:Arial, sans-serif;
+  background:#111;
+  color:white;
 }
-body{margin:0;font-family:Arial;background:var(--bg);color:var(--text);}
-header{padding:20px;text-align:center;font-size:24px;font-weight:bold;}
-.container{padding:15px;}
-.card{background:var(--card);padding:15px;margin-bottom:12px;border-radius:12px;}
-button{background:var(--accent);color:#fff;border:none;padding:8px 12px;border-radius:8px;cursor:pointer;}
-button:disabled{opacity:.5;cursor:not-allowed;}
-.qty{display:flex;align-items:center;gap:8px;}
-.cart-floating{
-position:fixed;bottom:20px;right:20px;
-background:var(--accent);
-padding:12px 18px;border-radius:30px;
-cursor:pointer;font-weight:bold;
+
+h1{
+  text-align:center;
+  padding:20px;
 }
-.hidden{display:none;}
-input,select{width:100%;padding:8px;margin:6px 0;border-radius:8px;border:none;}
-.small{font-size:13px;color:var(--muted);}
-.free-msg{color:#00e676;font-size:14px;margin-top:5px;}
-.admin-panel{position:fixed;top:0;right:0;background:#111;padding:20px;width:100%;max-width:350px;height:100%;overflow:auto;display:none;}
-.admin-panel h3{margin-top:0;}
+
+.category{
+  border-bottom:1px solid #333;
+}
+
+.category-header{
+  padding:15px;
+  background:#1c1c1c;
+  cursor:pointer;
+  font-weight:bold;
+}
+
+.products{
+  display:none;
+  padding:10px;
+}
+
+.product{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:10px;
+  background:#1a1a1a;
+  padding:10px;
+  border-radius:6px;
+}
+
+.controls button{
+  background:#ff9800;
+  border:none;
+  padding:5px 10px;
+  margin:0 5px;
+  color:white;
+  font-weight:bold;
+  border-radius:4px;
+  cursor:pointer;
+}
+
+#viewCartBtn{
+  position:fixed;
+  bottom:20px;
+  right:20px;
+  background:#ff9800;
+  padding:12px 18px;
+  border-radius:50px;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+#cart{
+  position:fixed;
+  right:-400px;
+  top:0;
+  width:350px;
+  height:100%;
+  background:#222;
+  padding:20px;
+  transition:0.3s;
+  overflow-y:auto;
+}
+
+#cart.open{
+  right:0;
+}
+
+.cart-item{
+  display:flex;
+  justify-content:space-between;
+  margin-bottom:10px;
+}
+
+.total{
+  margin-top:20px;
+  font-size:18px;
+  font-weight:bold;
+}
+
+button.send{
+  width:100%;
+  margin-top:15px;
+  padding:10px;
+  background:green;
+  border:none;
+  color:white;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+.delivery-info{
+  font-size:14px;
+  margin-top:10px;
+  color:#ccc;
+}
 </style>
 </head>
+
 <body>
 
-<header>🔥 Javier Bear Grill</header>
+<h1>🔥 Javier Bear Grill 🔥</h1>
 
-<div class="container" id="menu"></div>
+<div id="menu"></div>
 
-<div class="cart-floating" onclick="toggleCart()">🛒 Ver carrito (<span id="cartCount">0</span>)</div>
+<div id="viewCartBtn">🛒 Ver Carrito (<span id="cartCount">0</span>)</div>
 
-<div class="container hidden" id="cartSection">
+<div id="cart">
 <h2>Tu Pedido</h2>
 <div id="cartItems"></div>
-<h3>Total: $<span id="total">0.00</span></h3>
-<div id="deliveryMsg"></div>
-
-<input id="name" placeholder="Nombre">
-<input id="address" placeholder="Dirección exacta">
-<select id="zone">
-<option value="">Zona</option>
-<option>La Valdeza</option>
-<option>Llano Largo</option>
-<option>Las Praderas</option>
-<option>Alto de las Praderas</option>
-<option>Valle Bonito</option>
-<option>La Cantera</option>
-<option>Villa del Carmen</option>
-<option>Peñas Blancas</option>
-<option>Blue Garden</option>
-<option>Otra zona</option>
-</select>
-
-<button id="sendBtn" onclick="sendOrder()">Enviar por WhatsApp</button>
-</div>
-
-<div class="admin-panel" id="adminPanel">
-<h3>📊 Estadísticas</h3>
-<div id="stats"></div>
-<button onclick="closeAdmin()">Cerrar</button>
+<div class="delivery-info" id="deliveryInfo"></div>
+<div class="total" id="totalPrice">$0.00</div>
+<button class="send" onclick="sendOrder()">Enviar por WhatsApp</button>
 </div>
 
 <script>
 
-const CONFIG={
-whatsapp:"5070000000",
-minDeliveryFree:7.50,
-deliveryCost:1.25,
-/*
-minOrder:5.00, 
-🔒 Pedido mínimo DESACTIVADO.
-Para activarlo en el futuro:
-1) Descomenta esta línea
-2) Descomenta la validación dentro de sendOrder()
-*/
-adminPass:"bear2026",
-maxOrdersSaved:50
+const CONFIG = {
+  whatsapp: "65738924",
+  deliveryFee: 1.25,
+  freeDeliveryFrom: 7.50,
+  // minOrder: 5.00   // 🔒 Pedido mínimo desactivado por ahora
 };
 
-const PRODUCTS=[
-{name:"Hamburguesa Clásica",price:4.00},
-{name:"Hamburguesa Especial",price:5.50},
-{name:"Hot Dog",price:2.50},
-{name:"Papas Fritas",price:2.00},
-{name:"Soda",price:1.50}
-];
-
-let cart=JSON.parse(localStorage.getItem("cart"))||{};
-let statsData=JSON.parse(localStorage.getItem("stats"))||{
-totalSales:0,
-totalOrders:0,
-products:{}
+const PRODUCTS = {
+  "Combos": [
+    {id:1, name:"Combo Burger", price:6.00},
+    {id:2, name:"Combo Doble", price:7.50}
+  ],
+  "Extras": [
+    {id:3, name:"Papas", price:2.00},
+    {id:4, name:"Soda", price:1.50}
+  ]
 };
 
-function saveCart(){localStorage.setItem("cart",JSON.stringify(cart));}
-function saveStats(){localStorage.setItem("stats",JSON.stringify(statsData));}
+let cart = JSON.parse(localStorage.getItem("cart")) || {};
+
+function saveCart(){
+  localStorage.setItem("cart", JSON.stringify(cart));
+}
 
 function renderMenu(){
-const menu=document.getElementById("menu");
-menu.innerHTML="";
-PRODUCTS.forEach(p=>{
-const div=document.createElement("div");
-div.className="card";
-div.innerHTML=`
-<h3>${p.name}</h3>
-<p>$${p.price.toFixed(2)}</p>
-<div class="qty">
-<button onclick="changeQty('${p.name}',-1)">-</button>
-<span id="qty-${p.name}">${cart[p.name]?.qty||0}</span>
-<button onclick="changeQty('${p.name}',1)">+</button>
-</div>
-`;
-menu.appendChild(div);
-});
+  const menu = document.getElementById("menu");
+  menu.innerHTML = "";
+
+  Object.keys(PRODUCTS).forEach(category=>{
+    const categoryDiv = document.createElement("div");
+    categoryDiv.className = "category";
+
+    const header = document.createElement("div");
+    header.className = "category-header";
+    header.innerText = category;
+    header.onclick = ()=>{
+      productsDiv.style.display =
+      productsDiv.style.display === "none" ? "block" : "none";
+    };
+
+    const productsDiv = document.createElement("div");
+    productsDiv.className = "products";
+
+    PRODUCTS[category].forEach(product=>{
+      const div = document.createElement("div");
+      div.className = "product";
+      div.innerHTML = `
+        <div>${product.name} - $${product.price.toFixed(2)}</div>
+        <div class="controls">
+          <button onclick="updateQuantity(${product.id}, -1)">-</button>
+          <span id="qty-${product.id}">${cart[product.id] || 0}</span>
+          <button onclick="updateQuantity(${product.id}, 1)">+</button>
+        </div>
+      `;
+      productsDiv.appendChild(div);
+    });
+
+    categoryDiv.appendChild(header);
+    categoryDiv.appendChild(productsDiv);
+    menu.appendChild(categoryDiv);
+  });
 }
 
-function changeQty(name,delta){
-if(!cart[name]) cart[name]={qty:0,price:PRODUCTS.find(p=>p.name===name).price};
-cart[name].qty+=delta;
-if(cart[name].qty<=0) delete cart[name];
-saveCart();
-updateCartUI();
-renderMenu();
+function updateQuantity(id, change){
+  if(!cart[id]) cart[id] = 0;
+  cart[id] += change;
+
+  if(cart[id] <= 0){
+    delete cart[id];
+  }
+
+  saveCart();
+  renderMenu();
+  renderCart();
 }
 
-function updateCartUI(){
-const cartItems=document.getElementById("cartItems");
-cartItems.innerHTML="";
-let total=0,count=0;
-Object.keys(cart).forEach(name=>{
-let item=cart[name];
-let sub=item.qty*item.price;
-total+=sub;
-count+=item.qty;
-cartItems.innerHTML+=`<div class="card">${name} x${item.qty} - $${sub.toFixed(2)}</div>`;
-});
-document.getElementById("total").innerText=total.toFixed(2);
-document.getElementById("cartCount").innerText=count;
-handleDelivery(total);
-}
+function renderCart(){
+  const cartItems = document.getElementById("cartItems");
+  cartItems.innerHTML = "";
 
-function handleDelivery(total){
-const msg=document.getElementById("deliveryMsg");
-if(total>=CONFIG.minDeliveryFree){
-msg.innerHTML=`<div class="free-msg">🚚 Delivery GRATIS 🎉</div>`;
-}else{
-let faltante=(CONFIG.minDeliveryFree-total).toFixed(2);
-msg.innerHTML=`Delivery $${CONFIG.deliveryCost.toFixed(2)}<div class="small">Agrega $${faltante} más para envío GRATIS</div>`;
-}
-}
+  let subtotal = 0;
+  let count = 0;
 
-function toggleCart(){
-document.getElementById("cartSection").classList.toggle("hidden");
-}
+  Object.keys(cart).forEach(id=>{
+    const product = Object.values(PRODUCTS)
+    .flat()
+    .find(p=>p.id == id);
 
-let sending=false;
+    const quantity = cart[id];
+    const total = product.price * quantity;
+
+    subtotal += total;
+    count += quantity;
+
+    const div = document.createElement("div");
+    div.className = "cart-item";
+    div.innerHTML = `
+      ${product.name} x${quantity}
+      <span>$${total.toFixed(2)}</span>
+    `;
+    cartItems.appendChild(div);
+  });
+
+  document.getElementById("cartCount").innerText = count;
+
+  let delivery = 0;
+  let deliveryText = "";
+
+  if(subtotal >= CONFIG.freeDeliveryFrom && subtotal > 0){
+    deliveryText = "🚚 Delivery GRATIS";
+  }else if(subtotal > 0){
+    delivery = CONFIG.deliveryFee;
+    deliveryText = `🚚 Delivery $${CONFIG.deliveryFee.toFixed(2)}`;
+  }
+
+  document.getElementById("deliveryInfo").innerText = deliveryText;
+  document.getElementById("totalPrice").innerText =
+  "Total: $" + (subtotal + delivery).toFixed(2);
+}
 
 function sendOrder(){
-if(sending)return;
+  if(Object.keys(cart).length === 0){
+    alert("El carrito está vacío");
+    return;
+  }
 
-let total=parseFloat(document.getElementById("total").innerText);
+  let message = "🛒 Pedido Javier Bear Grill:\n\n";
+  let subtotal = 0;
 
-/*
-🔒 VALIDACIÓN DE PEDIDO MÍNIMO (DESACTIVADA)
+  Object.keys(cart).forEach(id=>{
+    const product = Object.values(PRODUCTS)
+    .flat()
+    .find(p=>p.id == id);
 
-if(total < CONFIG.minOrder){
-  alert(`Pedido mínimo $${CONFIG.minOrder.toFixed(2)}`);
-  return;
-}
-*/
+    const quantity = cart[id];
+    const total = product.price * quantity;
 
-let delivery= total>=CONFIG.minDeliveryFree?0:CONFIG.deliveryCost;
-let finalTotal=total+delivery;
+    subtotal += total;
 
-let name=document.getElementById("name").value;
-let address=document.getElementById("address").value;
-let zone=document.getElementById("zone").value;
+    message += `${product.name} x${quantity} - $${total.toFixed(2)}\n`;
+  });
 
-if(!name||!address||!zone){alert("Completa todos los datos");return;}
+  let delivery = 0;
 
-let message="Pedido:\n";
-Object.keys(cart).forEach(n=>{
-message+=`${n} x${cart[n].qty}\n`;
-statsData.products[n]=(statsData.products[n]||0)+cart[n].qty;
-});
-message+=`\nSubtotal: $${total.toFixed(2)}\nDelivery: $${delivery.toFixed(2)}\nTotal: $${finalTotal.toFixed(2)}\n\nNombre: ${name}\nDirección: ${address}\nZona: ${zone}`;
+  if(subtotal < CONFIG.freeDeliveryFrom){
+    delivery = CONFIG.deliveryFee;
+  }
 
-statsData.totalSales+=finalTotal;
-statsData.totalOrders++;
-saveStats();
+  const finalTotal = subtotal + delivery;
 
-sending=true;
-window.open(`https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent(message)}`);
+  message += `\nSubtotal: $${subtotal.toFixed(2)}`;
+  message += `\nDelivery: $${delivery.toFixed(2)}`;
+  message += `\nTotal: $${finalTotal.toFixed(2)}`;
 
-cart={};
-saveCart();
-updateCartUI();
-renderMenu();
-sending=false;
+  const url = `https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent(message)}`;
+  window.open(url, "_blank");
 }
 
-function showAdmin(){
-let pass=prompt("Contraseña admin:");
-if(pass!==CONFIG.adminPass)return;
-document.getElementById("adminPanel").style.display="block";
-let best=Object.entries(statsData.products).sort((a,b)=>b[1]-a[1])[0];
-document.getElementById("stats").innerHTML=`
-<p>Total ventas: $${statsData.totalSales.toFixed(2)}</p>
-<p>Total pedidos: ${statsData.totalOrders}</p>
-<p>Ticket promedio: $${(statsData.totalSales/(statsData.totalOrders||1)).toFixed(2)}</p>
-<p>Producto más vendido: ${best?best[0]+" ("+best[1]+")":"N/A"}</p>
-`;
-}
-
-function closeAdmin(){document.getElementById("adminPanel").style.display="none";}
-
-let tapCount=0;
-document.querySelector("header").addEventListener("click",()=>{
-tapCount++;
-if(tapCount>=5){showAdmin();tapCount=0;}
-});
+document.getElementById("viewCartBtn").onclick = ()=>{
+  document.getElementById("cart").classList.toggle("open");
+};
 
 renderMenu();
-updateCartUI();
+renderCart();
 
 </script>
+
 </body>
 </html>
