@@ -6,305 +6,327 @@
 <title>🔥 Javier Bear Grill 🔥</title>
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
-  /* CSS UNIFICADO Y OPTIMIZADO */
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
     --bg: #0f0f0f; --surface: #1a1a1a; --surface2: #242424;
     --yellow: #f5c518; --yellow-dark: #d4a800;
     --green: #25D366; --text: #f0f0f0; --muted: #888;
-    --border: #2e2e2e; --red: #ff4444; --orange: #ff8800;
+    --border: #2e2e2e; --red: #ff4444;
   }
-  body { background: var(--bg); color: var(--text); font-family: 'Nunito', sans-serif; min-height: 100vh; }
+  body { background: var(--bg); color: var(--text); font-family: 'Nunito', sans-serif; min-height: 100vh; padding-bottom: 50px; }
 
-  /* BANNER DE CERRADO (POPUP) */
-  #closedBanner {
-    display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95);
-    z-index: 9999; flex-direction: column; align-items: center; justify-content: center;
-    text-align: center; padding: 30px;
-  }
+  /* CINTILLO Y POPUP */
+  #closedBanner { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.96); z-index: 9999; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 30px; }
   #closedBanner.show { display: flex; }
-  .closed-icon { font-size: 60px; margin-bottom: 10px; }
-  .closed-title { font-family: 'Oswald', sans-serif; font-size: 28px; color: var(--yellow); text-transform: uppercase; }
-  .closed-hours { margin: 20px 0; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 15px; font-size: 14px; line-height: 1.8; }
-  .closed-hours span { color: var(--yellow); font-weight: 700; }
-  .btn-continuar {
-    background: transparent; color: var(--yellow); border: 2px solid var(--yellow);
-    padding: 10px 20px; border-radius: 30px; font-family: 'Oswald', sans-serif;
-    text-transform: uppercase; cursor: pointer; transition: 0.3s;
-  }
-  .btn-continuar:hover { background: var(--yellow); color: #000; }
-
-  /* BARRA DE HORARIO SUPERIOR */
-  #scheduleBar { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 8px; font-size: 13px; font-weight: 700; }
-  .open-bar { background: #0d2b1a; color: var(--green); }
-  .closed-bar { background: #2b0d0d; color: var(--red); }
+  .closed-hours { margin: 20px 0; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 15px; font-size: 15px; }
+  .closed-hours span { color: var(--yellow); font-weight: 700; display: block; margin-top: 5px; font-size: 18px; }
+  
+  #scheduleBar { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 10px; font-size: 13px; font-weight: 700; position: sticky; top: 0; z-index: 900; }
+  .open-bar { background: #0d2b1a; color: var(--green); border-bottom: 1px solid #1a4a2a; }
+  .closed-bar { background: #2b0d0d; color: var(--red); border-bottom: 1px solid #4a1a1a; }
   .dot { width: 8px; height: 8px; border-radius: 50%; }
   .open-bar .dot { background: var(--green); animation: pulse 2s infinite; }
   .closed-bar .dot { background: var(--red); }
-  @keyframes pulse { 0% {opacity:1} 50% {opacity:0.5} 100% {opacity:1} }
+  @keyframes pulse { 0% {opacity:1} 50% {opacity:0.4} 100% {opacity:1} }
 
-  /* HEADER */
-  header { text-align: center; padding: 30px 20px; background: linear-gradient(180deg, #1a0a00 0%, #0f0f0f 100%); border-bottom: 1px solid #2a1800; }
-  .header-title { font-family: 'Oswald', sans-serif; font-size: 32px; color: var(--yellow); text-transform: uppercase; letter-spacing: 2px; }
-
-  /* MENU & CARDS */
-  .category-block { margin: 10px 14px; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
-  .category-toggle { width: 100%; padding: 15px; background: var(--surface); border: none; color: var(--yellow); font-family: 'Oswald', sans-serif; text-align: left; font-size: 16px; cursor: pointer; display: flex; justify-content: space-between; }
-  .category-body { display: none; padding: 10px; background: var(--bg); grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 10px; }
-  .category-body.open { display: grid; }
-  .card { background: var(--surface); padding: 12px; border-radius: 12px; border: 1px solid var(--border); }
-  .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
-  .card-name { font-weight: 700; font-size: 16px; }
-  .card-price { color: var(--yellow); font-family: 'Oswald'; font-size: 18px; }
-
-  /* CONTROLES CANTIDAD */
-  .qty-controls { display: flex; align-items: center; background: var(--surface2); border-radius: 20px; border: 1px solid var(--border); }
-  .qty-btn { width: 30px; height: 30px; border: none; background: none; color: var(--yellow); font-weight: bold; cursor: pointer; }
-  .qty-btn.plus { background: var(--yellow); color: #000; border-radius: 0 20px 20px 0; }
-  .qty-val { width: 30px; text-align: center; font-size: 14px; }
-
-  /* CARRITO Y BOTÓN ENVÍO */
-  #carrito { padding: 20px; background: var(--surface); margin: 20px 14px; border-radius: 15px; border: 1px solid var(--border); }
-  .form-group { margin-bottom: 10px; }
-  .form-group label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 4px; }
-  .form-group input, .form-group select { width: 100%; padding: 10px; background: var(--bg); border: 1px solid var(--border); color: #fff; border-radius: 8px; }
+  /* ESTRUCTURA */
+  header { text-align: center; padding: 30px 20px; background: linear-gradient(180deg, #1a0a00 0%, #0f0f0f 100%); }
+  .header-title { font-family: 'Oswald', sans-serif; font-size: 32px; color: var(--yellow); text-transform: uppercase; }
   
-  .btn-send { 
-    width: 100%; padding: 15px; background: var(--green); border: none; color: #fff; 
-    border-radius: 10px; font-family: 'Oswald'; font-size: 18px; cursor: pointer; transition: 0.3s;
-  }
-  .btn-send:disabled { background: #444 !important; color: #888 !important; cursor: not-allowed; filter: grayscale(1); }
+  .category-block { margin: 10px 14px; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+  .category-toggle { width: 100%; padding: 15px; background: var(--surface); border: none; color: var(--yellow); font-family: 'Oswald', sans-serif; text-align: left; font-size: 16px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+  .category-body { display: none; padding: 10px; background: var(--bg); grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 10px; }
+  .category-body.open { display: grid; }
+  
+  .card { background: var(--surface); padding: 12px; border-radius: 12px; border: 1px solid var(--border); display: flex; flex-direction: column; justify-content: space-between; }
+  .card-info { margin-bottom: 10px; }
+  .card-name { font-weight: 600; font-size: 15px; display: block; margin-bottom: 4px; }
+  .card-price { color: var(--yellow); font-family: 'Oswald'; font-size: 17px; font-weight: 600; }
+  
+  .qty-controls { display: flex; align-items: center; background: var(--surface2); border-radius: 20px; border: 1px solid var(--border); height: 34px; }
+  .qty-btn { width: 34px; height: 34px; border: none; background: none; color: var(--yellow); font-weight: bold; cursor: pointer; font-size: 18px; }
+  .qty-btn.plus { background: var(--yellow); color: #000; border-radius: 0 20px 20px 0; }
+  .qty-val { width: 30px; text-align: center; font-weight: 700; }
 
-  #floatCart { position: fixed; bottom: 20px; right: 20px; background: var(--yellow); color: #000; padding: 12px 20px; border-radius: 30px; font-weight: 800; box-shadow: 0 4px 15px rgba(0,0,0,0.4); border: none; cursor: pointer; z-index: 100; }
-  .toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: #333; padding: 10px 20px; border-radius: 20px; opacity: 0; transition: 0.3s; z-index: 1000; }
-  .toast.show { opacity: 1; }
+  /* FORMULARIO Y CARRITO */
+  #carrito { padding: 20px; background: var(--surface); margin: 20px 14px 100px; border-radius: 15px; border: 1px solid var(--border); }
+  .form-group { margin-bottom: 12px; }
+  .form-group label { display: block; font-size: 11px; color: var(--muted); text-transform: uppercase; margin-bottom: 4px; font-weight: 700; }
+  .form-group input, .form-group select { width: 100%; padding: 12px; background: var(--bg); border: 1px solid var(--border); color: #fff; border-radius: 8px; outline: none; }
+  .form-group input:focus { border-color: var(--yellow); }
+
+  .btn-send { width: 100%; padding: 16px; background: var(--green); border: none; color: #fff; border-radius: 12px; font-family: 'Oswald'; font-size: 18px; font-weight: 700; cursor: pointer; transition: 0.3s; margin-top: 10px; }
+  .btn-send:disabled { background: #333 !important; color: #666 !important; cursor: not-allowed; }
+
+  #floatCart { position: fixed; bottom: 20px; right: 20px; background: var(--yellow); color: #000; padding: 14px 24px; border-radius: 50px; font-weight: 800; box-shadow: 0 5px 20px rgba(0,0,0,0.5); border: none; cursor: pointer; z-index: 1000; font-family: 'Oswald'; font-size: 16px; }
 </style>
 </head>
 <body>
 
 <div id="closedBanner">
-  <div class="closed-icon">🔒</div>
-  <div class="closed-title">Local Cerrado</div>
-  <div class="closed-msg">No estamos recibiendo pedidos en este momento.</div>
-  <div id="nextOpeningInfo" class="closed-hours">Cargando horario...</div>
-  <button class="btn-continuar" onclick="cerrarPopup()">Ver menú de todos modos</button>
+  <div style="font-size: 50px;">😴</div>
+  <h2 style="font-family:'Oswald'; color:var(--yellow); margin-top:10px;">ESTAMOS DESCANSANDO</h2>
+  <p style="color:var(--muted); max-width: 280px; margin-top: 10px;">Puedes ver el menú y preparar tu pedido, pero la cocina está cerrada.</p>
+  <div id="nextOpeningPopup" class="closed-hours">Cargando horario de apertura...</div>
+  <button onclick="cerrarPopup()" style="background:none; border:2px solid var(--yellow); color:var(--yellow); padding:10px 20px; border-radius:30px; font-family:'Oswald'; cursor:pointer;">VER MENÚ</button>
 </div>
 
 <div id="scheduleBar">
   <div class="dot"></div>
-  <span id="scheduleText">Verificando...</span>
+  <span id="scheduleText">Verificando disponibilidad...</span>
 </div>
 
 <header>
-  <div class="header-title">Javier Bear Grill</div>
-  <p style="color:var(--muted); font-size: 12px; letter-spacing: 2px;">SABOR A FUEGO</p>
+  <h1 class="header-title">Javier Bear Grill</h1>
+  <p style="color:var(--muted); font-size: 11px; letter-spacing: 3px; font-weight: 700;">CHORRERA, PANAMÁ</p>
 </header>
 
 <div id="menuContainer"></div>
 
-<button id="floatCart" onclick="document.getElementById('carrito').scrollIntoView({behavior:'smooth'})">🛒 Carrito (<span id="cartCount">0</span>)</button>
+<button id="floatCart" onclick="document.getElementById('carrito').scrollIntoView({behavior:'smooth'})">🛒 MI PEDIDO (<span id="cartCount">0</span>)</button>
 
 <div id="carrito">
-  <h3 style="font-family:'Oswald'; color:var(--yellow); margin-bottom:15px;">Finalizar Pedido</h3>
-  <div id="listaItems" style="margin-bottom:15px; font-size:14px;"></div>
-  <div style="border-top:1px solid var(--border); padding-top:10px; margin-bottom:15px;">
-    <div style="display:flex; justify-content:space-between;"><span>Total:</span><span id="totalVal" style="color:var(--yellow); font-weight:800; font-size:20px;">$0.00</span></div>
+  <h3 style="font-family:'Oswald'; color:var(--yellow); margin-bottom:15px; border-bottom: 1px solid var(--border); padding-bottom: 10px;">RESUMEN Y ENTREGA</h3>
+  <div id="listaItems" style="margin-bottom:20px;"></div>
+  
+  <div style="background:var(--surface2); padding:15px; border-radius:10px; margin-bottom:20px;">
+    <div style="display:flex; justify-content:space-between; margin-bottom:5px;"><span>Subtotal:</span><span id="subtotalVal">$0.00</span></div>
+    <div style="display:flex; justify-content:space-between; margin-bottom:5px;"><span>Delivery:</span><span id="deliveryVal">$0.00</span></div>
+    <div style="display:flex; justify-content:space-between; font-weight:800; font-size:20px; color:var(--yellow); margin-top:10px; border-top:1px solid var(--border); padding-top:10px;">
+      <span>TOTAL:</span><span id="totalVal">$0.00</span>
+    </div>
   </div>
   
   <div class="form-group">
-    <label>Nombre</label>
-    <input type="text" id="nombre" placeholder="Tu nombre">
+    <label>Nombre Completo</label>
+    <input type="text" id="nombre" placeholder="¿A quién entregamos?">
   </div>
   <div class="form-group">
     <label>Zona de Entrega</label>
-    <select id="zona">
+    <select id="zona" onchange="actualizarResumen()">
       <option value="La Valdeza">La Valdeza ($1.25)</option>
       <option value="Llano Largo">Llano Largo ($1.25)</option>
-      <option value="Fuera de zona">Fuera de zona (Coord. por WA)</option>
+      <option value="Las Praderas">Las Praderas ($1.25)</option>
+      <option value="Alto de las Praderas">Alto de las Praderas ($1.25)</option>
+      <option value="Valle Bonito">Valle Bonito ($1.25)</option>
+      <option value="La Cantera">La Cantera ($1.25)</option>
+      <option value="Villa del Carmen">Villa del Carmen ($1.25)</option>
+      <option value="Peñas Blancas">Peñas Blancas ($1.25)</option>
+      <option value="Blue Garden">Blue Garden ($1.25)</option>
+      <option value="Fuera de zona">Fuera de zona (Coord. por WhatsApp)</option>
     </select>
   </div>
+  <div class="form-group">
+    <label>Notas (opcional)</label>
+    <input type="text" id="notas" placeholder="Ej. Sin cebolla, casa color verde...">
+  </div>
   
-  <button class="btn-send" id="btnEnviar" onclick="enviarPedido()">Enviar Pedido por WhatsApp</button>
+  <button class="btn-send" id="btnEnviar" onclick="enviarPedido()">ENVIAR PEDIDO A WHATSAPP</button>
 </div>
 
-<div class="toast" id="toast"></div>
-
 <script>
-// CONFIGURACIÓN DE HORARIOS
-const HORARIO = {
-  0: { open: 13, close: 22, name: "Domingo" },
+// CONFIGURACIÓN DE HORARIOS (V, S, D)
+const HORARIOS = {
   5: { open: 15, close: 24, name: "Viernes" },
-  6: { open: 13, close: 24, name: "Sábado" }
-  // Lunes a Jueves se asume cerrado basado en tu solicitud previa
+  6: { open: 13, close: 24, name: "Sábado" },
+  0: { open: 13, close: 22, name: "Domingo" }
 };
 
+// BASE DE DATOS DE PRODUCTOS
 const CATEGORIAS = [
   { nombre: "🥳 Promociones", items: [
-    {id:1, n:"Las tres Smash Burgers", p:11.99},
-    {id:2, n:"Promo Brutalito", p:5.75}
+    {n:"Smash para compartir", p:11.99}, {n:"Las tres Smash Burgers", p:11.99}, {n:"Promo Brutalito", p:5.75}
   ]},
   { nombre: "🍗 Pollos Asados", items: [
-    {id:3, n:"1 Pollo Entero", p:9.00},
-    {id:4, n:"1/2 Pollo Asado", p:5.00},
-    {id:5, n:"COMBO Pollo Entero", p:13.00}
+    {n:"1 pollo entero", p:9.00}, {n:"1/2 pollo asado", p:5.00}, {n:"1/4 de pollo asado", p:2.75},
+    {n:"COMBO 1/4 DE POLLO", p:5.00}, {n:"COMBO MEDIO POLLO", p:7.50}, {n:"COMBO POLLO ENTERO", p:13.00}
+  ]},
+  { nombre: "🍔 Combos de Hamburguesas", items: [
+    {n:"COMBO HAMBURGUESA LA GARRA", p:10.99}, {n:"COMBO HAMBURGUESA SENCILLA", p:5.25}, 
+    {n:"COMBO DOBLE HAMBURGUESA", p:6.75}, {n:"COMBO TRIPLE HAMBURGUESA", p:10.25},
+    {n:"Queso Hamburguesa Combo", p:5.75}, {n:"Combo La Rompe Yema", p:6.49}, {n:"Combo La Tableña", p:7.50}
   ]},
   { nombre: "🍔 Hamburguesas", items: [
-    {id:6, n:"La Garra (Especial)", p:8.50},
-    {id:7, n:"Doble Hamburguesa", p:4.75},
-    {id:8, n:"La Rompe Yema", p:3.99}
+    {n:"Hamburguesa Clásica", p:3.00}, {n:"Doble hamburguesa", p:4.75}, {n:"Triple hamburguesa", p:7.75},
+    {n:"La Garra", p:8.50}, {n:"Queso Hamburguesa", p:3.50}, {n:"La Rompe Yema", p:3.99}, {n:"La Tableña Smash", p:4.99}
+  ]},
+  { nombre: "🥩 Carnes y Cerdo", items: [
+    {n:"Bistec de cinta asado", p:4.50}, {n:"Costillita de cerdo asada", p:4.50}, 
+    {n:"Costillas BBQ con arepas y patacón", p:8.75}, {n:"COMBO PUERCO AHUMADO", p:6.50}, {n:"COMBO CARNE AHUMADA", p:6.50}
+  ]},
+  { nombre: "🍖 Picadas", items: [
+    {n:"Picada personal", p:9.75}, {n:"Picada mixta para dos", p:15.99}, 
+    {n:"Picada mixta para cuatro", p:29.99}, {n:"Picada mixta fiesta", p:59.99}
+  ]},
+  { nombre: "🌭 Salchipapas y Hotdogs", items: [
+    {n:"Salchipapas gratinadas", p:6.50}, {n:"Salchipapas con pollo", p:8.25}, {n:"Salchipapas mini", p:3.50},
+    {n:"Salchipapas cargadas", p:10.50}, {n:"Carnipapas", p:10.50}, {n:"Choripapas", p:7.75},
+    {n:"Hotdog Brutal", p:4.50}, {n:"Combo Hotdog Brutal", p:6.75}, {n:"Hotdog clásico", p:2.50}, {n:"Combo Hotdog clásico", p:5.00}
+  ]},
+  { nombre: "🌭 Chorizos", items: [
+    {n:"Chorizo criollo asado", p:1.75}, {n:"COMBO CHORIZOS", p:5.25}, {n:"Paquete de Chorizo", p:6.50}, {n:"Chorizo crudo", p:1.25}
   ]},
   { nombre: "🍟 Acompañantes", items: [
-    {id:9, n:"Papas Fritas", p:1.75},
-    {id:10, n:"Patacones", p:1.75},
-    {id:11, n:"Yuca al Mojo", p:1.75}
+    {n:"Papas fritas", p:1.75}, {n:"Papas asadas (Mojo Ajo)", p:1.75}, {n:"Patacones", p:1.75}, 
+    {n:"Yuca frita", p:1.75}, {n:"Yuca al mojo", p:1.75}, {n:"Arroz con pollo", p:2.50}, {n:"Arepas rellenas", p:2.25}
+  ]},
+  { nombre: "➕ Extras", items: [
+    {n:"Tocino ahumado", p:0.50}, {n:"Queso mozarella extra", p:0.50}, {n:"Topping Pollo", p:1.50}
   ]},
   { nombre: "🥤 Bebidas", items: [
-    {id:12, n:"Soda Lata", p:1.00},
-    {id:13, n:"Agua Botella", p:1.00},
-    {id:14, n:"Soda 1.5L", p:2.75}
-  ]}
+    {n:"Cocacola", p:1.25}, {n:"Agua botella", p:1.00}, {n:"Jugos naturales", p:1.50}, {n:"Sodas Variadas", p:1.00},
+    {n:"Litro Soda Cocacola", p:2.75}, {n:"Fresca 1lt", p:2.75}, {n:"Soda manzana mini", p:1.00}
+  ]},
+  { nombre: "🥫 Salsas Extras", items: [
+    {n:"Ketchup", p:0.50}, {n:"Mostaza dulce", p:0.50}, {n:"Mostaza", p:0.50}, {n:"Mayonesa", p:0.50}, {n:"Salsa de ajo", p:0.50}
+  ]},
+  { nombre: "👶 Niños", items: [{n:"Combo nugget", p:5.50}]}
 ];
 
 let carrito = {};
-let bannerForzadoCerrado = false;
+let popupForzado = false;
+
+function getProximaApertura() {
+  const ahora = new Date();
+  for (let i = 0; i < 8; i++) {
+    const tempDate = new Date();
+    tempDate.setDate(ahora.getDate() + i);
+    const diaSemana = tempDate.getDay();
+    const config = HORARIOS[diaSemana];
+    
+    if (config) {
+      if (i === 0 && ahora.getHours() < config.open) {
+        return { dia: "Hoy", hora: formatHora(config.open) };
+      }
+      if (i > 0) {
+        return { dia: config.name, hora: formatHora(config.open) };
+      }
+    }
+  }
+  return null;
+}
+
+function formatHora(h) {
+  return h > 12 ? (h - 12) + ":00 PM" : h + ":00 AM";
+}
 
 function checkSchedule() {
-  const now = new Date();
-  const day = now.getDay();
-  const hour = now.getHours();
-  
-  const hoy = HORARIO[day];
-  const isOpen = hoy && hour >= hoy.open && hour < hoy.close;
-  
+  const ahora = new Date();
+  const dia = ahora.getDay();
+  const hora = ahora.getHours();
+  const hoy = HORARIOS[dia];
+  const isOpen = hoy && hora >= hoy.open && hora < hoy.close;
+
   const bar = document.getElementById('scheduleBar');
   const txt = document.getElementById('scheduleText');
   const btn = document.getElementById('btnEnviar');
   const banner = document.getElementById('closedBanner');
+  const proxima = getProximaApertura();
 
   if (isOpen) {
     bar.className = "open-bar";
-    txt.innerText = `Abierto ahora · Cerramos a las ${hoy.close > 12 ? hoy.close-12 : hoy.close}:00${hoy.close >= 12 ? 'pm' : 'am'}`;
+    txt.innerText = `🟢 ABIERTO AHORA · Cerramos a las ${formatHora(hoy.close)}`;
     btn.disabled = false;
-    btn.innerText = "Enviar Pedido por WhatsApp";
     banner.classList.remove('show');
   } else {
     bar.className = "closed-bar";
-    const next = getNextOpening();
-    txt.innerText = `Cerrado · Abrimos el ${next.dia} a las ${next.hora}`;
+    const infoStr = proxima ? `PRÓXIMA APERTURA: ${proxima.dia} a las ${proxima.hora}` : "CERRADO POR HOY";
+    txt.innerText = `🔴 ${infoStr}`;
     btn.disabled = true;
-    btn.innerText = "🚫 Local Cerrado";
-    
-    if (!bannerForzadoCerrado) {
+    if (!popupForzado) {
       banner.classList.add('show');
-      document.getElementById('nextOpeningInfo').innerHTML = `🕐 Próxima apertura:<br><span>${next.dia} a las ${next.hora}</span>`;
+      document.getElementById('nextOpeningPopup').innerHTML = `Próxima apertura: <span>${proxima ? proxima.dia + " " + proxima.hora : "Muy pronto"}</span>`;
     }
   }
 }
 
-function getNextOpening() {
-  const now = new Date();
-  for (let i = 0; i < 7; i++) {
-    const nextDate = new Date();
-    nextDate.setDate(now.getDate() + i);
-    const dayIndex = nextDate.getDay();
-    const config = HORARIO[dayIndex];
-    
-    if (config) {
-      if (i === 0 && now.getHours() < config.open) {
-        return { dia: "Hoy", hora: (config.open > 12 ? config.open-12 : config.open) + ":00pm" };
-      }
-      if (i > 0) {
-        return { dia: config.name, hora: (config.open > 12 ? config.open-12 : config.open) + ":00pm" };
-      }
-    }
-  }
-  return { dia: "Próximamente", hora: "--" };
-}
-
-function cerrarPopup() {
-  bannerForzadoCerrado = true;
-  document.getElementById('closedBanner').classList.remove('show');
-}
+function cerrarPopup() { popupForzado = true; document.getElementById('closedBanner').classList.remove('show'); }
 
 function renderMenu() {
   const container = document.getElementById('menuContainer');
-  CATEGORIAS.forEach(cat => {
+  CATEGORIAS.forEach((cat, idx) => {
     const block = document.createElement('div');
     block.className = 'category-block';
     block.innerHTML = `
-      <button class="category-toggle" onclick="this.nextElementSibling.classList.toggle('open')">
-        ${cat.nombre} <span>▼</span>
+      <button class="category-toggle" onclick="toggleCat(this)">
+        ${cat.nombre} <span>+</span>
       </button>
       <div class="category-body">
-        ${cat.items.map(item => `
+        ${cat.items.map(item => {
+          const id = item.n.replace(/\s/g, '');
+          return `
           <div class="card">
-            <div class="card-header">
+            <div class="card-info">
               <span class="card-name">${item.n}</span>
               <span class="card-price">$${item.p.toFixed(2)}</span>
             </div>
-            <div style="display:flex; justify-content:flex-end;">
-              <div class="qty-controls">
-                <button class="qty-btn" onclick="updateQty(${item.id}, '${item.n}', ${item.p}, -1)">-</button>
-                <div class="qty-val" id="qty-${item.id}">0</div>
-                <button class="qty-btn plus" onclick="updateQty(${item.id}, '${item.n}', ${item.p}, 1)">+</button>
-              </div>
+            <div class="qty-controls">
+              <button class="qty-btn" onclick="updateQty('${id}', '${item.n}', ${item.p}, -1)">-</button>
+              <div class="qty-val" id="qty-${id}">0</div>
+              <button class="qty-btn plus" onclick="updateQty('${id}', '${item.n}', ${item.p}, 1)">+</button>
             </div>
-          </div>
-        `).join('')}
-      </div>
-    `;
+          </div>`;
+        }).join('')}
+      </div>`;
     container.appendChild(block);
   });
+}
+
+function toggleCat(btn) {
+  const body = btn.nextElementSibling;
+  const span = btn.querySelector('span');
+  const isOpen = body.classList.toggle('open');
+  span.innerText = isOpen ? "-" : "+";
 }
 
 function updateQty(id, name, price, delta) {
   if (!carrito[id]) carrito[id] = { name, price, qty: 0 };
   carrito[id].qty += delta;
-  if (carrito[id].qty <= 0) {
-    carrito[id].qty = 0;
-    delete carrito[id];
-  }
+  if (carrito[id].qty <= 0) delete carrito[id];
   document.getElementById(`qty-${id}`).innerText = carrito[id] ? carrito[id].qty : 0;
   actualizarResumen();
 }
 
 function actualizarResumen() {
   const lista = document.getElementById('listaItems');
-  let total = 0;
-  let count = 0;
+  let subtotal = 0, count = 0;
   lista.innerHTML = "";
   
   Object.values(carrito).forEach(item => {
-    total += item.price * item.qty;
+    subtotal += item.price * item.qty;
     count += item.qty;
-    lista.innerHTML += `<div style="display:flex; justify-content:space-between; margin-bottom:5px;">
-      <span>${item.name} x${item.qty}</span>
+    lista.innerHTML += `<div style="display:flex; justify-content:space-between; margin-bottom:5px; font-size:13px;">
+      <span>${item.name} (x${item.qty})</span>
       <span>$${(item.price * item.qty).toFixed(2)}</span>
     </div>`;
   });
   
-  document.getElementById('totalVal').innerText = `$${total.toFixed(2)}`;
+  const zona = document.getElementById('zona').value;
+  const delivery = (subtotal > 0 && zona !== "Fuera de zona") ? 1.25 : 0;
+  
+  document.getElementById('subtotalVal').innerText = `$${subtotal.toFixed(2)}`;
+  document.getElementById('deliveryVal').innerText = (zona === "Fuera de zona") ? "A coord." : `$${delivery.toFixed(2)}`;
+  document.getElementById('totalVal').innerText = `$${(subtotal + delivery).toFixed(2)}`;
   document.getElementById('cartCount').innerText = count;
 }
 
 function enviarPedido() {
   const nombre = document.getElementById('nombre').value;
-  const zona = document.getElementById('zona').value;
   if (!nombre || Object.keys(carrito).length === 0) {
-    alert("Por favor añade productos y tu nombre.");
+    alert("Por favor escribe tu nombre y añade al menos un producto.");
     return;
   }
   
-  let msg = `🔥 *NUEVO PEDIDO - Javier Bear Grill* 🔥%0A%0A`;
-  Object.values(carrito).forEach(i => msg += `• ${i.name} x${i.qty}%0A`);
-  msg += `%0A👤 *Cliente:* ${nombre}%0A📍 *Zona:* ${zona}%0A💰 *Total:* ${document.getElementById('totalVal').innerText}`;
+  let msg = `🔥 *Javier Bear Grill - NUEVO PEDIDO* 🔥%0A%0A`;
+  Object.values(carrito).forEach(i => msg += `• ${i.name} (x${i.qty})%0A`);
+  msg += `%0A👤 *Cliente:* ${nombre}%0A📍 *Zona:* ${document.getElementById('zona').value}%0A📝 *Notas:* ${document.getElementById('notas').value}%0A%0A💰 *TOTAL:* ${document.getElementById('totalVal').innerText}`;
   
   window.open(`https://wa.me/50765738924?text=${msg}`);
 }
 
 renderMenu();
 checkSchedule();
-setInterval(checkSchedule, 60000);
+setInterval(checkSchedule, 30000);
 </script>
 </body>
 </html>
