@@ -12,7 +12,7 @@ body{
     padding:0;
     background:#111;
     color:white;
-    padding-bottom:220px;
+    padding-bottom:340px;
 }
 
 h1{
@@ -69,6 +69,8 @@ h1{
     background:#000;
     padding:15px;
     border-top:2px solid #ffcc00;
+    max-height:330px;
+    overflow-y:auto;
 }
 
 .item-carrito{
@@ -90,11 +92,28 @@ h1{
 .total{
     font-size:18px;
     font-weight:bold;
+    margin-top:8px;
+}
+
+.formulario{
     margin-top:10px;
 }
 
+.formulario input, .formulario select{
+    width:100%;
+    padding:6px;
+    margin-bottom:6px;
+    border-radius:5px;
+    border:none;
+}
+
+.nota-zona{
+    font-size:12px;
+    color:#ccc;
+    margin-bottom:6px;
+}
+
 .enviar-btn{
-    margin-top:10px;
     width:100%;
     background:#25D366;
     border:none;
@@ -115,27 +134,22 @@ h1{
 <div class="producto" data-nombre="La Rompe Yema" data-precio="3.99">
 <h3>La Rompe Yema</h3>
 <p class="precio">$3.99</p>
-
 <div class="cantidad-control">
 <button onclick="cambiarCantidad(this,-1)">-</button>
 <span class="cantidad">1</span>
 <button onclick="cambiarCantidad(this,1)">+</button>
 </div>
-
 <button class="agregar-btn" onclick="agregarDesdeMenu(this)">Agregar</button>
 </div>
-
 
 <div class="producto" data-nombre="Combo La Rompe Yema" data-precio="6.49">
 <h3>Combo La Rompe Yema</h3>
 <p class="precio">$6.49</p>
-
 <div class="cantidad-control">
 <button onclick="cambiarCantidad(this,-1)">-</button>
 <span class="cantidad">1</span>
 <button onclick="cambiarCantidad(this,1)">+</button>
 </div>
-
 <button class="agregar-btn" onclick="agregarDesdeMenu(this)">Agregar</button>
 </div>
 
@@ -144,21 +158,49 @@ h1{
 <div class="carrito">
 <h2>🛒 Carrito</h2>
 <div id="lista-carrito"></div>
+<div class="total">Subtotal: $<span id="subtotal">0.00</span></div>
+<div class="total" id="delivery-texto">Delivery: $1.25</div>
 <div class="total">Total: $<span id="total">0.00</span></div>
-<button class="enviar-btn" onclick="enviarWhatsApp()">Enviar por WhatsApp</button>
+
+<div class="formulario">
+<input type="text" id="nombre" placeholder="Tu nombre">
+<input type="text" id="direccion" placeholder="Dirección exacta">
+
+<select id="zona" onchange="actualizarDelivery()">
+<option value="">Selecciona tu zona</option>
+<option value="1.25">La Valdeza</option>
+<option value="1.25">Llano Largo</option>
+<option value="1.25">Las Praderas</option>
+<option value="1.25">Alto de las Praderas</option>
+<option value="1.25">Valle Bonito</option>
+<option value="1.25">La Cantera</option>
+<option value="1.25">Villa del Carmen</option>
+<option value="1.25">Peñas Blancas</option>
+<option value="1.25">Blue Garden</option>
+<option value="consultar">Fuera de zona (consultar costo)</option>
+</select>
+
+<div class="nota-zona">
+Si estás fuera de estas zonas, puedes seleccionar la última opción y coordinamos el costo del delivery por WhatsApp.
+</div>
+
+</div>
+
+<button class="enviar-btn" onclick="enviarWhatsApp()">Enviar Pedido</button>
+
 </div>
 
 <script>
 
 let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
+let delivery = 1.25;
 
 function guardarCarrito(){
     localStorage.setItem("carrito", JSON.stringify(carrito));
 }
 
 function cambiarCantidad(btn, cambio){
-    const contenedor = btn.parentElement;
-    const span = contenedor.querySelector(".cantidad");
+    const span = btn.parentElement.querySelector(".cantidad");
     let cantidad = parseInt(span.innerText);
     cantidad += cambio;
     if(cantidad < 1) cantidad = 1;
@@ -170,7 +212,6 @@ function agregarDesdeMenu(btn){
     const nombre = producto.dataset.nombre;
     const precio = parseFloat(producto.dataset.precio);
     const cantidad = parseInt(producto.querySelector(".cantidad").innerText);
-
     agregarAlCarrito(nombre, precio, cantidad);
     producto.querySelector(".cantidad").innerText = "1";
 }
@@ -179,7 +220,7 @@ function agregarAlCarrito(nombre, precio, cantidad){
     const existente = carrito.find(item => item.nombre === nombre);
     if(existente){
         existente.cantidad += cantidad;
-    }else{
+    } else {
         carrito.push({nombre, precio, cantidad});
     }
     actualizarCarrito();
@@ -188,11 +229,10 @@ function agregarAlCarrito(nombre, precio, cantidad){
 function actualizarCarrito(){
     const lista = document.getElementById("lista-carrito");
     lista.innerHTML = "";
-    let total = 0;
+    let subtotal = 0;
 
     carrito.forEach((item,index)=>{
-        total += item.precio * item.cantidad;
-
+        subtotal += item.precio * item.cantidad;
         lista.innerHTML += `
         <div class="item-carrito">
             <span>${item.nombre} x${item.cantidad}</span>
@@ -201,8 +241,29 @@ function actualizarCarrito(){
         `;
     });
 
-    document.getElementById("total").innerText = total.toFixed(2);
+    document.getElementById("subtotal").innerText = subtotal.toFixed(2);
+
+    if(delivery !== "consultar"){
+        document.getElementById("total").innerText = (subtotal + delivery).toFixed(2);
+    } else {
+        document.getElementById("total").innerText = subtotal.toFixed(2);
+    }
+
     guardarCarrito();
+}
+
+function actualizarDelivery(){
+    const zona = document.getElementById("zona").value;
+
+    if(zona === "consultar"){
+        delivery = "consultar";
+        document.getElementById("delivery-texto").innerText = "Delivery: A consultar";
+    } else {
+        delivery = parseFloat(zona);
+        document.getElementById("delivery-texto").innerText = "Delivery: $" + delivery.toFixed(2);
+    }
+
+    actualizarCarrito();
 }
 
 function eliminarItem(index){
@@ -211,17 +272,44 @@ function eliminarItem(index){
 }
 
 function enviarWhatsApp(){
+
+    const nombre = document.getElementById("nombre").value.trim();
+    const direccion = document.getElementById("direccion").value.trim();
+    const zonaSelect = document.getElementById("zona");
+    const zonaTexto = zonaSelect.options[zonaSelect.selectedIndex].text;
+    const zonaValor = zonaSelect.value;
+
     if(carrito.length === 0){
         alert("El carrito está vacío");
         return;
     }
 
-    let mensaje = "Hola, quiero hacer este pedido:%0A";
+    if(!nombre || !direccion || !zonaValor){
+        alert("Completa todos los datos antes de enviar");
+        return;
+    }
+
+    let subtotal = 0;
+    let mensaje = "🔥 PEDIDO JAVIER BEAR GRILL 🔥%0A%0A";
+    mensaje += `Cliente: ${nombre}%0A`;
+    mensaje += `Zona: ${zonaTexto}%0A`;
+    mensaje += `Dirección: ${direccion}%0A%0A`;
+    mensaje += "Pedido:%0A";
+
     carrito.forEach(item=>{
+        subtotal += item.precio * item.cantidad;
         mensaje += `${item.nombre} x${item.cantidad} - $${(item.precio*item.cantidad).toFixed(2)}%0A`;
     });
 
-    mensaje += `%0ATotal: $${document.getElementById("total").innerText}`;
+    mensaje += `%0ASubtotal: $${subtotal.toFixed(2)}%0A`;
+
+    if(zonaValor === "consultar"){
+        mensaje += "Delivery: A consultar%0A";
+        mensaje += "TOTAL: A confirmar con delivery";
+    } else {
+        mensaje += `Delivery: $${delivery.toFixed(2)}%0A`;
+        mensaje += `TOTAL: $${(subtotal+delivery).toFixed(2)}`;
+    }
 
     window.open(`https://wa.me/50765738924?text=${mensaje}`);
 
