@@ -13,9 +13,7 @@
   --card: #1a1a1a;
 }
 
-* {
-  box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
 body {
   margin: 0;
@@ -88,14 +86,30 @@ h1 {
   z-index: 2000;
 }
 
-.cart-panel.active {
-  right: 0;
-}
+.cart-panel.active { right: 0; }
 
 .cart-item {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   margin-bottom: 10px;
+}
+
+.qty-controls button {
+  background: var(--primary);
+  border: none;
+  padding: 3px 8px;
+  margin: 0 3px;
+  cursor: pointer;
+}
+
+.remove-btn {
+  background: red;
+  border: none;
+  color: white;
+  padding: 3px 6px;
+  cursor: pointer;
+  margin-left: 5px;
 }
 
 .checkout-btn {
@@ -108,7 +122,7 @@ h1 {
   margin-top: 15px;
 }
 
-@media(min-width: 768px){
+@media(min-width:768px){
   .menu-container{
     grid-template-columns: repeat(2,1fr);
   }
@@ -144,11 +158,15 @@ h1 {
 </main>
 
 <div class="cart-button" onclick="toggleCart()">
-  🛒 Carrito (<span id="cart-count">0</span>)
+  🛒 (<span id="cart-count">0</span>)
 </div>
 
 <div class="cart-panel" id="cart">
-  <h2>Tu Pedido</h2>
+  <div style="display:flex; justify-content:space-between; align-items:center;">
+    <h2 style="margin:0;">Tu Pedido</h2>
+    <button onclick="toggleCart()" style="background:none;border:none;color:white;font-size:22px;cursor:pointer;">✕</button>
+  </div>
+
   <div id="cart-items"></div>
   <h3>Total: PAB <span id="cart-total">0.00</span></h3>
   <button class="checkout-btn" onclick="checkout()">Enviar por WhatsApp</button>
@@ -158,29 +176,57 @@ h1 {
 let cart = [];
 
 function addToCart(name, price){
-  cart.push({name, price});
+  let existing = cart.find(item => item.name === name);
+  if(existing){
+    existing.qty += 1;
+  } else {
+    cart.push({name, price, qty:1});
+  }
   updateCart();
 }
 
 function updateCart(){
-  document.getElementById("cart-count").innerText = cart.length;
+  document.getElementById("cart-count").innerText =
+    cart.reduce((sum,item)=>sum+item.qty,0);
 
-  let itemsContainer = document.getElementById("cart-items");
-  itemsContainer.innerHTML = "";
-
+  let container = document.getElementById("cart-items");
+  container.innerHTML = "";
   let total = 0;
 
-  cart.forEach(item=>{
-    total += item.price;
-    itemsContainer.innerHTML += `
+  cart.forEach((item,index)=>{
+    total += item.price * item.qty;
+    container.innerHTML += `
       <div class="cart-item">
-        <span>${item.name}</span>
-        <span>PAB ${item.price.toFixed(2)}</span>
+        <div>
+          <strong>${item.name}</strong><br>
+          <div class="qty-controls">
+            <button onclick="changeQty(${index},-1)">-</button>
+            ${item.qty}
+            <button onclick="changeQty(${index},1)">+</button>
+          </div>
+        </div>
+        <div>
+          PAB ${(item.price*item.qty).toFixed(2)}
+          <button class="remove-btn" onclick="removeItem(${index})">X</button>
+        </div>
       </div>
     `;
   });
 
   document.getElementById("cart-total").innerText = total.toFixed(2);
+}
+
+function changeQty(index,amount){
+  cart[index].qty += amount;
+  if(cart[index].qty <= 0){
+    cart.splice(index,1);
+  }
+  updateCart();
+}
+
+function removeItem(index){
+  cart.splice(index,1);
+  updateCart();
 }
 
 function toggleCart(){
@@ -193,13 +239,12 @@ function checkout(){
     return;
   }
 
-  let message = "Hola Javier Bear Grill 🍔%0A%0AQuiero hacer este pedido:%0A";
-
+  let message = "Hola Javier Bear Grill 🍔%0A%0ANuevo pedido:%0A";
   let total = 0;
 
   cart.forEach(item=>{
-    message += `- ${item.name} PAB ${item.price.toFixed(2)}%0A`;
-    total += item.price;
+    message += `- ${item.name} x${item.qty} PAB ${(item.price*item.qty).toFixed(2)}%0A`;
+    total += item.price*item.qty;
   });
 
   message += `%0ATotal: PAB ${total.toFixed(2)}`;
