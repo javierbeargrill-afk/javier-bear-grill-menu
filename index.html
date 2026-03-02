@@ -6,362 +6,299 @@
 <title>🔥 Javier Bear Grill 🔥</title>
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
+  /* CSS UNIFICADO Y OPTIMIZADO */
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
   :root {
-    --bg: #0f0f0f;
-    --surface: #1a1a1a;
-    --surface2: #242424;
-    --yellow: #f5c518;
-    --yellow-dark: #d4a800;
-    --green: #25D366;
-    --green-dark: #1da851;
-    --text: #f0f0f0;
-    --muted: #888;
-    --border: #2e2e2e;
-    --red: #ff4444;
-    --orange: #ff8800;
-    --blue: #3b9eff;
+    --bg: #0f0f0f; --surface: #1a1a1a; --surface2: #242424;
+    --yellow: #f5c518; --yellow-dark: #d4a800;
+    --green: #25D366; --text: #f0f0f0; --muted: #888;
+    --border: #2e2e2e; --red: #ff4444; --orange: #ff8800;
   }
+  body { background: var(--bg); color: var(--text); font-family: 'Nunito', sans-serif; min-height: 100vh; }
 
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'Nunito', sans-serif;
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
-
-  /* ===== CLOSED OVERLAY ===== */
+  /* BANNER DE CERRADO (POPUP) */
   #closedBanner {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.95);
-    z-index: 9999;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    padding: 30px;
+    display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95);
+    z-index: 9999; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center; padding: 30px;
   }
   #closedBanner.show { display: flex; }
-  .closed-icon  { font-size: 72px; margin-bottom: 16px; }
-  .closed-title { font-family: 'Oswald', sans-serif; font-size: 32px; color: var(--yellow); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 10px; }
-  .closed-msg   { font-size: 16px; color: var(--muted); line-height: 1.6; max-width: 320px; margin-bottom: 20px; }
-  .closed-hours { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px 24px; font-size: 15px; line-height: 2.2; color: var(--text); }
+  .closed-icon { font-size: 60px; margin-bottom: 10px; }
+  .closed-title { font-family: 'Oswald', sans-serif; font-size: 28px; color: var(--yellow); text-transform: uppercase; }
+  .closed-hours { margin: 20px 0; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 15px; font-size: 14px; line-height: 1.8; }
   .closed-hours span { color: var(--yellow); font-weight: 700; }
-  
-  .btn-ver-menu {
-    margin-top: 25px;
-    background: transparent;
-    color: var(--yellow);
-    border: 2px solid var(--yellow);
-    padding: 12px 24px;
-    border-radius: 30px;
-    font-family: 'Oswald', sans-serif;
-    text-transform: uppercase;
-    font-weight: 700;
-    cursor: pointer;
-    transition: 0.3s;
+  .btn-continuar {
+    background: transparent; color: var(--yellow); border: 2px solid var(--yellow);
+    padding: 10px 20px; border-radius: 30px; font-family: 'Oswald', sans-serif;
+    text-transform: uppercase; cursor: pointer; transition: 0.3s;
   }
-  .btn-ver-menu:hover { background: var(--yellow); color: #000; }
+  .btn-continuar:hover { background: var(--yellow); color: #000; }
 
-  /* ===== SCHEDULE BAR ===== */
-  #scheduleBar {
-    display: flex; align-items: center; justify-content: center;
-    gap: 8px; padding: 8px 16px; font-size: 13px; font-weight: 700; text-align: center;
-  }
-  #scheduleBar.open-bar   { background: #0d2b1a; color: var(--green); border-bottom: 1px solid #1a4a2a; }
-  #scheduleBar.closed-bar { background: #2b0d0d; color: var(--red);   border-bottom: 1px solid #4a1a1a; }
-  .schedule-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; animation: pulse-dot 2s ease-in-out infinite; }
-  .open-bar .schedule-dot { background: var(--green); }
-  .closed-bar .schedule-dot { background: var(--red); animation: none; }
-  @keyframes pulse-dot { 0%,100% { opacity:1; transform:scale(1); } 50% { opacity:.5; transform:scale(1.3); } }
+  /* BARRA DE HORARIO SUPERIOR */
+  #scheduleBar { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 8px; font-size: 13px; font-weight: 700; }
+  .open-bar { background: #0d2b1a; color: var(--green); }
+  .closed-bar { background: #2b0d0d; color: var(--red); }
+  .dot { width: 8px; height: 8px; border-radius: 50%; }
+  .open-bar .dot { background: var(--green); animation: pulse 2s infinite; }
+  .closed-bar .dot { background: var(--red); }
+  @keyframes pulse { 0% {opacity:1} 50% {opacity:0.5} 100% {opacity:1} }
 
-  /* ===== HEADER ===== */
-  header {
-    position: relative; text-align: center; padding: 36px 20px 28px;
-    background: linear-gradient(180deg, #1a0a00 0%, #0f0f0f 100%);
-    border-bottom: 1px solid #2a1800; overflow: hidden;
-  }
-  .header-flame { font-size: 48px; display: block; line-height: 1; animation: flicker 2s ease-in-out infinite alternate; filter: drop-shadow(0 0 16px rgba(245,140,0,0.7)); }
-  .header-title { font-family:'Oswald',sans-serif; font-size:clamp(26px,7vw,44px); font-weight:700; letter-spacing:3px; color:var(--yellow); text-transform:uppercase; margin:8px 0 4px; }
-  .header-sub   { font-size:12px; letter-spacing:4px; text-transform:uppercase; color:var(--muted); font-weight:600; }
-  .header-divider { margin:14px auto 0; width:60px; height:2px; background:linear-gradient(90deg,transparent,var(--yellow),transparent); }
+  /* HEADER */
+  header { text-align: center; padding: 30px 20px; background: linear-gradient(180deg, #1a0a00 0%, #0f0f0f 100%); border-bottom: 1px solid #2a1800; }
+  .header-title { font-family: 'Oswald', sans-serif; font-size: 32px; color: var(--yellow); text-transform: uppercase; letter-spacing: 2px; }
 
-  /* ===== MENU & CARDS ===== */
-  #menu { padding-top: 14px; }
-  .category-block { margin: 0 14px 8px; border-radius: 14px; overflow: hidden; border: 1px solid var(--border); }
-  .category-toggle { width:100%; background:var(--surface); border:none; padding:15px 18px; display:flex; align-items:center; justify-content:space-between; cursor:pointer; }
-  .category-toggle.open { background: #1e1600; border-bottom: 1px solid #2a1800; }
-  .cat-title { font-family:'Oswald',sans-serif; font-size:17px; letter-spacing:1.5px; text-transform:uppercase; color:var(--yellow); }
-  .category-body { max-height:0; overflow:hidden; transition:max-height 0.45s ease; background:var(--bg); }
-  .category-body.open { max-height: 6000px; }
-  .menu-grid { padding:12px; display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:12px; }
+  /* MENU & CARDS */
+  .category-block { margin: 10px 14px; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+  .category-toggle { width: 100%; padding: 15px; background: var(--surface); border: none; color: var(--yellow); font-family: 'Oswald', sans-serif; text-align: left; font-size: 16px; cursor: pointer; display: flex; justify-content: space-between; }
+  .category-body { display: none; padding: 10px; background: var(--bg); grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 10px; }
+  .category-body.open { display: grid; }
+  .card { background: var(--surface); padding: 12px; border-radius: 12px; border: 1px solid var(--border); }
+  .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+  .card-name { font-weight: 700; font-size: 16px; }
+  .card-price { color: var(--yellow); font-family: 'Oswald'; font-size: 18px; }
+
+  /* CONTROLES CANTIDAD */
+  .qty-controls { display: flex; align-items: center; background: var(--surface2); border-radius: 20px; border: 1px solid var(--border); }
+  .qty-btn { width: 30px; height: 30px; border: none; background: none; color: var(--yellow); font-weight: bold; cursor: pointer; }
+  .qty-btn.plus { background: var(--yellow); color: #000; border-radius: 0 20px 20px 0; }
+  .qty-val { width: 30px; text-align: center; font-size: 14px; }
+
+  /* CARRITO Y BOTÓN ENVÍO */
+  #carrito { padding: 20px; background: var(--surface); margin: 20px 14px; border-radius: 15px; border: 1px solid var(--border); }
+  .form-group { margin-bottom: 10px; }
+  .form-group label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+  .form-group input, .form-group select { width: 100%; padding: 10px; background: var(--bg); border: 1px solid var(--border); color: #fff; border-radius: 8px; }
   
-  .card { background:var(--surface); border:1px solid var(--border); border-radius:16px; overflow:hidden; position:relative; }
-  .card-img-placeholder { width:100%; height:110px; display:flex; align-items:center; justify-content:center; font-size:52px; background:var(--surface2); }
-  .card-body { padding:10px 16px 16px; }
-  .card-name { font-family:'Oswald',sans-serif; font-size:18px; font-weight:600; color:var(--text); margin-bottom:8px; }
-  .card-footer { display:flex; align-items:center; justify-content:space-between; }
-  .card-price { font-family:'Oswald',sans-serif; font-size:22px; font-weight:700; color:var(--yellow); }
+  .btn-send { 
+    width: 100%; padding: 15px; background: var(--green); border: none; color: #fff; 
+    border-radius: 10px; font-family: 'Oswald'; font-size: 18px; cursor: pointer; transition: 0.3s;
+  }
+  .btn-send:disabled { background: #444 !important; color: #888 !important; cursor: not-allowed; filter: grayscale(1); }
 
-  .qty-controls { display:flex; align-items:center; background:var(--surface2); border-radius:30px; border:1px solid var(--border); }
-  .qty-btn { background:transparent; border:none; color:var(--yellow); font-size:20px; font-weight:700; width:38px; height:38px; cursor:pointer; }
-  .qty-plus { background:var(--yellow); color:#000; border-radius:0 30px 30px 0; }
-  .qty-display { min-width:32px; text-align:center; font-weight:700; }
-
-  /* ===== CART & BUTTONS ===== */
-  #verCarritoBtn { position:fixed; bottom:24px; right:20px; background:var(--yellow); color:#000; border:none; padding:14px 22px; border-radius:50px; font-weight:700; z-index:998; box-shadow:0 4px 20px rgba(0,0,0,0.4); cursor:pointer; }
-  #carrito { background:var(--surface); margin:16px 14px 110px; border-radius:20px; border:1px solid var(--border); overflow:hidden; }
-  .cart-body { padding:18px 20px; }
-  .totals { background:var(--surface2); border-radius:12px; padding:14px; margin-bottom:18px; border:1px solid var(--border); }
-  
-  .form-group { margin-bottom:10px; }
-  .form-group label { display:block; font-size:11px; font-weight:700; text-transform:uppercase; color:var(--muted); margin-bottom:5px; }
-  .form-group input, .form-group select, .form-group textarea { width:100%; padding:11px; background:var(--surface2); border:1px solid var(--border); border-radius:10px; color:var(--text); outline:none; font-family:inherit; }
-
-  /* BOTÓN DE ENVÍO Y BLOQUEO */
-  .btn-send { width:100%; padding:16px; background:var(--green); border:none; border-radius:12px; color:#fff; font-family:'Oswald',sans-serif; font-size:18px; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:10px; transition:0.3s; }
-  .btn-send:disabled { background:#444 !important; color:#888 !important; cursor:not-allowed !important; filter:grayscale(100%); opacity:0.7; }
-
-  .toast { position:fixed; bottom:90px; left:50%; transform:translateX(-50%); background:#333; color:#fff; padding:12px 24px; border-radius:30px; font-size:14px; opacity:0; pointer-events:none; transition:0.3s; z-index:1000; }
-  .toast.show { opacity:1; }
-  footer { text-align:center; padding:20px; color:var(--muted); font-size:12px; }
+  #floatCart { position: fixed; bottom: 20px; right: 20px; background: var(--yellow); color: #000; padding: 12px 20px; border-radius: 30px; font-weight: 800; box-shadow: 0 4px 15px rgba(0,0,0,0.4); border: none; cursor: pointer; z-index: 100; }
+  .toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: #333; padding: 10px 20px; border-radius: 20px; opacity: 0; transition: 0.3s; z-index: 1000; }
+  .toast.show { opacity: 1; }
 </style>
 </head>
 <body>
 
 <div id="closedBanner">
   <div class="closed-icon">🔒</div>
-  <div class="closed-title">Estamos Cerrados</div>
-  <div class="closed-msg">No estamos recibiendo pedidos por ahora, pero puedes antojarte viendo el menú.</div>
-  <div class="closed-hours">
-    <div>🕐 Horario de atención:</div>
-    <div>Viernes: <span>3:00pm – 12:00mn</span></div>
-    <div>Sábados: <span>1:00pm – 12:00mn</span></div>
-    <div>Domingos: <span>1:00pm – 10:00pm</span></div>
-  </div>
-  <button class="btn-ver-menu" onclick="document.getElementById('closedBanner').classList.remove('show')">Ver menú de todos modos</button>
+  <div class="closed-title">Local Cerrado</div>
+  <div class="closed-msg">No estamos recibiendo pedidos en este momento.</div>
+  <div id="nextOpeningInfo" class="closed-hours">Cargando horario...</div>
+  <button class="btn-continuar" onclick="cerrarPopup()">Ver menú de todos modos</button>
 </div>
 
 <div id="scheduleBar">
-  <span class="schedule-dot"></span>
-  <span id="scheduleText">Verificando horario...</span>
+  <div class="dot"></div>
+  <span id="scheduleText">Verificando...</span>
 </div>
 
 <header>
-  <span class="header-flame">🔥</span>
   <div class="header-title">Javier Bear Grill</div>
-  <div class="header-sub">Sabor a fuego · Hecho con pasión</div>
-  <div class="header-divider"></div>
+  <p style="color:var(--muted); font-size: 12px; letter-spacing: 2px;">SABOR A FUEGO</p>
 </header>
 
-<div id="menu"></div>
+<div id="menuContainer"></div>
 
-<button id="verCarritoBtn" onclick="irCarrito()">
-  🛒 Ver carrito (<span id="cartCount">0</span>)
-</button>
+<button id="floatCart" onclick="document.getElementById('carrito').scrollIntoView({behavior:'smooth'})">🛒 Carrito (<span id="cartCount">0</span>)</button>
 
 <div id="carrito">
-  <div class="cart-body">
-    <h2 style="font-family:'Oswald'; color:var(--yellow); margin-bottom:15px;">Tu Pedido</h2>
-    <div id="listaCarrito"></div>
-    <div class="totals">
-      <div style="display:flex; justify-content:space-between"><span>Subtotal</span><span>$<span id="subtotal">0.00</span></span></div>
-      <div style="display:flex; justify-content:space-between"><span>Delivery</span><span>$<span id="delivery">0.00</span></span></div>
-      <div style="display:flex; justify-content:space-between; font-weight:800; font-size:20px; color:var(--yellow); margin-top:10px;"><span>Total</span><span>$<span id="total">0.00</span></span></div>
-    </div>
-
-    <div class="form-section">
-      <div class="form-group"><label>Nombre</label><input type="text" id="nombre" placeholder="Tu nombre"></div>
-      <div class="form-group"><label>Dirección</label><input type="text" id="direccion" placeholder="Dirección exacta"></div>
-      <div class="form-group">
-        <label>Zona</label>
-        <select id="zona" onchange="actualizarCarrito()">
-          <option value="">Selecciona zona</option>
-          <option value="La Valdeza">La Valdeza</option>
-          <option value="Llano Largo">Llano Largo</option>
-          <option value="Fuera de zona">Fuera de zona (A coordinar)</option>
-        </select>
-      </div>
-      <div class="form-group"><label>Notas</label><textarea id="notas" placeholder="Ej: Sin cebolla..."></textarea></div>
-    </div>
-
-    <button class="btn-send" id="btnEnviar" onclick="enviarPedido()">
-      Enviar Pedido por WhatsApp
-    </button>
+  <h3 style="font-family:'Oswald'; color:var(--yellow); margin-bottom:15px;">Finalizar Pedido</h3>
+  <div id="listaItems" style="margin-bottom:15px; font-size:14px;"></div>
+  <div style="border-top:1px solid var(--border); padding-top:10px; margin-bottom:15px;">
+    <div style="display:flex; justify-content:space-between;"><span>Total:</span><span id="totalVal" style="color:var(--yellow); font-weight:800; font-size:20px;">$0.00</span></div>
   </div>
+  
+  <div class="form-group">
+    <label>Nombre</label>
+    <input type="text" id="nombre" placeholder="Tu nombre">
+  </div>
+  <div class="form-group">
+    <label>Zona de Entrega</label>
+    <select id="zona">
+      <option value="La Valdeza">La Valdeza ($1.25)</option>
+      <option value="Llano Largo">Llano Largo ($1.25)</option>
+      <option value="Fuera de zona">Fuera de zona (Coord. por WA)</option>
+    </select>
+  </div>
+  
+  <button class="btn-send" id="btnEnviar" onclick="enviarPedido()">Enviar Pedido por WhatsApp</button>
 </div>
-
-<footer>🔥 Javier Bear Grill · 2024</footer>
 
 <div class="toast" id="toast"></div>
 
 <script>
-// ============================================================
-// CONFIGURACIÓN DE HORARIOS ACTUALIZADA
-// ============================================================
+// CONFIGURACIÓN DE HORARIOS
 const HORARIO = {
-  0: [13, 22], // Domingo: 1pm a 10pm
-  1: [11, 22], // Lunes
-  2: [11, 22], // Martes
-  3: [11, 22], // Miércoles
-  4: [11, 22], // Jueves
-  5: [15, 24], // Viernes: 3pm a 12mn
-  6: [13, 24], // Sábado: 1pm a 12mn
+  0: { open: 13, close: 22, name: "Domingo" },
+  5: { open: 15, close: 24, name: "Viernes" },
+  6: { open: 13, close: 24, name: "Sábado" }
+  // Lunes a Jueves se asume cerrado basado en tu solicitud previa
 };
 
-const DELIVERY_BASE = 1.25;
-
-const categorias = [
-  {
-    nombre: '🥳 Promociones', id: 'promos',
-    productos: [
-      { id: 'tres-smash', nombre: 'Las tres Smash Burgers', precio: 11.99, emoji: '🔥' },
-      { id: 'brutalito', nombre: 'Promo Brutalito', precio: 5.75, emoji: '💥' },
-    ]
-  },
-  {
-    nombre: '🍗 Pollos Asados', id: 'pollos',
-    productos: [
-      { id: 'pollo-entero', nombre: '1 Pollo Entero', precio: 9.00, emoji: '🍗' },
-      { id: 'combo-medio-pollo', nombre: 'COMBO Medio Pollo', precio: 7.50, emoji: '🍽️' },
-    ]
-  }
+const CATEGORIAS = [
+  { nombre: "🥳 Promociones", items: [
+    {id:1, n:"Las tres Smash Burgers", p:11.99},
+    {id:2, n:"Promo Brutalito", p:5.75}
+  ]},
+  { nombre: "🍗 Pollos Asados", items: [
+    {id:3, n:"1 Pollo Entero", p:9.00},
+    {id:4, n:"1/2 Pollo Asado", p:5.00},
+    {id:5, n:"COMBO Pollo Entero", p:13.00}
+  ]},
+  { nombre: "🍔 Hamburguesas", items: [
+    {id:6, n:"La Garra (Especial)", p:8.50},
+    {id:7, n:"Doble Hamburguesa", p:4.75},
+    {id:8, n:"La Rompe Yema", p:3.99}
+  ]},
+  { nombre: "🍟 Acompañantes", items: [
+    {id:9, n:"Papas Fritas", p:1.75},
+    {id:10, n:"Patacones", p:1.75},
+    {id:11, n:"Yuca al Mojo", p:1.75}
+  ]},
+  { nombre: "🥤 Bebidas", items: [
+    {id:12, n:"Soda Lata", p:1.00},
+    {id:13, n:"Agua Botella", p:1.00},
+    {id:14, n:"Soda 1.5L", p:2.75}
+  ]}
 ];
 
-const todosProductos = categorias.flatMap(c => c.productos);
 let carrito = {};
+let bannerForzadoCerrado = false;
 
-// FUNCIÓN DE VERIFICACIÓN DE HORARIO Y BLOQUEO
 function checkSchedule() {
   const now = new Date();
   const day = now.getDay();
   const hour = now.getHours();
-  const [openH, closeH] = HORARIO[day];
-  const isOpen = hour >= openH && hour < closeH;
-
+  
+  const hoy = HORARIO[day];
+  const isOpen = hoy && hour >= hoy.open && hour < hoy.close;
+  
   const bar = document.getElementById('scheduleBar');
-  const text = document.getElementById('scheduleText');
+  const txt = document.getElementById('scheduleText');
+  const btn = document.getElementById('btnEnviar');
   const banner = document.getElementById('closedBanner');
-  const btnEnviar = document.getElementById('btnEnviar');
 
   if (isOpen) {
-    bar.className = 'open-bar';
-    const ch = closeH === 24 ? "12:00mn" : (closeH > 12 ? `${closeH-12}:00pm` : `${closeH}:00am`);
-    text.textContent = `Abierto ahora · Cerramos a las ${ch}`;
+    bar.className = "open-bar";
+    txt.innerText = `Abierto ahora · Cerramos a las ${hoy.close > 12 ? hoy.close-12 : hoy.close}:00${hoy.close >= 12 ? 'pm' : 'am'}`;
+    btn.disabled = false;
+    btn.innerText = "Enviar Pedido por WhatsApp";
     banner.classList.remove('show');
-    
-    // Habilitar botón
-    btnEnviar.disabled = false;
-    btnEnviar.innerHTML = "Enviar Pedido por WhatsApp";
   } else {
-    bar.className = 'closed-bar';
-    const oh = openH > 12 ? `${openH-12}:00pm` : `${openH}:00am`;
-    text.textContent = `Cerrado · Abrimos a las ${oh}`;
-    banner.classList.add('show');
+    bar.className = "closed-bar";
+    const next = getNextOpening();
+    txt.innerText = `Cerrado · Abrimos el ${next.dia} a las ${next.hora}`;
+    btn.disabled = true;
+    btn.innerText = "🚫 Local Cerrado";
     
-    // Bloquear botón
-    btnEnviar.disabled = true;
-    btnEnviar.innerHTML = "🚫 Local Cerrado (Solo consulta)";
+    if (!bannerForzadoCerrado) {
+      banner.classList.add('show');
+      document.getElementById('nextOpeningInfo').innerHTML = `🕐 Próxima apertura:<br><span>${next.dia} a las ${next.hora}</span>`;
+    }
   }
+}
+
+function getNextOpening() {
+  const now = new Date();
+  for (let i = 0; i < 7; i++) {
+    const nextDate = new Date();
+    nextDate.setDate(now.getDate() + i);
+    const dayIndex = nextDate.getDay();
+    const config = HORARIO[dayIndex];
+    
+    if (config) {
+      if (i === 0 && now.getHours() < config.open) {
+        return { dia: "Hoy", hora: (config.open > 12 ? config.open-12 : config.open) + ":00pm" };
+      }
+      if (i > 0) {
+        return { dia: config.name, hora: (config.open > 12 ? config.open-12 : config.open) + ":00pm" };
+      }
+    }
+  }
+  return { dia: "Próximamente", hora: "--" };
+}
+
+function cerrarPopup() {
+  bannerForzadoCerrado = true;
+  document.getElementById('closedBanner').classList.remove('show');
 }
 
 function renderMenu() {
-  const menuDiv = document.getElementById('menu');
-  categorias.forEach(cat => {
-    let html = `<div class="category-block">
-      <button class="category-toggle" id="toggle-${cat.id}" onclick="toggleCategoria('${cat.id}')">
-        <span class="cat-title">${cat.nombre}</span>
+  const container = document.getElementById('menuContainer');
+  CATEGORIAS.forEach(cat => {
+    const block = document.createElement('div');
+    block.className = 'category-block';
+    block.innerHTML = `
+      <button class="category-toggle" onclick="this.nextElementSibling.classList.toggle('open')">
+        ${cat.nombre} <span>▼</span>
       </button>
-      <div class="category-body" id="body-${cat.id}">
-        <div class="menu-grid">`;
-    cat.productos.forEach(p => {
-      html += `<div class="card">
-        <div class="card-img-placeholder">${p.emoji}</div>
-        <div class="card-body">
-          <div class="card-name">${p.nombre}</div>
-          <div class="card-footer">
-            <div class="card-price">$${p.precio.toFixed(2)}</div>
-            <div class="qty-controls">
-              <button class="qty-btn" onclick="cambiarCantidad('${p.id}',${p.precio},-1)">-</button>
-              <span class="qty-display" id="qty-${p.id}">0</span>
-              <button class="qty-btn qty-plus" onclick="cambiarCantidad('${p.id}',${p.precio},1)">+</button>
+      <div class="category-body">
+        ${cat.items.map(item => `
+          <div class="card">
+            <div class="card-header">
+              <span class="card-name">${item.n}</span>
+              <span class="card-price">$${item.p.toFixed(2)}</span>
+            </div>
+            <div style="display:flex; justify-content:flex-end;">
+              <div class="qty-controls">
+                <button class="qty-btn" onclick="updateQty(${item.id}, '${item.n}', ${item.p}, -1)">-</button>
+                <div class="qty-val" id="qty-${item.id}">0</div>
+                <button class="qty-btn plus" onclick="updateQty(${item.id}, '${item.n}', ${item.p}, 1)">+</button>
+              </div>
             </div>
           </div>
-        </div>
-      </div>`;
-    });
-    html += `</div></div></div>`;
-    menuDiv.innerHTML += html;
+        `).join('')}
+      </div>
+    `;
+    container.appendChild(block);
   });
 }
 
-function toggleCategoria(id) {
-  const body = document.getElementById('body-' + id);
-  const toggle = document.getElementById('toggle-' + id);
-  body.classList.toggle('open');
-  toggle.classList.toggle('open');
-}
-
-function cambiarCantidad(id, precio, delta) {
-  let qtySpan = document.getElementById('qty-' + id);
-  let q = parseInt(qtySpan.textContent) + delta;
-  if (q < 0) q = 0;
-  qtySpan.textContent = q;
-  
-  if (q > 0) {
-    carrito[id] = { nombre: todosProductos.find(x=>x.id===id).nombre, precio, cantidad: q };
-  } else {
+function updateQty(id, name, price, delta) {
+  if (!carrito[id]) carrito[id] = { name, price, qty: 0 };
+  carrito[id].qty += delta;
+  if (carrito[id].qty <= 0) {
+    carrito[id].qty = 0;
     delete carrito[id];
   }
-  actualizarCarrito();
+  document.getElementById(`qty-${id}`).innerText = carrito[id] ? carrito[id].qty : 0;
+  actualizarResumen();
 }
 
-function actualizarCarrito() {
-  let sub = 0;
+function actualizarResumen() {
+  const lista = document.getElementById('listaItems');
+  let total = 0;
   let count = 0;
-  const lista = document.getElementById('listaCarrito');
   lista.innerHTML = "";
   
   Object.values(carrito).forEach(item => {
-    sub += item.precio * item.cantidad;
-    count += item.cantidad;
-    lista.innerHTML += `<div style="display:flex; justify-content:space-between; margin-bottom:5px; font-size:14px;">
-      <span>${item.nombre} x${item.cantidad}</span>
-      <span>$${(item.precio * item.cantidad).toFixed(2)}</span>
+    total += item.price * item.qty;
+    count += item.qty;
+    lista.innerHTML += `<div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+      <span>${item.name} x${item.qty}</span>
+      <span>$${(item.price * item.qty).toFixed(2)}</span>
     </div>`;
   });
-
-  let zona = document.getElementById('zona').value;
-  let deli = (sub > 0 && zona !== "" && zona !== "Fuera de zona") ? DELIVERY_BASE : 0;
   
-  document.getElementById('cartCount').textContent = count;
-  document.getElementById('subtotal').textContent = sub.toFixed(2);
-  document.getElementById('delivery').textContent = (zona === "Fuera de zona") ? "Coord." : deli.toFixed(2);
-  document.getElementById('total').textContent = (sub + deli).toFixed(2);
-}
-
-function irCarrito() { document.getElementById('carrito').scrollIntoView({behavior:'smooth'}); }
-
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg; t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'), 3000);
+  document.getElementById('totalVal').innerText = `$${total.toFixed(2)}`;
+  document.getElementById('cartCount').innerText = count;
 }
 
 function enviarPedido() {
   const nombre = document.getElementById('nombre').value;
   const zona = document.getElementById('zona').value;
-  if (!nombre || !zona || Object.keys(carrito).length === 0) {
-    showToast("⚠️ Completa tus datos y añade productos");
+  if (!nombre || Object.keys(carrito).length === 0) {
+    alert("Por favor añade productos y tu nombre.");
     return;
   }
-  let msg = `🔥 *PEDIDO - Javier Bear Grill* 🔥%0A%0A`;
-  Object.values(carrito).forEach(i => msg += `• ${i.nombre} x${i.cantidad}%0A`);
-  msg += `%0A💰 *Total:* $${document.getElementById('total').textContent}%0A👤 *Cliente:* ${nombre}%0A📍 *Zona:* ${zona}`;
+  
+  let msg = `🔥 *NUEVO PEDIDO - Javier Bear Grill* 🔥%0A%0A`;
+  Object.values(carrito).forEach(i => msg += `• ${i.name} x${i.qty}%0A`);
+  msg += `%0A👤 *Cliente:* ${nombre}%0A📍 *Zona:* ${zona}%0A💰 *Total:* ${document.getElementById('totalVal').innerText}`;
+  
   window.open(`https://wa.me/50765738924?text=${msg}`);
 }
 
