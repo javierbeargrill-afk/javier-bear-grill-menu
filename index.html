@@ -181,7 +181,7 @@ h1{
 </select>
 
 <div class="nota-zona">
-Si estás fuera de estas zonas, puedes seleccionar la última opción y coordinamos el costo del delivery por WhatsApp.
+Si estás fuera de estas zonas, selecciona la última opción y coordinamos el costo por WhatsApp.
 </div>
 
 </div>
@@ -273,16 +273,16 @@ function eliminarItem(index){
 
 function enviarWhatsApp(){
 
+    if(carrito.length === 0){
+        alert("El carrito está vacío");
+        return;
+    }
+
     const nombre = document.getElementById("nombre").value.trim();
     const direccion = document.getElementById("direccion").value.trim();
     const zonaSelect = document.getElementById("zona");
     const zonaTexto = zonaSelect.options[zonaSelect.selectedIndex].text;
     const zonaValor = zonaSelect.value;
-
-    if(carrito.length === 0){
-        alert("El carrito está vacío");
-        return;
-    }
 
     if(!nombre || !direccion || !zonaValor){
         alert("Completa todos los datos antes de enviar");
@@ -290,32 +290,35 @@ function enviarWhatsApp(){
     }
 
     let subtotal = 0;
-    let mensaje = "🔥 PEDIDO JAVIER BEAR GRILL 🔥%0A%0A";
-    mensaje += `Cliente: ${nombre}%0A`;
-    mensaje += `Zona: ${zonaTexto}%0A`;
-    mensaje += `Dirección: ${direccion}%0A%0A`;
-    mensaje += "Pedido:%0A";
+    let mensaje = "🔥 PEDIDO JAVIER BEAR GRILL 🔥\n\n";
+    mensaje += `Cliente: ${nombre}\n`;
+    mensaje += `Zona: ${zonaTexto}\n`;
+    mensaje += `Dirección: ${direccion}\n\n`;
+    mensaje += "Pedido:\n";
 
     carrito.forEach(item=>{
         subtotal += item.precio * item.cantidad;
-        mensaje += `${item.nombre} x${item.cantidad} - $${(item.precio*item.cantidad).toFixed(2)}%0A`;
+        mensaje += `${item.nombre} x${item.cantidad} - $${(item.precio*item.cantidad).toFixed(2)}\n`;
     });
 
-    mensaje += `%0ASubtotal: $${subtotal.toFixed(2)}%0A`;
+    mensaje += `\nSubtotal: $${subtotal.toFixed(2)}\n`;
 
     if(zonaValor === "consultar"){
-        mensaje += "Delivery: A consultar%0A";
+        mensaje += "Delivery: A consultar\n";
         mensaje += "TOTAL: A confirmar con delivery";
     } else {
-        mensaje += `Delivery: $${delivery.toFixed(2)}%0A`;
+        mensaje += `Delivery: $${delivery.toFixed(2)}\n`;
         mensaje += `TOTAL: $${(subtotal+delivery).toFixed(2)}`;
     }
 
-    window.open(`https://wa.me/50765738924?text=${mensaje}`);
+    const url = "https://wa.me/50765738924?text=" + encodeURIComponent(mensaje);
+    window.location.href = url;
 
-    carrito = [];
-    guardarCarrito();
-    actualizarCarrito();
+    setTimeout(() => {
+        carrito = [];
+        guardarCarrito();
+        actualizarCarrito();
+    }, 1500);
 }
 
 actualizarCarrito();
