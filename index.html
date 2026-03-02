@@ -12,6 +12,7 @@ body{
     padding:0;
     background:#111;
     color:white;
+    padding-bottom:220px;
 }
 
 h1{
@@ -28,10 +29,6 @@ h1{
     padding:15px;
     margin-bottom:15px;
     border-radius:10px;
-}
-
-.producto h3{
-    margin:0;
 }
 
 .precio{
@@ -72,10 +69,6 @@ h1{
     background:#000;
     padding:15px;
     border-top:2px solid #ffcc00;
-}
-
-.carrito h2{
-    margin-top:0;
 }
 
 .item-carrito{
@@ -119,7 +112,7 @@ h1{
 
 <div class="menu">
 
-<div class="producto" data-nombre="Hamburguesa La Rompe Yema" data-precio="3.99">
+<div class="producto" data-nombre="La Rompe Yema" data-precio="3.99">
 <h3>La Rompe Yema</h3>
 <p class="precio">$3.99</p>
 
@@ -157,7 +150,11 @@ h1{
 
 <script>
 
-let carrito = [];
+let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
+
+function guardarCarrito(){
+    localStorage.setItem("carrito", JSON.stringify(carrito));
+}
 
 function cambiarCantidad(btn, cambio){
     const contenedor = btn.parentElement;
@@ -175,7 +172,6 @@ function agregarDesdeMenu(btn){
     const cantidad = parseInt(producto.querySelector(".cantidad").innerText);
 
     agregarAlCarrito(nombre, precio, cantidad);
-
     producto.querySelector(".cantidad").innerText = "1";
 }
 
@@ -206,6 +202,7 @@ function actualizarCarrito(){
     });
 
     document.getElementById("total").innerText = total.toFixed(2);
+    guardarCarrito();
 }
 
 function eliminarItem(index){
@@ -227,7 +224,13 @@ function enviarWhatsApp(){
     mensaje += `%0ATotal: $${document.getElementById("total").innerText}`;
 
     window.open(`https://wa.me/50765738924?text=${mensaje}`);
+
+    carrito = [];
+    guardarCarrito();
+    actualizarCarrito();
 }
+
+actualizarCarrito();
 
 </script>
 
