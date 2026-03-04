@@ -14,44 +14,54 @@
   }
   body { background: var(--bg); color: var(--text); font-family: 'Nunito', sans-serif; min-height: 100vh; padding-bottom: 50px; }
 
-  /* CABECERA Y HORARIOS */
   #scheduleBar { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 10px; font-size: 13px; font-weight: 700; position: sticky; top: 0; z-index: 900; }
   .open-bar { background: #0d2b1a; color: var(--green); border-bottom: 1px solid #1a4a2a; }
   .closed-bar { background: #2b0d0d; color: var(--red); border-bottom: 1px solid #4a1a1a; }
   .dot { width: 8px; height: 8px; border-radius: 50%; }
   .open-bar .dot { background: var(--green); animation: pulse 2s infinite; }
   .closed-bar .dot { background: var(--red); }
-  @keyframes pulse { 0% {opacity:1} 50% {opacity:0.4} 100% {opacity:1} }
+  @keyframes pulse { 0%{opacity:1} 50%{opacity:0.4} 100%{opacity:1} }
 
-  header { text-align: center; padding: 25px 20px; background: linear-gradient(180deg, #1a0a00 0%, #0f0f0f 100%); }
+  header { text-align: center; padding: 25px 20px 15px; background: linear-gradient(180deg, #1a0a00 0%, #0f0f0f 100%); }
   .header-title { font-family: 'Oswald', sans-serif; font-size: 30px; color: var(--yellow); text-transform: uppercase; }
-  
-  /* DISEÑO DEL MENÚ */
+
+  #syncBar { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 8px 16px; }
+  #syncBtn { background: var(--surface2); border: 1px solid var(--border); color: var(--muted); font-size: 11px; padding: 5px 12px; border-radius: 20px; cursor: pointer; font-family: 'Nunito', sans-serif; }
+  #syncBtn:hover { border-color: var(--yellow); color: var(--yellow); }
+  #syncStatus { font-size: 11px; color: var(--muted); }
+
   .category-block { margin: 8px 12px; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
   .category-toggle { width: 100%; padding: 14px; background: var(--surface); border: none; color: var(--yellow); font-family: 'Oswald', sans-serif; text-align: left; font-size: 16px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
   .category-body { display: none; padding: 8px; background: var(--bg); grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 8px; }
   .category-body.open { display: grid; }
-  
-  .card { background: var(--surface); padding: 12px; border-radius: 10px; border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
-  .card-info { flex: 1; padding-right: 10px; }
+
+  .card { background: var(--surface); padding: 12px; border-radius: 10px; border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+  .card-info { flex: 1; min-width: 0; }
   .card-name { font-weight: 600; font-size: 14px; color: #fff; display: block; margin-bottom: 2px; }
   .card-price { color: var(--yellow); font-family: 'Oswald'; font-size: 16px; }
-  
-  .qty-controls { display: flex; align-items: center; background: var(--surface2); border-radius: 20px; border: 1px solid var(--border); height: 30px; }
+
+  .card.has-img { padding: 0; overflow: hidden; flex-direction: column; align-items: stretch; }
+  .card.has-img .card-img { width: 100%; height: 140px; object-fit: cover; display: block; }
+  .card.has-img .card-bottom { display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; gap: 8px; }
+  .card.has-img .card-info { flex: 1; min-width: 0; }
+
+  .qty-controls { display: flex; align-items: center; background: var(--surface2); border-radius: 20px; border: 1px solid var(--border); height: 30px; flex-shrink: 0; }
   .qty-btn { width: 30px; height: 30px; border: none; background: none; color: var(--yellow); font-weight: bold; cursor: pointer; font-size: 16px; }
   .qty-btn.plus { background: var(--yellow); color: #000; border-radius: 0 20px 20px 0; }
   .qty-val { width: 25px; text-align: center; font-weight: 700; font-size: 13px; }
 
-  /* CARRITO */
   #carrito { padding: 20px; background: var(--surface); margin: 20px 12px 100px; border-radius: 15px; border: 1px solid var(--border); }
   .form-group { margin-bottom: 12px; }
   .form-group label { display: block; font-size: 11px; color: var(--muted); text-transform: uppercase; margin-bottom: 4px; }
-  .form-group input, .form-group select { width: 100%; padding: 12px; background: var(--bg); border: 1px solid var(--border); color: #fff; border-radius: 8px; }
-
+  .form-group input, .form-group select { width: 100%; padding: 12px; background: var(--bg); border: 1px solid var(--border); color: #fff; border-radius: 8px; font-family: 'Nunito', sans-serif; font-size: 14px; }
   .btn-send { width: 100%; padding: 16px; background: var(--green); border: none; color: #fff; border-radius: 12px; font-family: 'Oswald'; font-size: 18px; font-weight: 700; cursor: pointer; margin-top: 10px; }
-  .btn-send:disabled { background: #333 !important; color: #666 !important; }
+  .btn-send:disabled { background: #333 !important; color: #666 !important; cursor: not-allowed; }
 
-  #floatCart { position: fixed; bottom: 20px; right: 20px; background: var(--yellow); color: #000; padding: 12px 20px; border-radius: 50px; font-weight: 800; box-shadow: 0 5px 20px rgba(0,0,0,0.5); border: none; z-index: 1000; font-family: 'Oswald'; }
+  #floatCart { position: fixed; bottom: 20px; right: 20px; background: var(--yellow); color: #000; padding: 12px 20px; border-radius: 50px; font-weight: 800; box-shadow: 0 5px 20px rgba(0,0,0,0.5); border: none; z-index: 1000; font-family: 'Oswald'; cursor: pointer; }
+
+  #loadingMsg { text-align: center; padding: 40px; color: var(--muted); font-size: 14px; }
+  .spinner { display: inline-block; width: 20px; height: 20px; border: 2px solid var(--border); border-top-color: var(--yellow); border-radius: 50%; animation: spin 0.8s linear infinite; margin-right: 8px; vertical-align: middle; }
+  @keyframes spin { to { transform: rotate(360deg); } }
 </style>
 </head>
 <body>
@@ -66,14 +76,21 @@
   <p style="color:var(--muted); font-size: 10px; letter-spacing: 2px;">LA CHORRERA, PANAMÁ</p>
 </header>
 
-<div id="menuContainer"></div>
+<div id="syncBar">
+  <button id="syncBtn" onclick="cargarMenu(true)">🔄 Sincronizar menú</button>
+  <span id="syncStatus"></span>
+</div>
+
+<div id="menuContainer">
+  <div id="loadingMsg"><span class="spinner"></span>Cargando menú...</div>
+</div>
 
 <button id="floatCart" onclick="document.getElementById('carrito').scrollIntoView({behavior:'smooth'})">🛒 PEDIDO (<span id="cartCount">0</span>)</button>
 
 <div id="carrito">
   <h3 style="font-family:'Oswald'; color:var(--yellow); margin-bottom:15px; border-bottom: 1px solid var(--border); padding-bottom: 8px;">TU PEDIDO</h3>
   <div id="listaItems" style="margin-bottom:15px;"></div>
-  
+
   <div style="background:var(--surface2); padding:15px; border-radius:10px; margin-bottom:15px;">
     <div style="display:flex; justify-content:space-between; margin-bottom:5px;"><span>Subtotal:</span><span id="subtotalVal">$0.00</span></div>
     <div style="display:flex; justify-content:space-between; margin-bottom:5px;"><span>Delivery:</span><span id="deliveryVal">$0.00</span></div>
@@ -81,7 +98,7 @@
       <span>TOTAL:</span><span id="totalVal">$0.00</span>
     </div>
   </div>
-  
+
   <div class="form-group"><label>Nombre</label><input type="text" id="nombre"></div>
   <div class="form-group">
     <label>Zona de Entrega</label>
@@ -95,92 +112,164 @@
     </select>
   </div>
   <div class="form-group"><label>Notas</label><input type="text" id="notas" placeholder="Ej. Sin cebolla, casa amarilla..."></div>
-  
+
   <button class="btn-send" id="btnEnviar" onclick="enviarPedido()">ENVIAR A WHATSAPP</button>
 </div>
 
 <script>
+const SUPABASE_URL = 'https://uazonbacmpwuznugirru.supabase.co/functions/v1/loyverse-menu';
 const HORARIOS = { 5: {o:15, c:24}, 6: {o:13, c:24}, 0: {o:13, c:22} };
-
-const CATEGORIAS = [
-  { n: "🥳 Promociones", i: [{n:"Las tres Smash Burgers", p:11.99}, {n:"Promo Brutalito", p:5.75}] },
-  { n: "🍗 Pollos Asados", i: [{n:"1 pollo entero", p:9.00}, {n:"1/2 pollo asado", p:5.00}, {n:"1/4 de pollo asado", p:2.75}, {n:"COMBO 1/4 DE POLLO", p:5.00}, {n:"COMBO MEDIO POLLO", p:7.50}, {n:"COMBO POLLO ENTERO", p:13.00}] },
-  { n: "🍔 Combos de Hamburguesas", i: [{n:"COMBO HAMBURGUESA LA GARRA", p:10.99}, {n:"COMBO HAMBURGUESA SENCILLA", p:5.25}, {n:"COMBO DOBLE HAMBURGUESA", p:6.75}, {n:"COMBO TRIPLE HAMBURGUESA", p:10.25}, {n:"Queso Hamburguesa Combo", p:5.75}, {n:"Combo La Rompe Yema", p:6.49}, {n:"Combo La Tableña", p:7.50}] },
-  { n: "🍔 Hamburguesas", i: [{n:"Hamburguesa Clásica", p:3.00}, {n:"Doble hamburguesa", p:4.75}, {n:"Triple hamburguesa", p:7.75}, {n:"La Garra", p:8.50}, {n:"Queso Hamburguesa", p:3.50}, {n:"La Rompe Yema", p:3.99}, {n:"La Tableña Smash", p:4.99}] },
-  { n: "🥩 Carnes y Cerdo", i: [{n:"Bistec de cinta asado", p:4.50}, {n:"Costillita de cerdo asada", p:4.50}, {n:"Costillas BBQ con arepas y patacón", p:8.75}, {n:"COMBO PUERCO AHUMADO", p:6.50}, {n:"COMBO CARNE AHUMADA", p:6.50}] },
-  { n: "🍖 Picadas", i: [{n:"Picada personal", p:9.75}, {n:"Picada mixta para dos", p:15.99}, {n:"Picada mixta para cuatro", p:29.99}, {n:"Picada mixta fiesta", p:59.99}] },
-  { n: "🌭 Salchipapas y Hotdogs", i: [{n:"Salchipapas gratinadas", p:6.50}, {n:"Salchipapas con pollo", p:8.25}, {n:"Salchipapas mini", p:3.50}, {n:"Salchipapas cargadas", p:10.50}, {n:"Carnipapas", p:10.50}, {n:"Choripapas", p:7.75}, {n:"Hotdog Brutal", p:4.50}, {n:"Combo Hotdog Brutal", p:6.75}, {n:"Hotdog clásico", p:2.50}, {n:"Combo Hotdog clásico", p:5.00}] },
-  { n: "🌭 Chorizos", i: [{n:"Chorizo criollo asado", p:1.75}, {n:"COMBO CHORIZOS", p:5.25}, {n:"Paquete de Chorizo", p:6.50}, {n:"Chorizo crudo", p:1.25}] },
-  { n: "🍟 Acompañantes", i: [{n:"Papas fritas", p:1.75}, {n:"Papas asadas (Mojo)", p:1.75}, {n:"Patacones", p:1.75}, {n:"Yuca frita", p:1.75}, {n:"Yuca al mojo", p:1.75}, {n:"Arroz con pollo", p:2.50}, {n:"Arepas rellenas", p:2.25}] },
-  { n: "➕ Extras", i: [{n:"Tocino ahumado", p:0.50}, {n:"Queso mozarella extra", p:0.50}, {n:"Topping Pollo", p:1.50}] },
-  { n: "🥤 Bebidas", i: [{n:"Cocacola", p:1.25}, {n:"Agua botella", p:1.00}, {n:"Jugos naturales", p:1.50}, {n:"Sodas Variadas", p:1.00}, {n:"Litro Soda Cocacola", p:2.75}, {n:"Fresca 1lt", p:2.75}, {n:"Soda manzana mini", p:1.00}] },
-  { n: "🥫 Salsas Extras", i: [{n:"Ketchup", p:0.50}, {n:"Mostaza dulce", p:0.50}, {n:"Mostaza", p:0.50}, {n:"Mayonesa", p:0.50}, {n:"Salsa de ajo", p:0.50}] },
-  { n: "👶 Niños", i: [{n:"Combo nugget", p:5.50}] }
-];
+const CACHE_KEY = 'jbg_menu_cache';
+const CACHE_TTL = 5 * 60 * 1000;
 
 let carrito = {};
+let CATEGORIAS = [];
 
 function checkSchedule() {
   const d = new Date(), dia = d.getDay(), hora = d.getHours();
-  const hoy = HORARIOS[dia], bar = document.getElementById('scheduleBar'), btn = document.getElementById('btnEnviar');
+  const hoy = HORARIOS[dia];
   const isOpen = hoy && hora >= hoy.o && hora < hoy.c;
-  bar.className = isOpen ? "open-bar" : "closed-bar";
-  document.getElementById('scheduleText').innerText = isOpen ? "🟢 ABIERTO AHORA" : "🔴 CERRADO";
-  btn.disabled = !isOpen;
+  const bar = document.getElementById('scheduleBar');
+  bar.className = isOpen ? 'open-bar' : 'closed-bar';
+  document.getElementById('scheduleText').innerText = isOpen ? '🟢 ABIERTO AHORA' : '🔴 CERRADO';
+  document.getElementById('btnEnviar').disabled = !isOpen;
 }
 
-function render() {
+async function cargarMenu(forzar = false) {
+  const statusEl = document.getElementById('syncStatus');
   const container = document.getElementById('menuContainer');
+
+  if (!forzar) {
+    try {
+      const cached = sessionStorage.getItem(CACHE_KEY);
+      if (cached) {
+        const { ts, data } = JSON.parse(cached);
+        if (Date.now() - ts < CACHE_TTL) {
+          CATEGORIAS = data;
+          renderMenu();
+          statusEl.innerText = 'Desde caché';
+          return;
+        }
+      }
+    } catch(e) {}
+  }
+
+  container.innerHTML = '<div id="loadingMsg"><span class="spinner"></span>Cargando menú...</div>';
+  statusEl.innerText = 'Sincronizando...';
+
+  try {
+    const res = await fetch(SUPABASE_URL);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    CATEGORIAS = data;
+    try {
+      sessionStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), data }));
+    } catch(e) {}
+    renderMenu();
+    statusEl.innerText = '✓ Actualizado ' + new Date().toLocaleTimeString('es-PA', {hour:'2-digit', minute:'2-digit'});
+  } catch(e) {
+    container.innerHTML = `<div id="loadingMsg" style="color:var(--red)">⚠️ No se pudo cargar el menú.<br><small>${e.message}</small></div>`;
+    statusEl.innerText = 'Error al sincronizar';
+  }
+}
+
+function renderMenu() {
+  const container = document.getElementById('menuContainer');
+  container.innerHTML = '';
+
   CATEGORIAS.forEach(cat => {
     const block = document.createElement('div');
     block.className = 'category-block';
-    block.innerHTML = `<button class="category-toggle" onclick="this.nextElementSibling.classList.toggle('open')">${cat.n} <span>▼</span></button>
-      <div class="category-body">${cat.i.map(item => {
-        const id = item.n.replace(/\W/g, '');
-        return `<div class="card"><div class="card-info"><span class="card-name">${item.n}</span><span class="card-price">$${item.p.toFixed(2)}</span></div>
-          <div class="qty-controls">
-            <button class="qty-btn" onclick="update('${id}','${item.n}',${item.p},-1)">-</button>
-            <div class="qty-val" id="qty-${id}">0</div>
-            <button class="qty-btn plus" onclick="update('${id}','${item.n}',${item.p},1)">+</button>
-          </div></div>`;
-      }).join('')}</div>`;
+
+    const itemsHTML = cat.i.map(item => {
+      const id = encodeId(item.n);
+      const precio = `$${item.p.toFixed(2)}`;
+
+      if (item.img) {
+        return `<div class="card has-img">
+          <img class="card-img" src="${item.img}" alt="${item.n}" loading="lazy" onerror="this.style.display='none';this.closest('.card').classList.remove('has-img')">
+          <div class="card-bottom">
+            <div class="card-info">
+              <span class="card-name">${item.n}</span>
+              <span class="card-price">${precio}</span>
+            </div>
+            ${qtyHTML(id, item)}
+          </div>
+        </div>`;
+      } else {
+        return `<div class="card">
+          <div class="card-info">
+            <span class="card-name">${item.n}</span>
+            <span class="card-price">${precio}</span>
+          </div>
+          ${qtyHTML(id, item)}
+        </div>`;
+      }
+    }).join('');
+
+    block.innerHTML = `
+      <button class="category-toggle" onclick="this.nextElementSibling.classList.toggle('open')">
+        ${cat.n} <span>▼</span>
+      </button>
+      <div class="category-body">${itemsHTML}</div>`;
+
     container.appendChild(block);
   });
+}
+
+function qtyHTML(id, item) {
+  const nameEsc = item.n.replace(/'/g, "\\'");
+  return `<div class="qty-controls">
+    <button class="qty-btn" onclick="update('${id}','${nameEsc}',${item.p},-1)">-</button>
+    <div class="qty-val" id="qty-${id}">0</div>
+    <button class="qty-btn plus" onclick="update('${id}','${nameEsc}',${item.p},1)">+</button>
+  </div>`;
+}
+
+function encodeId(name) {
+  return name.replace(/\W/g, '_');
 }
 
 function update(id, name, price, delta) {
   if (!carrito[id]) carrito[id] = { name, price, qty: 0 };
   carrito[id].qty += delta;
   if (carrito[id].qty <= 0) delete carrito[id];
-  document.getElementById(`qty-${id}`).innerText = carrito[id] ? carrito[id].qty : 0;
+  const el = document.getElementById('qty-' + id);
+  if (el) el.innerText = carrito[id] ? carrito[id].qty : 0;
   actualizarResumen();
 }
 
 function actualizarResumen() {
   const lista = document.getElementById('listaItems');
-  let sub = 0, count = 0; lista.innerHTML = "";
+  let sub = 0, count = 0;
+  lista.innerHTML = '';
   Object.values(carrito).forEach(i => {
-    sub += i.price * i.qty; count += i.qty;
-    lista.innerHTML += `<div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:4px;"><span>${i.name} (x${i.qty})</span><span>$${(i.price * i.qty).toFixed(2)}</span></div>`;
+    sub += i.price * i.qty;
+    count += i.qty;
+    lista.innerHTML += `<div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px;">
+      <span>${i.name} (x${i.qty})</span><span>$${(i.price * i.qty).toFixed(2)}</span>
+    </div>`;
   });
   const zona = document.getElementById('zona').value;
-  const delivery = (sub > 0 && zona !== "Fuera de zona") ? 1.25 : 0;
+  const delivery = (sub > 0 && zona !== 'Fuera de zona') ? 1.25 : 0;
   document.getElementById('subtotalVal').innerText = `$${sub.toFixed(2)}`;
-  document.getElementById('deliveryVal').innerText = zona === "Fuera de zona" ? "A coord." : `$${delivery.toFixed(2)}`;
+  document.getElementById('deliveryVal').innerText = zona === 'Fuera de zona' ? 'A coord.' : `$${delivery.toFixed(2)}`;
   document.getElementById('totalVal').innerText = `$${(sub + delivery).toFixed(2)}`;
   document.getElementById('cartCount').innerText = count;
 }
 
 function enviarPedido() {
-  const nom = document.getElementById('nombre').value;
-  if (!nom || Object.keys(carrito).length === 0) return alert("Nombre y productos requeridos");
+  const nom = document.getElementById('nombre').value.trim();
+  if (!nom || Object.keys(carrito).length === 0) return alert('Nombre y productos requeridos');
   let m = `🔥 *PEDIDO - Javier Bear Grill* 🔥%0A%0A`;
   Object.values(carrito).forEach(i => m += `• ${i.name} (x${i.qty})%0A`);
   m += `%0A👤 *Cliente:* ${nom}%0A📍 *Zona:* ${document.getElementById('zona').value}%0A📝 *Notas:* ${document.getElementById('notas').value}%0A%0A💰 *TOTAL:* ${document.getElementById('totalVal').innerText}`;
   window.open(`https://wa.me/50765738924?text=${m}`);
 }
 
-render(); checkSchedule();
+cargarMenu();
+checkSchedule();
+setInterval(checkSchedule, 60000);
 </script>
 </body>
 </html>
