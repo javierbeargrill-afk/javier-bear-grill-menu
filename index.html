@@ -72,26 +72,29 @@ button {
 // ==========================
 
 async function cargarMenu() {
-  const res = await fetch("https://uazonbacmpwuznugirru.supabase.co/functions/v1/loyverse-menu");
-  const data = await res.json();
+  try {
+    const res = await fetch("https://uazonbacmpwuznugirru.supabase.co/functions/v1/loyverse-menu");
+    const data = await res.json();
 
-  const menu = document.getElementById("menu");
-  menu.innerHTML = "";
+    const menu = document.getElementById("menu");
+    menu.innerHTML = "";
 
-  data.forEach(item => {
+    data.forEach(item => {
 
-    const price = item.variants?.[0]?.stores?.[0]?.price;
+      const price = item?.variants?.[0]?.stores?.[0]?.price ?? "No disponible";
 
-    if (!price) return;
+      const div = document.createElement("div");
+      div.className = "card";
+      div.innerHTML = `
+        <h3>${item.item_name}</h3>
+        <p>Precio: $${price}</p>
+      `;
+      menu.appendChild(div);
+    });
 
-    const div = document.createElement("div");
-    div.className = "card";
-    div.innerHTML = `
-      <h3>${item.item_name}</h3>
-      <p>Precio: $${price}</p>
-    `;
-    menu.appendChild(div);
-  });
+  } catch (error) {
+    document.getElementById("menu").innerHTML = "<p>Error cargando menú</p>";
+  }
 }
 
 cargarMenu();
