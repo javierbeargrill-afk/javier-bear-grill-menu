@@ -43,10 +43,6 @@ h1 {
   display: none;
 }
 
-.admin-panel h2 {
-  margin-top: 0;
-}
-
 button {
   padding: 10px;
   margin-top: 10px;
@@ -70,6 +66,7 @@ button {
 </div>
 
 <script>
+
 // ==========================
 // CARGAR MENU
 // ==========================
@@ -82,11 +79,16 @@ async function cargarMenu() {
   menu.innerHTML = "";
 
   data.forEach(item => {
+
+    const price = item.variants?.[0]?.stores?.[0]?.price;
+
+    if (!price) return;
+
     const div = document.createElement("div");
     div.className = "card";
     div.innerHTML = `
       <h3>${item.item_name}</h3>
-      <p>Precio: $${item.variants[0]?.price || "0"}</p>
+      <p>Precio: $${price}</p>
     `;
     menu.appendChild(div);
   });
