@@ -133,22 +133,26 @@
 </head>
 <body>
 
+<!-- SCHEDULE BAR -->
 <div id="scheduleBar">
   <div class="dot"></div>
   <span id="scheduleText">Verificando...</span>
   <span id="nextOpen"></span>
 </div>
 
+<!-- HEADER -->
 <header>
   <h1 class="header-title">🔥 Javier Bear Grill 🔥</h1>
   <p style="color:var(--muted); font-size:10px; letter-spacing:2px; margin-top:4px;">LA CHORRERA, PANAMÁ</p>
 </header>
 
+<!-- SYNC BAR -->
 <div id="syncBar">
   <button id="syncBtn" onclick="cargarMenu(true)">🔄 Sincronizar menú</button>
   <span id="syncStatus"></span>
 </div>
 
+<!-- SEARCH -->
 <div id="searchWrap">
   <div class="search-container">
     <span id="searchIcon">🔍</span>
@@ -156,15 +160,19 @@
   </div>
 </div>
 
+<!-- CATEGORY PILLS -->
 <div id="catNav"></div>
 
+<!-- MENU -->
 <div id="menuContainer">
   <div id="loadingMsg"><span class="spinner"></span>Cargando menú...</div>
 </div>
 <div id="noResults">😕 No se encontraron productos para "<span id="searchTerm"></span>"</div>
 
+<!-- FLOAT CART -->
 <button id="floatCart" onclick="document.getElementById('carrito').scrollIntoView({behavior:'smooth'})">🛒 PEDIDO (<span id="cartCount">0</span>)</button>
 
+<!-- CARRITO -->
 <div id="carrito">
   <h3 style="font-family:'Oswald'; color:var(--yellow); margin-bottom:15px; border-bottom:1px solid var(--border); padding-bottom:8px;">TU PEDIDO</h3>
   <div id="listaItems" style="margin-bottom:15px;"></div>
@@ -191,6 +199,7 @@
   <button class="btn-send" id="btnEnviar" onclick="enviarPedido()">ENVIAR A WHATSAPP</button>
 </div>
 
+<!-- ADMIN PANEL -->
 <div id="adminOverlay">
   <div id="adminBox">
     <h2>⚙️ Panel Admin</h2>
@@ -209,9 +218,12 @@
 </div>
 
 <script>
+// ══════════════════════════════════════════
+//  CONFIG
+// ══════════════════════════════════════════
 const SUPABASE_URL  = 'https://uazonbacmpwuznugirru.supabase.co/functions/v1/loyverse-menu';
 const CACHE_KEY     = 'jbg_menu_v2';
-const CACHE_TTL     = 24 * 60 * 60 * 1000;
+const CACHE_TTL     = 24 * 60 * 60 * 1000; // 24 horas
 const ADMIN_PASS    = 'javier2026';
 const HORARIOS      = { 5:{o:15,c:24}, 6:{o:13,c:24}, 0:{o:13,c:22} };
 const CAT_ORDER     = [
@@ -223,6 +235,9 @@ const CAT_ORDER     = [
 let carrito   = {};
 let CATEGORIAS = [];
 
+// ══════════════════════════════════════════
+//  HORARIO
+// ══════════════════════════════════════════
 function checkSchedule() {
   const d = new Date(), dia = d.getDay(), hora = d.getHours();
   const hoy = HORARIOS[dia];
@@ -243,6 +258,9 @@ function checkSchedule() {
   } else { nextEl.innerText = ''; }
 }
 
+// ══════════════════════════════════════════
+//  CARGAR MENÚ
+// ══════════════════════════════════════════
 async function cargarMenu(forzar = false) {
   const statusEl   = document.getElementById('syncStatus');
   const container  = document.getElementById('menuContainer');
@@ -294,6 +312,9 @@ function sortCats(data) {
   });
 }
 
+// ══════════════════════════════════════════
+//  RENDER MENÚ
+// ══════════════════════════════════════════
 function renderMenu() {
   const container = document.getElementById('menuContainer');
   container.innerHTML = '';
@@ -370,13 +391,16 @@ function initLazyImages() {
           obs.unobserve(img);
         }
       });
-    }, { rootMargin: '150px' });
+    }, { rootMargin: '600px' });
     imgs.forEach(img => io.observe(img));
   } else {
     imgs.forEach(img => { img.src = img.dataset.src; });
   }
 }
 
+// ══════════════════════════════════════════
+//  CATEGORY PILLS
+// ══════════════════════════════════════════
 function renderCatNav() {
   const nav = document.getElementById('catNav');
   nav.innerHTML = CATEGORIAS.map(cat =>
@@ -397,6 +421,9 @@ function irACat(catName, pillEl) {
   });
 }
 
+// ══════════════════════════════════════════
+//  BÚSQUEDA
+// ══════════════════════════════════════════
 function buscar(query) {
   const q = query.trim().toLowerCase();
   const noResults = document.getElementById('noResults');
@@ -425,6 +452,9 @@ function buscar(query) {
   noResults.style.display = hayResultados ? 'none' : 'block';
 }
 
+// ══════════════════════════════════════════
+//  CARRITO
+// ══════════════════════════════════════════
 function encodeId(name) { return name.replace(/\W/g, '_'); }
 
 function update(id, name, price, delta) {
@@ -434,6 +464,7 @@ function update(id, name, price, delta) {
   const el = document.getElementById('qty-' + id);
   if (el) el.innerText = carrito[id] ? carrito[id].qty : 0;
   actualizarResumen();
+  // Animación botón flotante
   const btn = document.getElementById('floatCart');
   btn.classList.remove('bump');
   void btn.offsetWidth;
@@ -468,6 +499,9 @@ function enviarPedido() {
   window.open(`https://wa.me/50765738924?text=${m}`);
 }
 
+// ══════════════════════════════════════════
+//  PANEL ADMIN (5 TOQUES SECRETOS)
+// ══════════════════════════════════════════
 let tapCount = 0, tapTimer;
 document.addEventListener('click', e => {
   if (e.target.closest('#adminOverlay') || e.target.closest('#adminBox')) return;
@@ -519,6 +553,9 @@ function limpiarCache() {
   document.getElementById('adminMsg').innerText = '✓ Caché limpiada. Recarga la página.';
 }
 
+// ══════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════
 cargarMenu();
 checkSchedule();
 setInterval(checkSchedule, 60000);
