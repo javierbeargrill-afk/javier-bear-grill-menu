@@ -3,149 +3,525 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Javier Bear Grill</title>
-
+<title>🔥 Javier Bear Grill 🔥</title>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
-body {
-  font-family: Arial, sans-serif;
-  margin: 0;
-  background: #111;
-  color: white;
-}
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0f0f0f; --surface: #1a1a1a; --surface2: #242424;
+    --yellow: #f5c518; --green: #25D366; --text: #f0f0f0; --muted: #888;
+    --border: #2e2e2e; --red: #ff4444;
+  }
 
-h1 {
-  text-align: center;
-  padding: 20px;
-}
+  body { background: var(--bg); color: var(--text); font-family: 'Nunito', sans-serif; min-height: 100vh; padding-bottom: 120px; }
 
-#menu {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 15px;
-  padding: 20px;
-}
+  /* ── SCHEDULE BAR ── */
+  #scheduleBar { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 10px; font-size: 13px; font-weight: 700; position: sticky; top: 0; z-index: 900; }
+  .open-bar  { background: #0d2b1a; color: var(--green); border-bottom: 1px solid #1a4a2a; }
+  .closed-bar{ background: #2b0d0d; color: var(--red);   border-bottom: 1px solid #4a1a1a; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .open-bar  .dot { background: var(--green); animation: pulse 2s infinite; }
+  .closed-bar .dot { background: var(--red); }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+  #nextOpen { font-size: 11px; color: var(--muted); margin-left: 6px; }
 
-.card {
-  background: #1e1e1e;
-  padding: 15px;
-  border-radius: 10px;
-}
+  /* ── HEADER ── */
+  header { text-align: center; padding: 28px 20px 16px; background: linear-gradient(180deg, #1a0a00 0%, #0f0f0f 100%); }
+  .header-title { font-family: 'Oswald'; font-size: clamp(24px, 6vw, 36px); color: var(--yellow); text-transform: uppercase; letter-spacing: 2px; animation: flame 2.8s ease-in-out infinite; }
+  @keyframes flame { 0%,100%{text-shadow:0 0 8px #f5c518,0 0 20px #ff6b00} 50%{text-shadow:0 0 18px #f5c518,0 0 44px #ff6b00,0 0 70px #ff2200} }
 
-.admin-panel {
-  position: fixed;
-  top: 0;
-  right: 0;
-  width: 300px;
-  height: 100%;
-  background: #222;
-  padding: 20px;
-  box-shadow: -5px 0 15px rgba(0,0,0,0.5);
-  display: none;
-}
+  /* ── SYNC BAR ── */
+  #syncBar { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 8px 16px; }
+  #syncBtn { background: var(--surface2); border: 1px solid var(--border); color: var(--muted); font-size: 11px; padding: 5px 12px; border-radius: 20px; cursor: pointer; font-family: 'Nunito'; transition: all 0.2s; }
+  #syncBtn:hover { border-color: var(--yellow); color: var(--yellow); }
+  #syncStatus { font-size: 11px; color: var(--muted); }
 
-button {
-  padding: 10px;
-  margin-top: 10px;
-  width: 100%;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
+  /* ── SEARCH ── */
+  #searchWrap { padding: 8px 12px; position: sticky; top: 42px; z-index: 850; background: var(--bg); border-bottom: 1px solid var(--border); }
+  .search-container { position: relative; }
+  #searchInput { width: 100%; padding: 10px 16px 10px 38px; background: var(--surface); border: 1px solid var(--border); border-radius: 25px; color: var(--text); font-family: 'Nunito'; font-size: 14px; outline: none; transition: border-color 0.2s; }
+  #searchInput:focus { border-color: var(--yellow); }
+  #searchIcon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-size: 15px; pointer-events: none; }
+
+  /* ── CATEGORY PILLS ── */
+  #catNav { display: flex; gap: 6px; overflow-x: auto; padding: 8px 12px; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+  #catNav::-webkit-scrollbar { display: none; }
+  .cat-pill { flex-shrink: 0; padding: 5px 12px; background: var(--surface); border: 1px solid var(--border); border-radius: 20px; font-size: 11px; color: var(--muted); cursor: pointer; white-space: nowrap; transition: all 0.2s; font-family: 'Nunito'; font-weight: 600; }
+  .cat-pill:hover, .cat-pill.active { background: var(--yellow); color: #000; border-color: var(--yellow); }
+
+  /* ── MENU ── */
+  .category-block { margin: 8px 12px; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; animation: fadeUp 0.35s ease both; }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+  .category-toggle { width: 100%; padding: 14px; background: var(--surface); border: none; color: var(--yellow); font-family: 'Oswald'; text-align: left; font-size: 16px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+  .arrow { transition: transform 0.25s; display: inline-block; }
+  .category-toggle.open .arrow { transform: rotate(180deg); }
+  .category-body { display: none; padding: 8px; background: var(--bg); gap: 8px; grid-template-columns: 1fr; }
+  .category-body.open { display: grid; }
+
+  /* ── RESPONSIVE GRID ── */
+  @media (min-width: 540px)  { .category-body { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 900px)  {
+    .category-body { grid-template-columns: repeat(3, 1fr); }
+    .category-block { margin: 8px 20px; }
+    #searchWrap { padding: 8px 20px; }
+    #catNav { padding: 8px 20px; }
+  }
+
+  /* ── CARDS ── */
+  .card { background: var(--surface); border-radius: 10px; border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 12px; transition: border-color 0.15s, transform 0.1s; }
+  .card:active { transform: scale(0.98); }
+  .card:hover { border-color: #3a3a3a; }
+  .card-info { flex: 1; min-width: 0; }
+  .card-name { font-weight: 600; font-size: 14px; color: #fff; display: block; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .card-price { color: var(--yellow); font-family: 'Oswald'; font-size: 16px; }
+
+  .card.has-img { padding: 0; overflow: hidden; flex-direction: column; align-items: stretch; }
+  .card.has-img .img-wrap { position: relative; width: 100%; height: 140px; background: var(--surface2); overflow: hidden; }
+  .card.has-img .card-img { width: 100%; height: 100%; object-fit: cover; display: block; opacity: 0; transition: opacity 0.3s; }
+  .card.has-img .card-img.loaded { opacity: 1; }
+  .img-placeholder { position: absolute; inset: 0; background: linear-gradient(90deg, var(--surface2) 25%, #2e2e2e 50%, var(--surface2) 75%); background-size: 200% 100%; animation: shimmer 1.4s infinite; }
+  @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+  .card.has-img .card-bottom { display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; gap: 8px; }
+  .card.has-img .card-info { flex: 1; min-width: 0; }
+
+  /* ── QTY CONTROLS ── */
+  .qty-controls { display: flex; align-items: center; background: var(--surface2); border-radius: 20px; border: 1px solid var(--border); height: 30px; flex-shrink: 0; }
+  .qty-btn { width: 30px; height: 30px; border: none; background: none; color: var(--yellow); font-weight: bold; cursor: pointer; font-size: 16px; transition: transform 0.1s; }
+  .qty-btn:active { transform: scale(0.85); }
+  .qty-btn.plus { background: var(--yellow); color: #000; border-radius: 0 20px 20px 0; }
+  .qty-btn.plus:hover { background: #ffd84d; }
+  .qty-val { width: 25px; text-align: center; font-weight: 700; font-size: 13px; }
+
+  /* ── CARRITO ── */
+  #carrito { padding: 20px; background: var(--surface); margin: 20px 12px 100px; border-radius: 15px; border: 1px solid var(--border); }
+  @media (min-width: 900px) { #carrito { margin: 20px 20px 120px; } }
+  .form-group { margin-bottom: 12px; }
+  .form-group label { display: block; font-size: 11px; color: var(--muted); text-transform: uppercase; margin-bottom: 4px; }
+  .form-group input, .form-group select { width: 100%; padding: 12px; background: var(--bg); border: 1px solid var(--border); color: #fff; border-radius: 8px; font-family: 'Nunito'; font-size: 14px; }
+  .btn-send { width: 100%; padding: 16px; background: var(--green); border: none; color: #fff; border-radius: 12px; font-family: 'Oswald'; font-size: 18px; font-weight: 700; cursor: pointer; margin-top: 10px; transition: all 0.2s; }
+  .btn-send:not(:disabled):hover { background: #1fba55; transform: translateY(-1px); }
+  .btn-send:disabled { background: #333 !important; color: #666 !important; cursor: not-allowed; }
+
+  /* ── FLOAT CART ── */
+  #floatCart { position: fixed; bottom: 20px; right: 20px; background: var(--yellow); color: #000; padding: 12px 20px; border-radius: 50px; font-weight: 800; box-shadow: 0 5px 20px rgba(0,0,0,0.5); border: none; z-index: 1000; font-family: 'Oswald'; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; }
+  #floatCart:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(245,197,24,0.4); }
+  #floatCart.bump { animation: pop 0.3s ease; }
+  @keyframes pop { 0%{transform:scale(0.85)} 70%{transform:scale(1.15)} 100%{transform:scale(1)} }
+
+  /* ── LOADING / NO RESULTS ── */
+  #loadingMsg { text-align: center; padding: 40px; color: var(--muted); font-size: 14px; }
+  .spinner { display: inline-block; width: 20px; height: 20px; border: 2px solid var(--border); border-top-color: var(--yellow); border-radius: 50%; animation: spin 0.8s linear infinite; margin-right: 8px; vertical-align: middle; }
+  @keyframes spin { to{transform:rotate(360deg)} }
+  #noResults { display: none; text-align: center; padding: 40px 20px; color: var(--muted); font-size: 14px; }
+
+  /* ── ADMIN PANEL ── */
+  #adminOverlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 1100; align-items: center; justify-content: center; }
+  #adminOverlay.visible { display: flex; }
+  #adminBox { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 24px; width: 90%; max-width: 360px; }
+  #adminBox h2 { font-family: 'Oswald'; color: var(--yellow); margin-bottom: 16px; font-size: 20px; }
+  #adminBox input { width: 100%; padding: 10px 14px; background: var(--bg); border: 1px solid var(--border); color: #fff; border-radius: 8px; font-family: 'Nunito'; font-size: 14px; margin-bottom: 12px; }
+  #adminBox input:focus { outline: none; border-color: var(--yellow); }
+  .admin-btn { width: 100%; padding: 12px; border: none; border-radius: 8px; font-family: 'Oswald'; font-size: 15px; font-weight: 600; cursor: pointer; margin-bottom: 8px; transition: opacity 0.2s; }
+  .admin-btn:hover { opacity: 0.85; }
+  .admin-btn.primary { background: var(--yellow); color: #000; }
+  .admin-btn.secondary { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+  .admin-btn.danger { background: var(--red); color: #fff; }
+  #adminMsg { font-size: 12px; color: var(--muted); text-align: center; min-height: 18px; }
+
+  @keyframes slideIn { from{opacity:0;transform:translateX(-6px)} to{opacity:1;transform:translateX(0)} }
 </style>
 </head>
 <body>
 
-<h1>Javier Bear Grill</h1>
+<div id="scheduleBar">
+  <div class="dot"></div>
+  <span id="scheduleText">Verificando...</span>
+  <span id="nextOpen"></span>
+</div>
 
-<div id="menu"></div>
+<header>
+  <h1 class="header-title">🔥 Javier Bear Grill 🔥</h1>
+  <p style="color:var(--muted); font-size:10px; letter-spacing:2px; margin-top:4px;">LA CHORRERA, PANAMÁ</p>
+</header>
 
-<div class="admin-panel" id="adminPanel">
-  <h2>Panel Admin</h2>
-  <button onclick="refrescarMenu()">Refrescar Menú</button>
-  <button onclick="cerrarAdmin()">Cerrar</button>
+<div id="syncBar">
+  <button id="syncBtn" onclick="cargarMenu(true)">🔄 Sincronizar menú</button>
+  <span id="syncStatus"></span>
+</div>
+
+<div id="searchWrap">
+  <div class="search-container">
+    <span id="searchIcon">🔍</span>
+    <input type="search" id="searchInput" placeholder="Buscar producto..." oninput="buscar(this.value)" autocomplete="off">
+  </div>
+</div>
+
+<div id="catNav"></div>
+
+<div id="menuContainer">
+  <div id="loadingMsg"><span class="spinner"></span>Cargando menú...</div>
+</div>
+<div id="noResults">😕 No se encontraron productos para "<span id="searchTerm"></span>"</div>
+
+<button id="floatCart" onclick="document.getElementById('carrito').scrollIntoView({behavior:'smooth'})">🛒 PEDIDO (<span id="cartCount">0</span>)</button>
+
+<div id="carrito">
+  <h3 style="font-family:'Oswald'; color:var(--yellow); margin-bottom:15px; border-bottom:1px solid var(--border); padding-bottom:8px;">TU PEDIDO</h3>
+  <div id="listaItems" style="margin-bottom:15px;"></div>
+  <div style="background:var(--surface2); padding:15px; border-radius:10px; margin-bottom:15px;">
+    <div style="display:flex; justify-content:space-between; margin-bottom:5px;"><span>Subtotal:</span><span id="subtotalVal">$0.00</span></div>
+    <div style="display:flex; justify-content:space-between; margin-bottom:5px;"><span>Delivery:</span><span id="deliveryVal">$0.00</span></div>
+    <div style="display:flex; justify-content:space-between; font-weight:800; font-size:20px; color:var(--yellow); margin-top:5px; border-top:1px solid var(--border); padding-top:8px;">
+      <span>TOTAL:</span><span id="totalVal">$0.00</span>
+    </div>
+  </div>
+  <div class="form-group"><label>Nombre</label><input type="text" id="nombre"></div>
+  <div class="form-group">
+    <label>Zona de Entrega</label>
+    <select id="zona" onchange="actualizarResumen()">
+      <option value="La Valdeza">La Valdeza ($1.25)</option>
+      <option value="Llano Largo">Llano Largo ($1.25)</option>
+      <option value="Las Praderas">Las Praderas ($1.25)</option>
+      <option value="Valle Bonito">Valle Bonito ($1.25)</option>
+      <option value="Villa del Carmen">Villa del Carmen ($1.25)</option>
+      <option value="Fuera de zona">Fuera de zona (Coord. por WA)</option>
+    </select>
+  </div>
+  <div class="form-group"><label>Notas</label><input type="text" id="notas" placeholder="Ej. Sin cebolla, casa amarilla..."></div>
+  <button class="btn-send" id="btnEnviar" onclick="enviarPedido()">ENVIAR A WHATSAPP</button>
+</div>
+
+<div id="adminOverlay">
+  <div id="adminBox">
+    <h2>⚙️ Panel Admin</h2>
+    <div id="adminLoginSection">
+      <input type="password" id="adminPass" placeholder="Clave de acceso..." onkeydown="if(event.key==='Enter')loginAdmin()">
+      <button class="admin-btn primary" onclick="loginAdmin()">ENTRAR</button>
+      <button class="admin-btn secondary" onclick="cerrarAdmin()">Cancelar</button>
+    </div>
+    <div id="adminControls" style="display:none;">
+      <button class="admin-btn primary" onclick="sincronizarAdmin()">🔄 Sincronizar menú ahora</button>
+      <button class="admin-btn danger" onclick="limpiarCache()">🗑️ Limpiar caché</button>
+      <button class="admin-btn secondary" onclick="cerrarAdmin()">Cerrar</button>
+    </div>
+    <p id="adminMsg"></p>
+  </div>
 </div>
 
 <script>
+const SUPABASE_URL  = 'https://uazonbacmpwuznugirru.supabase.co/functions/v1/loyverse-menu';
+const CACHE_KEY     = 'jbg_menu_v2';
+const CACHE_TTL     = 24 * 60 * 60 * 1000;
+const ADMIN_PASS    = 'javier2026';
+const HORARIOS      = { 5:{o:15,c:24}, 6:{o:13,c:24}, 0:{o:13,c:22} };
+const CAT_ORDER     = [
+  'Promociones','Pollo','Combo de hamburguesas','Hamburguesas',
+  'CARNE Y CERDO','Picadas','Salchipapas y HodDogs','Chorizos',
+  'Acompañantes','Bebidas','SALSAS','Niños','Especiales'
+];
 
-// ==========================
-// CARGAR MENU
-// ==========================
+let carrito   = {};
+let CATEGORIAS = [];
 
-async function cargarMenu() {
+function checkSchedule() {
+  const d = new Date(), dia = d.getDay(), hora = d.getHours();
+  const hoy = HORARIOS[dia];
+  const isOpen = hoy && hora >= hoy.o && hora < hoy.c;
+  const bar = document.getElementById('scheduleBar');
+  bar.className = isOpen ? 'open-bar' : 'closed-bar';
+  document.getElementById('scheduleText').innerText = isOpen ? '🟢 ABIERTO AHORA' : '🔴 CERRADO';
+  document.getElementById('btnEnviar').disabled = !isOpen;
+  const nextEl = document.getElementById('nextOpen');
+  if (!isOpen) {
+    const dias = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+    let found = null;
+    for (let i = 1; i <= 7; i++) {
+      const nd = (dia + i) % 7;
+      if (HORARIOS[nd]) { const h = HORARIOS[nd].o; found = `Abre ${dias[nd]} ${h}:00${h<12?'am':'pm'}`; break; }
+    }
+    nextEl.innerText = found ? `· ${found}` : '';
+  } else { nextEl.innerText = ''; }
+}
+
+async function cargarMenu(forzar = false) {
+  const statusEl   = document.getElementById('syncStatus');
+  const container  = document.getElementById('menuContainer');
+
+  if (!forzar) {
+    try {
+      const cached = localStorage.getItem(CACHE_KEY);
+      if (cached) {
+        const { ts, data } = JSON.parse(cached);
+        if (Date.now() - ts < CACHE_TTL) {
+          CATEGORIAS = sortCats(data);
+          renderMenu();
+          renderCatNav();
+          statusEl.innerText = 'Menú actualizado ✓';
+          return;
+        }
+      }
+    } catch(e) {}
+  }
+
+  container.innerHTML = '<div id="loadingMsg"><span class="spinner"></span>Cargando menú...</div>';
+  statusEl.innerText = 'Sincronizando...';
+
   try {
-    const res = await fetch("https://uazonbacmpwuznugirru.supabase.co/functions/v1/loyverse-menu");
+    const res = await fetch(SUPABASE_URL);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
     const data = await res.json();
-
-    const menu = document.getElementById("menu");
-    menu.innerHTML = "";
-
-    data.forEach(item => {
-
-      const price = item?.variants?.[0]?.stores?.[0]?.price ?? "No disponible";
-
-      const div = document.createElement("div");
-      div.className = "card";
-      div.innerHTML = `
-        <h3>${item.item_name}</h3>
-        <p>Precio: $${price}</p>
-      `;
-      menu.appendChild(div);
-    });
-
-  } catch (error) {
-    document.getElementById("menu").innerHTML = "<p>Error cargando menú</p>";
+    if (!Array.isArray(data)) throw new Error('Respuesta inesperada del servidor');
+    CATEGORIAS = sortCats(data);
+    try { localStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), data })); } catch(e) {}
+    renderMenu();
+    renderCatNav();
+    statusEl.innerText = '✓ ' + new Date().toLocaleTimeString('es-PA', {hour:'2-digit', minute:'2-digit'});
+  } catch(e) {
+    container.innerHTML = `<div id="loadingMsg" style="color:var(--red)">⚠️ No se pudo cargar el menú.<br><small>${e.message}</small></div>`;
+    statusEl.innerText = 'Error al sincronizar';
   }
 }
 
-cargarMenu();
+function sortCats(data) {
+  return [...data].sort((a, b) => {
+    const nameA = a.n.replace(/^[\p{Emoji}\s]+/u, '').trim();
+    const nameB = b.n.replace(/^[\p{Emoji}\s]+/u, '').trim();
+    const iA = CAT_ORDER.findIndex(c => nameA.toLowerCase().includes(c.toLowerCase()));
+    const iB = CAT_ORDER.findIndex(c => nameB.toLowerCase().includes(c.toLowerCase()));
+    if (iA === -1 && iB === -1) return nameA.localeCompare(nameB);
+    if (iA === -1) return 1; if (iB === -1) return -1;
+    return iA - iB;
+  });
+}
 
-// ==========================
-// 5 TOQUES SECRETOS
-// ==========================
+function renderMenu() {
+  const container = document.getElementById('menuContainer');
+  container.innerHTML = '';
+  CATEGORIAS.forEach((cat, ci) => {
+    const block = document.createElement('div');
+    block.className = 'category-block';
+    block.dataset.cat = cat.n;
+    block.style.animationDelay = `${ci * 0.04}s`;
+    const toggle = document.createElement('button');
+    toggle.className = 'category-toggle';
+    toggle.innerHTML = `${cat.n} <span class="arrow">▼</span>`;
+    toggle.onclick = function() {
+      this.nextElementSibling.classList.toggle('open');
+      this.classList.toggle('open');
+    };
+    const body = document.createElement('div');
+    body.className = 'category-body';
+    body.innerHTML = cat.i.map(item => cardHTML(item)).join('');
+    block.appendChild(toggle);
+    block.appendChild(body);
+    container.appendChild(block);
+  });
+  setTimeout(initLazyImages, 50);
+}
 
-let tapCount = 0;
-let tapTimer;
-
-document.body.addEventListener("click", () => {
-  tapCount++;
-
-  clearTimeout(tapTimer);
-
-  tapTimer = setTimeout(() => {
-    tapCount = 0;
-  }, 2000);
-
-  if (tapCount === 5) {
-    tapCount = 0;
-    abrirAdmin();
+function cardHTML(item) {
+  const id      = encodeId(item.n);
+  const precio  = `$${item.p.toFixed(2)}`;
+  const nameEsc = item.n.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+  if (item.img) {
+    return `<div class="card has-img">
+      <div class="img-wrap">
+        <div class="img-placeholder"></div>
+        <img class="card-img" data-src="${item.img}" alt="${nameEsc}"
+          onload="this.classList.add('loaded')"
+          onerror="this.closest('.card').classList.remove('has-img');this.closest('.img-wrap').remove()">
+      </div>
+      <div class="card-bottom">
+        <div class="card-info">
+          <span class="card-name">${item.n}</span>
+          <span class="card-price">${precio}</span>
+        </div>
+        ${qtyHTML(id, item)}
+      </div>
+    </div>`;
   }
+  return `<div class="card">
+    <div class="card-info">
+      <span class="card-name">${item.n}</span>
+      <span class="card-price">${precio}</span>
+    </div>
+    ${qtyHTML(id, item)}
+  </div>`;
+}
+
+function qtyHTML(id, item) {
+  const nameEsc = item.n.replace(/'/g, "\\'");
+  return `<div class="qty-controls">
+    <button class="qty-btn" onclick="update('${id}','${nameEsc}',${item.p},-1)">−</button>
+    <div class="qty-val" id="qty-${id}">0</div>
+    <button class="qty-btn plus" onclick="update('${id}','${nameEsc}',${item.p},1)">+</button>
+  </div>`;
+}
+
+function initLazyImages() {
+  const imgs = document.querySelectorAll('img[data-src]');
+  if ('IntersectionObserver' in window) {
+    const io = new IntersectionObserver((entries, obs) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          const img = e.target;
+          img.src = img.dataset.src;
+          img.removeAttribute('data-src');
+          obs.unobserve(img);
+        }
+      });
+    }, { rootMargin: '150px' });
+    imgs.forEach(img => io.observe(img));
+  } else {
+    imgs.forEach(img => { img.src = img.dataset.src; });
+  }
+}
+
+function renderCatNav() {
+  const nav = document.getElementById('catNav');
+  nav.innerHTML = CATEGORIAS.map(cat =>
+    `<button class="cat-pill" onclick="irACat('${cat.n.replace(/'/g,"\\'")}',this)">${cat.n}</button>`
+  ).join('');
+}
+
+function irACat(catName, pillEl) {
+  document.querySelectorAll('.cat-pill').forEach(p => p.classList.remove('active'));
+  pillEl.classList.add('active');
+  document.querySelectorAll('.category-block').forEach(block => {
+    if (block.dataset.cat === catName) {
+      const body   = block.querySelector('.category-body');
+      const toggle = block.querySelector('.category-toggle');
+      if (!body.classList.contains('open')) { body.classList.add('open'); toggle.classList.add('open'); }
+      setTimeout(() => block.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
+    }
+  });
+}
+
+function buscar(query) {
+  const q = query.trim().toLowerCase();
+  const noResults = document.getElementById('noResults');
+  document.getElementById('searchTerm').innerText = query;
+  if (!q) {
+    document.querySelectorAll('.category-block').forEach(b => b.style.display = '');
+    noResults.style.display = 'none';
+    return;
+  }
+  let hayResultados = false;
+  document.querySelectorAll('.category-block').forEach(block => {
+    let catOk = false;
+    block.querySelectorAll('.card').forEach(card => {
+      const nombre = card.querySelector('.card-name')?.textContent.toLowerCase() || '';
+      const match  = nombre.includes(q);
+      card.style.display = match ? '' : 'none';
+      if (match) catOk = true;
+    });
+    block.style.display = catOk ? '' : 'none';
+    if (catOk) {
+      block.querySelector('.category-body').classList.add('open');
+      block.querySelector('.category-toggle').classList.add('open');
+      hayResultados = true;
+    }
+  });
+  noResults.style.display = hayResultados ? 'none' : 'block';
+}
+
+function encodeId(name) { return name.replace(/\W/g, '_'); }
+
+function update(id, name, price, delta) {
+  if (!carrito[id]) carrito[id] = { name, price, qty: 0 };
+  carrito[id].qty += delta;
+  if (carrito[id].qty <= 0) delete carrito[id];
+  const el = document.getElementById('qty-' + id);
+  if (el) el.innerText = carrito[id] ? carrito[id].qty : 0;
+  actualizarResumen();
+  const btn = document.getElementById('floatCart');
+  btn.classList.remove('bump');
+  void btn.offsetWidth;
+  btn.classList.add('bump');
+}
+
+function actualizarResumen() {
+  const lista = document.getElementById('listaItems');
+  let sub = 0, count = 0;
+  lista.innerHTML = '';
+  Object.values(carrito).forEach(i => {
+    sub   += i.price * i.qty;
+    count += i.qty;
+    lista.innerHTML += `<div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px;animation:slideIn 0.2s ease">
+      <span>${i.name} (x${i.qty})</span><span>$${(i.price * i.qty).toFixed(2)}</span>
+    </div>`;
+  });
+  const zona     = document.getElementById('zona').value;
+  const delivery = (sub > 0 && zona !== 'Fuera de zona') ? 1.25 : 0;
+  document.getElementById('subtotalVal').innerText  = `$${sub.toFixed(2)}`;
+  document.getElementById('deliveryVal').innerText  = zona === 'Fuera de zona' ? 'A coord.' : `$${delivery.toFixed(2)}`;
+  document.getElementById('totalVal').innerText     = `$${(sub + delivery).toFixed(2)}`;
+  document.getElementById('cartCount').innerText    = count;
+}
+
+function enviarPedido() {
+  const nom = document.getElementById('nombre').value.trim();
+  if (!nom || Object.keys(carrito).length === 0) return alert('Nombre y productos requeridos');
+  let m = `🔥 *PEDIDO - Javier Bear Grill* 🔥%0A%0A`;
+  Object.values(carrito).forEach(i => m += `• ${i.name} (x${i.qty})%0A`);
+  m += `%0A👤 *Cliente:* ${nom}%0A📍 *Zona:* ${document.getElementById('zona').value}%0A📝 *Notas:* ${document.getElementById('notas').value}%0A%0A💰 *TOTAL:* ${document.getElementById('totalVal').innerText}`;
+  window.open(`https://wa.me/50765738924?text=${m}`);
+}
+
+let tapCount = 0, tapTimer;
+document.addEventListener('click', e => {
+  if (e.target.closest('#adminOverlay') || e.target.closest('#adminBox')) return;
+  tapCount++;
+  clearTimeout(tapTimer);
+  tapTimer = setTimeout(() => { tapCount = 0; }, 2000);
+  if (tapCount >= 5) { tapCount = 0; abrirAdmin(); }
 });
 
 function abrirAdmin() {
-  const clave = prompt("Acceso Admin - Ingresa clave:");
-
-  if (clave === "javier2026") {
-    document.getElementById("adminPanel").style.display = "block";
-  } else {
-    alert("Clave incorrecta");
-  }
+  document.getElementById('adminOverlay').classList.add('visible');
+  document.getElementById('adminLoginSection').style.display = '';
+  document.getElementById('adminControls').style.display = 'none';
+  document.getElementById('adminPass').value = '';
+  document.getElementById('adminMsg').innerText = '';
+  setTimeout(() => document.getElementById('adminPass').focus(), 100);
 }
 
 function cerrarAdmin() {
-  document.getElementById("adminPanel").style.display = "none";
+  document.getElementById('adminOverlay').classList.remove('visible');
 }
 
-// ==========================
-// REFRESCAR MANUAL
-// ==========================
-
-async function refrescarMenu() {
-  await fetch("https://uazonbacmpwuznugirru.supabase.co/functions/v1/loyverse-menu?refresh=javier2026");
-  alert("Menú actualizado");
-  cargarMenu();
+function loginAdmin() {
+  const pass = document.getElementById('adminPass').value;
+  if (pass === ADMIN_PASS) {
+    document.getElementById('adminLoginSection').style.display = 'none';
+    document.getElementById('adminControls').style.display = '';
+    document.getElementById('adminMsg').innerText = '✓ Acceso concedido';
+  } else {
+    document.getElementById('adminMsg').innerText = '❌ Clave incorrecta';
+    document.getElementById('adminPass').value = '';
+  }
 }
 
+async function sincronizarAdmin() {
+  const msg = document.getElementById('adminMsg');
+  msg.innerText = 'Sincronizando...';
+  try {
+    localStorage.removeItem(CACHE_KEY);
+    await cargarMenu(true);
+    msg.innerText = '✓ Menú sincronizado correctamente';
+  } catch(e) {
+    msg.innerText = '❌ Error: ' + e.message;
+  }
+}
+
+function limpiarCache() {
+  localStorage.removeItem(CACHE_KEY);
+  document.getElementById('adminMsg').innerText = '✓ Caché limpiada. Recarga la página.';
+}
+
+cargarMenu();
+checkSchedule();
+setInterval(checkSchedule, 60000);
 </script>
-
 </body>
 </html>
