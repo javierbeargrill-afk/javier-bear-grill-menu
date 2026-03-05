@@ -70,9 +70,10 @@
   .card-info { flex: 1; min-width: 0; }
   .card-name { font-weight: 600; font-size: 14px; color: #fff; display: block; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .card-price { color: var(--yellow); font-family: 'Oswald'; font-size: 16px; }
+  .card-desc { font-size: 11px; color: var(--muted); margin-top: 2px; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 
   .card.has-img { padding: 0; overflow: hidden; flex-direction: column; align-items: stretch; }
-  .card.has-img .img-wrap { position: relative; width: 100%; height: 140px; background: var(--surface2); overflow: hidden; }
+  .card.has-img .img-wrap { position: relative; width: 100%; aspect-ratio: 1/1; background: var(--surface2); overflow: hidden; }
   .card.has-img .card-img { width: 100%; height: 100%; object-fit: cover; display: block; position: relative; z-index: 2; }
   .img-placeholder { position: absolute; inset: 0; z-index: 1; background: linear-gradient(90deg, var(--surface2) 25%, #2e2e2e 50%, var(--surface2) 75%); background-size: 200% 100%; animation: shimmer 1.4s infinite; }
   .img-placeholder.hidden { display: none; }
@@ -317,9 +318,9 @@ async function cargarMenu(forzar = false) {
 
   if (!forzar) {
     try {
-      const cached = localStorage.getItem(CACHE_KEY);
-      if (cached) {
-        const { ts, data } = JSON.parse(cached);
+      const rawLocal = localStorage.getItem(CACHE_KEY) || sessionStorage.getItem(CACHE_KEY);
+      if (rawLocal) {
+        const { ts, data } = JSON.parse(rawLocal);
         if (Date.now() - ts < CACHE_TTL) {
           CATEGORIAS = sortCats(data);
           renderMenu();
@@ -328,7 +329,10 @@ async function cargarMenu(forzar = false) {
           return;
         }
       }
-    } catch(e) {}
+    } catch(e) {
+      localStorage.removeItem(CACHE_KEY);
+      sessionStorage.removeItem(CACHE_KEY);
+    }
   }
 
   container.innerHTML = '<div id="loadingMsg"><span class="spinner"></span>Cargando menú...</div>';
@@ -339,7 +343,21 @@ async function cargarMenu(forzar = false) {
     const data = await res.json();
     if (!Array.isArray(data)) throw new Error('Respuesta inesperada del servidor');
     CATEGORIAS = sortCats(data);
-    try { localStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), data })); } catch(e) {}
+
+    // Guardar en caché sin imágenes para ahorrar espacio
+    try {
+      const dataSlim = data.map(cat => ({
+        n: cat.n,
+        i: cat.i.map(item => ({ n: item.n, p: item.p, img: item.img }))
+      }));
+      localStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), data: dataSlim }));
+    } catch(e) {
+      // Si localStorage falla (lleno), usar sessionStorage
+      try {
+        sessionStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), data }));
+      } catch(e2) {}
+    }
+
     renderMenu();
     renderCatNav();
     mostrarPromoAleatoria();
@@ -404,6 +422,7 @@ function cardHTML(item) {
         <div class="card-info">
           <span class="card-name">${item.n}</span>
           <span class="card-price">${precio}</span>
+          ${item.d ? `<span class="card-desc">${item.d}</span>` : ''}
         </div>
         ${qtyHTML(id, item)}
       </div>
@@ -413,6 +432,7 @@ function cardHTML(item) {
     <div class="card-info">
       <span class="card-name">${item.n}</span>
       <span class="card-price">${precio}</span>
+      ${item.d ? `<span class="card-desc">${item.d}</span>` : ''}
     </div>
     ${qtyHTML(id, item)}
   </div>`;
