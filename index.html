@@ -31,10 +31,6 @@
   @keyframes flame { 0%,100%{text-shadow:0 0 8px #f5c518,0 0 20px #ff6b00} 50%{text-shadow:0 0 18px #f5c518,0 0 44px #ff6b00,0 0 70px #ff2200} }
 
   /* ── SYNC BAR ── */
-  #syncBar { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 8px 16px; }
-  #syncBtn { background: var(--surface2); border: 1px solid var(--border); color: var(--muted); font-size: 11px; padding: 5px 12px; border-radius: 20px; cursor: pointer; font-family: 'Nunito'; transition: all 0.2s; }
-  #syncBtn:hover { border-color: var(--yellow); color: var(--yellow); }
-  #syncStatus { font-size: 11px; color: var(--muted); }
 
   /* ── SEARCH ── */
   #searchWrap { padding: 8px 12px; position: sticky; top: 42px; z-index: 850; background: var(--bg); border-bottom: 1px solid var(--border); }
@@ -142,15 +138,9 @@
 
 <!-- HEADER -->
 <header>
-  <h1 class="header-title">🔥 Javier Bear Grill 🔥</h1>
-  <p style="color:var(--muted); font-size:10px; letter-spacing:2px; margin-top:4px;">LA CHORRERA, PANAMÁ</p>
+  <img src="logo.png" alt="Javier Bear Grill" style="max-width:220px; width:70%; display:block; margin:0 auto 6px;">
+  <p style="color:var(--muted); font-size:10px; letter-spacing:2px;">LA CHORRERA, PANAMÁ</p>
 </header>
-
-<!-- SYNC BAR -->
-<div id="syncBar">
-  <button id="syncBtn" onclick="cargarMenu(true)">🔄 Sincronizar menú</button>
-  <span id="syncStatus"></span>
-</div>
 
 <!-- SEARCH -->
 <div id="searchWrap">
@@ -196,7 +186,7 @@
     </select>
   </div>
   <div class="form-group"><label>Notas</label><input type="text" id="notas" placeholder="Ej. Sin cebolla, casa amarilla..."></div>
-  <button class="btn-send" id="btnEnviar" onclick="enviarPedido()">ENVIAR A WHATSAPP</button>
+  <button class="btn-send" id="btnEnviar" onclick="enviarPedido()">📲 HACER MI PEDIDO AHORA</button>
 </div>
 
 <!-- ADMIN PANEL -->
@@ -210,6 +200,7 @@
     </div>
     <div id="adminControls" style="display:none;">
       <button class="admin-btn primary" onclick="sincronizarAdmin()">🔄 Sincronizar menú ahora</button>
+      <button class="admin-btn secondary" id="testModeBtn" onclick="toggleTestMode()">🧪 Modo prueba: OFF</button>
       <button class="admin-btn danger" onclick="limpiarCache()">🗑️ Limpiar caché</button>
       <button class="admin-btn secondary" onclick="cerrarAdmin()">Cerrar</button>
     </div>
@@ -238,32 +229,91 @@ let CATEGORIAS = [];
 // ══════════════════════════════════════════
 //  HORARIO
 // ══════════════════════════════════════════
+let testMode = false;
+
+function toggleTestMode() {
+  testMode = !testMode;
+  const btn = document.getElementById('testModeBtn');
+  btn.innerText = `🧪 Modo prueba: ${testMode ? 'ON' : 'OFF'}`;
+  btn.style.background = testMode ? '#f5c518' : '';
+  btn.style.color = testMode ? '#000' : '';
+  checkSchedule();
+  document.getElementById('adminMsg').innerText = testMode ? '⚠️ Modo prueba activo' : '✓ Modo prueba desactivado';
+}
+
 function checkSchedule() {
   const d = new Date(), dia = d.getDay(), hora = d.getHours();
   const hoy = HORARIOS[dia];
-  const isOpen = hoy && hora >= hoy.o && hora < hoy.c;
+  const isOpen = testMode || (hoy && hora >= hoy.o && hora < hoy.c);
   const bar = document.getElementById('scheduleBar');
   bar.className = isOpen ? 'open-bar' : 'closed-bar';
-  document.getElementById('scheduleText').innerText = isOpen ? '🟢 ABIERTO AHORA' : '🔴 CERRADO';
   document.getElementById('btnEnviar').disabled = !isOpen;
   const nextEl = document.getElementById('nextOpen');
-  if (!isOpen) {
+
+  if (isOpen) {
+    document.getElementById('scheduleText').innerText = '🟢 Estamos abiertos, haz tu pedido';
+    nextEl.innerHTML = '';
+    stopCountdown();
+  } else {
     const dias = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
-    let found = null;
+    const diasFull = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+    let nextDia = null, nextDiaNum = null;
     for (let i = 1; i <= 7; i++) {
       const nd = (dia + i) % 7;
-      if (HORARIOS[nd]) { const h = HORARIOS[nd].o; found = `Abre ${dias[nd]} ${h}:00${h<12?'am':'pm'}`; break; }
+      if (HORARIOS[nd]) { nextDia = nd; nextDiaNum = i; break; }
     }
-    nextEl.innerText = found ? `· ${found}` : '';
-  } else { nextEl.innerText = ''; }
+    if (nextDia !== null) {
+      const h = HORARIOS[nextDia].o;
+      const nextDate = new Date(d);
+      nextDate.setDate(d.getDate() + nextDiaNum);
+      nextDate.setHours(h, 0, 0, 0);
+      document.getElementById('scheduleText').innerText = `🔴 En este momento estamos cerrados, abrimos nuestras puertas el ${diasFull[nextDia]}`;
+      startCountdown(nextDate);
+    } else {
+      document.getElementById('scheduleText').innerText = '🔴 Cerrados por ahora';
+      nextEl.innerHTML = '';
+    }
+  }
+}
+
+let countdownInterval = null;
+function stopCountdown() { if (countdownInterval) { clearInterval(countdownInterval); countdownInterval = null; } }
+
+function startCountdown(targetDate) {
+  stopCountdown();
+  const el = document.getElementById('nextOpen');
+  function update() {
+    const diff = targetDate - new Date();
+    if (diff <= 0) { el.innerHTML = ''; checkSchedule(); return; }
+    const h = Math.floor(diff / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    const s = Math.floor((diff % 60000) / 1000);
+    el.innerHTML = `<div style="display:flex;gap:6px;justify-content:center;margin-top:6px;">
+      <div style="background:#1a0a00;border:1px solid #f5c518;border-radius:8px;padding:4px 10px;text-align:center;">
+        <div style="font-family:'Oswald';font-size:20px;color:#f5c518;line-height:1;">${String(h).padStart(2,'0')}</div>
+        <div style="font-size:9px;color:#888;letter-spacing:1px;">HRS</div>
+      </div>
+      <div style="font-family:'Oswald';font-size:20px;color:#f5c518;align-self:center;padding-bottom:12px;">:</div>
+      <div style="background:#1a0a00;border:1px solid #f5c518;border-radius:8px;padding:4px 10px;text-align:center;">
+        <div style="font-family:'Oswald';font-size:20px;color:#f5c518;line-height:1;">${String(m).padStart(2,'0')}</div>
+        <div style="font-size:9px;color:#888;letter-spacing:1px;">MIN</div>
+      </div>
+      <div style="font-family:'Oswald';font-size:20px;color:#f5c518;align-self:center;padding-bottom:12px;">:</div>
+      <div style="background:#1a0a00;border:1px solid #f5c518;border-radius:8px;padding:4px 10px;text-align:center;">
+        <div style="font-family:'Oswald';font-size:20px;color:#f5c518;line-height:1;">${String(s).padStart(2,'0')}</div>
+        <div style="font-size:9px;color:#888;letter-spacing:1px;">SEG</div>
+      </div>
+    </div>`;
+  }
+  update();
+  countdownInterval = setInterval(update, 1000);
 }
 
 // ══════════════════════════════════════════
 //  CARGAR MENÚ
 // ══════════════════════════════════════════
 async function cargarMenu(forzar = false) {
-  const statusEl   = document.getElementById('syncStatus');
-  const container  = document.getElementById('menuContainer');
+  const container = document.getElementById('menuContainer');
 
   if (!forzar) {
     try {
@@ -274,7 +324,7 @@ async function cargarMenu(forzar = false) {
           CATEGORIAS = sortCats(data);
           renderMenu();
           renderCatNav();
-          statusEl.innerText = 'Menú actualizado ✓';
+          mostrarPromoAleatoria();
           return;
         }
       }
@@ -282,7 +332,6 @@ async function cargarMenu(forzar = false) {
   }
 
   container.innerHTML = '<div id="loadingMsg"><span class="spinner"></span>Cargando menú...</div>';
-  statusEl.innerText = 'Sincronizando...';
 
   try {
     const res = await fetch(SUPABASE_URL);
@@ -293,10 +342,9 @@ async function cargarMenu(forzar = false) {
     try { localStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), data })); } catch(e) {}
     renderMenu();
     renderCatNav();
-    statusEl.innerText = '✓ ' + new Date().toLocaleTimeString('es-PA', {hour:'2-digit', minute:'2-digit'});
+    mostrarPromoAleatoria();
   } catch(e) {
     container.innerHTML = `<div id="loadingMsg" style="color:var(--red)">⚠️ No se pudo cargar el menú.<br><small>${e.message}</small></div>`;
-    statusEl.innerText = 'Error al sincronizar';
   }
 }
 
@@ -556,9 +604,95 @@ function limpiarCache() {
 // ══════════════════════════════════════════
 //  INIT
 // ══════════════════════════════════════════
+function mostrarPromoAleatoria() {
+  const promoDiv = document.getElementById('footerPromo');
+  const promoCard = document.getElementById('footerPromoCard');
+  if (!CATEGORIAS.length) return;
+  const promoCat = CATEGORIAS.find(c => c.n.toLowerCase().includes('promoc'));
+  const fuente = promoCat ? promoCat.i : CATEGORIAS.flatMap(c => c.i);
+  if (!fuente.length) return;
+  const item = fuente[Math.floor(Math.random() * fuente.length)];
+  promoCard.innerHTML = `<div class="promo-card">
+    ${item.img ? `<img src="${item.img}" alt="${item.n}" onerror="this.style.display='none'">` : ''}
+    <div class="promo-info">
+      <div class="promo-name">${item.n}</div>
+      <div class="promo-price">$${item.p.toFixed(2)}</div>
+    </div>
+  </div>`;
+  promoDiv.style.display = '';
+}
+
 cargarMenu();
 checkSchedule();
 setInterval(checkSchedule, 60000);
 </script>
+
+<!-- FOOTER -->
+<footer id="footer">
+  <div class="footer-brand">🐻 Javier Bear Grill</div>
+  <p class="footer-sub">La Chorrera, Panamá</p>
+  <p class="footer-address">Residencial La Valdeza, Calle Boulevard, Casa 173</p>
+
+  <div class="footer-contact">
+    <a href="tel:+50765738924" class="footer-link">📞 +507 6573-8924</a>
+  </div>
+
+  <div class="footer-social">
+    <a href="https://www.instagram.com/javier_bear_grill" target="_blank" class="social-btn ig">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+      @javier_bear_grill
+    </a>
+    <a href="https://www.tiktok.com/@javier_bear_grill" target="_blank" class="social-btn tt">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.18 8.18 0 004.78 1.52V6.75a4.85 4.85 0 01-1.01-.06z"/></svg>
+      @javier_bear_grill
+    </a>
+  </div>
+
+  <div class="footer-schedule">
+    <p class="footer-section-title">🕐 Horario de atención</p>
+    <p class="footer-hours">Viernes: 3:00pm – 12:00am</p>
+    <p class="footer-hours">Sábado: 1:00pm – 12:00am</p>
+    <p class="footer-hours">Domingo: 1:00pm – 10:00pm</p>
+  </div>
+
+  <div class="footer-promo" id="footerPromo" style="display:none;">
+    <p class="footer-section-title">🔥 Promoción del momento</p>
+    <div id="footerPromoCard"></div>
+  </div>
+
+  <a href="https://maps.app.goo.gl/ttfyZQgvAxhtah51A" target="_blank" class="maps-btn">
+    📍 Cómo llegar — Google Maps
+  </a>
+
+  <p class="footer-credit">Creada por <strong>Javier el Oso</strong> con la ayuda de <strong>Claude</strong> 🤖</p>
+</footer>
+
+<style>
+  #footer { background: #0a0a0a; border-top: 1px solid var(--border); padding: 32px 20px 40px; text-align: center; margin-top: 20px; }
+  .footer-brand { font-family: 'Oswald'; font-size: 22px; color: var(--yellow); margin-bottom: 4px; }
+  .footer-sub { font-size: 11px; color: var(--muted); letter-spacing: 2px; margin-bottom: 4px; }
+  .footer-address { font-size: 12px; color: #555; margin-bottom: 16px; }
+  .footer-contact { margin-bottom: 16px; }
+  .footer-link { color: var(--muted); text-decoration: none; font-size: 13px; transition: color 0.2s; }
+  .footer-link:hover { color: var(--yellow); }
+  .footer-social { display: flex; gap: 10px; justify-content: center; margin-bottom: 16px; flex-wrap: wrap; }
+  .social-btn { display: flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 20px; text-decoration: none; font-size: 12px; font-weight: 700; transition: opacity 0.2s; }
+  .social-btn:hover { opacity: 0.85; }
+  .social-btn.ig { background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); color: #fff; }
+  .social-btn.tt { background: #010101; color: #fff; border: 1px solid #333; }
+  .maps-btn { display: inline-block; margin-bottom: 20px; padding: 10px 20px; background: #1a73e8; color: #fff; border-radius: 20px; text-decoration: none; font-size: 13px; font-weight: 700; transition: opacity 0.2s; }
+  .maps-btn:hover { opacity: 0.85; }
+  .footer-credit { font-size: 11px; color: #444; }
+  .footer-schedule { margin-bottom: 20px; }
+  .footer-section-title { font-family: 'Oswald'; color: var(--yellow); font-size: 14px; margin-bottom: 6px; }
+  .footer-hours { font-size: 12px; color: #666; margin-bottom: 2px; }
+  .footer-promo { margin-bottom: 20px; }
+  .promo-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 12px 16px; display: flex; align-items: center; gap: 12px; max-width: 320px; margin: 0 auto; }
+  .promo-card img { width: 60px; height: 60px; object-fit: cover; border-radius: 8px; flex-shrink: 0; }
+  .promo-card .promo-info { text-align: left; }
+  .promo-card .promo-name { font-weight: 700; font-size: 13px; color: #fff; margin-bottom: 2px; }
+  .promo-card .promo-price { font-family: 'Oswald'; color: var(--yellow); font-size: 16px; }
+  .footer-credit strong { color: #666; }
+</style>
 </body>
 </html>
