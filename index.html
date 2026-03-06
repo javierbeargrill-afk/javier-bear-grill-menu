@@ -28,6 +28,10 @@
   /* ── HEADER ── */
   header { text-align: center; padding: 28px 20px 16px; background: linear-gradient(180deg, #3a1000 0%, #1a0800 100%); }
   .header-title { font-family: 'Oswald'; font-size: clamp(24px, 6vw, 36px); color: var(--yellow); text-transform: uppercase; letter-spacing: 2px; animation: flame 2.8s ease-in-out infinite; }
+  @keyframes priceBlink {
+    0%,100% { opacity:1; text-shadow:0 0 20px rgba(255,135,50,0.6); }
+    50%      { opacity:0.6; text-shadow:0 0 35px rgba(255,135,50,1); }
+  }
   @keyframes flame { 0%,100%{text-shadow:0 0 8px #FF8732,0 0 20px #C8102E} 50%{text-shadow:0 0 18px #FF8732,0 0 44px #C8102E,0 0 70px #ff2200} }
 
   /* ── SYNC BAR ── */
@@ -161,18 +165,40 @@
 </div>
 
 <!-- HERO -->
-<div id="hero" style="display:none; position:relative; width:100%; overflow:hidden;">
+<section id="hero" style="display:none; position:relative; width:100%; overflow:hidden;" 
+  itemscope itemtype="https://schema.org/Restaurant"
+  aria-label="Javier Bear Grill - Menú destacado">
+  <!-- SEO meta invisible -->
+  <span itemprop="name" style="display:none">Javier Bear Grill</span>
+  <span itemprop="address" style="display:none">Residencial La Valdeza, Calle Boulevard, Casa 173, La Chorrera, Panamá</span>
+  <span itemprop="telephone" style="display:none">+507 6573-8924</span>
+  <span itemprop="servesCuisine" style="display:none">Hamburguesas, Pollo, Parrilla, Combos</span>
+
   <img id="heroImg" src="" alt="" style="width:100%; aspect-ratio:1/1; object-fit:cover; display:block;">
-  <div style="position:absolute; inset:0; background:linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.05) 60%);"></div>
-  <div style="position:absolute; bottom:0; left:0; right:0; padding:14px 16px;">
-    <div id="heroName" style="font-family:'Oswald'; font-size:20px; color:#fff; font-weight:700; margin-bottom:2px;"></div>
-    <div id="heroPrice" style="font-family:'Oswald'; font-size:24px; color:var(--yellow); margin-bottom:10px;"></div>
-    <div style="display:flex; gap:8px;">
-      <button id="heroBtn" onclick="heroAgregar()" style="flex:1; background:var(--yellow); color:#000; border:none; border-radius:20px; padding:10px; font-family:'Oswald'; font-size:14px; font-weight:700; cursor:pointer;">🛒 Agregar al carrito</button>
-      <button onclick="heroVerDetalle()" style="flex:1; background:rgba(255,255,255,0.15); color:#fff; border:1px solid rgba(255,255,255,0.3); border-radius:20px; padding:10px; font-family:'Oswald'; font-size:14px; font-weight:700; cursor:pointer; backdrop-filter:blur(4px);">📋 Ver detalle</button>
+  
+  <!-- Velo negro semitransparente -->
+  <div style="position:absolute; inset:0; background:rgba(0,0,0,0.52);"></div>
+
+  <!-- Contenido encima del velo -->
+  <div style="position:absolute; inset:0; display:flex; flex-direction:column; justify-content:center; align-items:center; padding:20px; text-align:center;">
+    <!-- Texto SEO -->
+    <h1 style="font-family:'Oswald'; font-size:clamp(24px,7vw,36px); color:#fff; font-weight:700; margin-bottom:10px; text-shadow:0 2px 16px rgba(0,0,0,0.9); line-height:1.2;">
+      ¿Hambre? Estás en el lugar correcto 🐻🔥
+    </h1>
+    <p style="font-size:clamp(12px,3.5vw,15px); color:rgba(255,255,255,0.85); margin-bottom:6px; line-height:1.5; text-shadow:0 1px 8px rgba(0,0,0,0.8);">
+      Bienvenido al menú de <strong>Javier Bear Grill</strong>, tu restaurante de hamburguesas y parrilla en La Chorrera, Panamá.
+    </p>
+    <p style="font-size:clamp(11px,3vw,13px); color:rgba(255,255,255,0.6); margin-bottom:16px; text-shadow:0 1px 6px rgba(0,0,0,0.8);">
+      Explora nuestros platillos y combos 👇 — ¡Disfrútalo!
+    </p>
+    <div id="heroName" style="font-family:'Oswald'; font-size:clamp(16px,4.5vw,22px); color:#fff; font-weight:700; margin-bottom:4px; text-shadow:0 2px 10px rgba(0,0,0,0.8);"></div>
+    <div id="heroPrice" style="font-family:'Oswald'; font-size:clamp(24px,7vw,34px); color:var(--yellow); margin-bottom:16px; text-shadow:0 0 20px rgba(255,135,50,0.6); animation: priceBlink 1.4s ease-in-out infinite;"></div>
+    <div style="display:flex; gap:10px; width:100%; max-width:340px;">
+      <button id="heroBtn" onclick="heroAgregar()" style="flex:1; background:var(--yellow); color:#000; border:none; border-radius:24px; padding:12px; font-family:'Oswald'; font-size:15px; font-weight:700; cursor:pointer; box-shadow:0 4px 15px rgba(255,135,50,0.4);">🛒 Agregar</button>
+      <button onclick="heroVerDetalle()" style="flex:1; background:rgba(255,255,255,0.15); color:#fff; border:1px solid rgba(255,255,255,0.35); border-radius:24px; padding:12px; font-family:'Oswald'; font-size:15px; font-weight:700; cursor:pointer; backdrop-filter:blur(6px);">📋 Ver más</button>
     </div>
   </div>
-</div>
+</section>
 
 <!-- SEARCH -->
 <div id="searchWrap">
