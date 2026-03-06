@@ -126,6 +126,28 @@
   #adminMsg { font-size: 12px; color: var(--muted); text-align: center; min-height: 18px; }
 
   @keyframes slideIn { from{opacity:0;transform:translateX(-6px)} to{opacity:1;transform:translateX(0)} }
+
+  /* ── PRODUCT MODAL ── */
+  #productModal { display: none; position: fixed; inset: 0; z-index: 1200; background: rgba(0,0,0,0.85); align-items: flex-end; justify-content: center; }
+  #productModal.visible { display: flex; animation: fadeIn 0.2s ease; }
+  @keyframes fadeIn { from{opacity:0} to{opacity:1} }
+  #modalBox { background: var(--surface); width: 100%; max-width: 540px; border-radius: 20px 20px 0 0; overflow: hidden; animation: slideUp 0.3s ease; max-height: 90vh; overflow-y: auto; }
+  @keyframes slideUp { from{transform:translateY(100%)} to{transform:translateY(0)} }
+  #modalImg { width: 100%; aspect-ratio: 1/1; object-fit: cover; display: block; }
+  #modalNoImg { width: 100%; aspect-ratio: 1/1; background: var(--surface2); display: flex; align-items: center; justify-content: center; font-size: 60px; }
+  .modal-content { padding: 20px; }
+  .modal-cat { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+  .modal-name { font-family: 'Oswald'; font-size: 24px; color: var(--text); margin-bottom: 4px; }
+  .modal-price { font-family: 'Oswald'; font-size: 28px; color: var(--yellow); margin-bottom: 12px; }
+  .modal-desc { font-size: 13px; color: var(--muted); line-height: 1.6; margin-bottom: 20px; }
+  .modal-close { position: absolute; top: 12px; right: 12px; width: 36px; height: 36px; background: rgba(0,0,0,0.6); border: none; border-radius: 50%; color: #fff; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 10; }
+  .modal-actions { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .modal-qty { display: flex; align-items: center; background: var(--surface2); border-radius: 20px; border: 1px solid var(--border); height: 44px; }
+  .modal-qty-btn { width: 44px; height: 44px; border: none; background: none; color: var(--yellow); font-size: 20px; cursor: pointer; font-weight: bold; }
+  .modal-qty-btn.plus { background: var(--yellow); color: #000; border-radius: 0 20px 20px 0; }
+  .modal-qty-val { width: 36px; text-align: center; font-weight: 700; font-size: 16px; }
+  .modal-add-btn { flex: 1; padding: 12px; background: var(--yellow); color: #000; border: none; border-radius: 12px; font-family: 'Oswald'; font-size: 16px; font-weight: 700; cursor: pointer; transition: opacity 0.2s; }
+  .modal-add-btn:hover { opacity: 0.85; }
 </style>
 </head>
 <body>
@@ -438,7 +460,7 @@ function renderMenu() {
     };
     const body = document.createElement('div');
     body.className = 'category-body';
-    body.innerHTML = cat.i.map(item => cardHTML(item)).join('');
+    body.innerHTML = cat.i.map(item => cardHTML(item, cat.n)).join('');
     block.appendChild(toggle);
     block.appendChild(body);
     container.appendChild(block);
@@ -446,13 +468,15 @@ function renderMenu() {
   setTimeout(initLazyImages, 50);
 }
 
-function cardHTML(item) {
+function cardHTML(item, cat) {
   const id      = encodeId(item.n);
   const precio  = `$${item.p.toFixed(2)}`;
   const nameEsc = item.n.replace(/'/g, "\\'").replace(/"/g, '&quot;');
   if (item.img) {
-    return `<div class="card has-img">
-      <div class="img-wrap">
+    const catClean = (cat||'').replace(/'/g,"\'");
+    const descClean = (item.d||'').replace(/'/g,"\'").replace(/"/g,'&quot;');
+    return `<div class="card has-img" data-n="${nameEsc}" data-p="${item.p}" data-img="${item.img}" data-d="${descClean}" data-cat="${catClean}">
+      <div class="img-wrap" style="cursor:pointer" onclick="abrirModalDesdeCard(this.closest('.card'))">
         <div class="img-placeholder"></div>
         <img class="card-img" data-src="${item.img}" alt="${nameEsc}"
           onload="this.previousElementSibling.classList.add('hidden')"
@@ -468,8 +492,10 @@ function cardHTML(item) {
       </div>
     </div>`;
   }
-  return `<div class="card">
-    <div class="card-info">
+  const catClean2 = (cat||'').replace(/'/g,"\'");
+  const descClean2 = (item.d||'').replace(/'/g,"\'").replace(/"/g,'&quot;');
+  return `<div class="card" data-n="${nameEsc}" data-p="${item.p}" data-img="" data-d="${descClean2}" data-cat="${catClean2}">
+    <div class="card-info" style="cursor:pointer" onclick="abrirModalDesdeCard(this.closest('.card'))">
       <span class="card-name">${item.n}</span>
       <span class="card-price">${precio}</span>
       ${item.d ? `<span class="card-desc">${item.d}</span>` : ''}
@@ -698,6 +724,76 @@ function mostrarPromoAleatoria() {
   promoDiv.style.display = '';
 }
 
+
+// ══════════════════════════════════════════
+//  MODAL DE PRODUCTO
+// ══════════════════════════════════════════
+let modalItem = null, modalCatName = '', modalQty = 0;
+
+function abrirModalDesdeCard(card) {
+  const itemN   = card.dataset.n;
+  const itemP   = parseFloat(card.dataset.p);
+  const itemImg = card.dataset.img || null;
+  const itemD   = card.dataset.d || null;
+  const catName = card.dataset.cat || '';
+  abrirModal(itemN, itemP, itemImg, itemD, catName);
+}
+
+function abrirModal(itemN, itemP, itemImg, itemD, catName) {
+  modalItem    = { n: itemN, p: itemP, img: itemImg, d: itemD };
+  modalCatName = catName;
+  const id     = encodeId(itemN);
+  modalQty     = carrito[id] ? carrito[id].qty : 0;
+
+  document.getElementById('modalCat').innerText   = catName;
+  document.getElementById('modalName').innerText  = itemN;
+  document.getElementById('modalPrice').innerText = `$${itemP.toFixed(2)}`;
+  document.getElementById('modalDesc').innerText  = itemD || '';
+  document.getElementById('modalDesc').style.display = itemD ? '' : 'none';
+  document.getElementById('modalQtyVal').innerText = modalQty;
+
+  const wrap = document.getElementById('modalImgWrap');
+  if (itemImg) {
+    wrap.innerHTML = `<img id="modalImg" src="${itemImg}" alt="${itemN}" onerror="this.parentElement.innerHTML='<div id=\"modalNoImg\">🍽️</div>'">`;
+  } else {
+    wrap.innerHTML = `<div id="modalNoImg">🍽️</div>`;
+  }
+
+  document.getElementById('productModal').classList.add('visible');
+  document.body.style.overflow = 'hidden';
+}
+
+function cerrarModal() {
+  document.getElementById('productModal').classList.remove('visible');
+  document.body.style.overflow = '';
+  modalItem = null;
+}
+
+function modalDelta(delta) {
+  modalQty = Math.max(0, modalQty + delta);
+  document.getElementById('modalQtyVal').innerText = modalQty;
+}
+
+function modalAgregar() {
+  if (!modalItem) return;
+  const id = encodeId(modalItem.n);
+  if (modalQty === 0) {
+    delete carrito[id];
+  } else {
+    carrito[id] = { name: modalItem.n, price: modalItem.p, qty: modalQty };
+  }
+  // Sync qty en la tarjeta del menú
+  const el = document.getElementById('qty-' + id);
+  if (el) el.innerText = modalQty || 0;
+  actualizarResumen();
+  // Animación botón flotante
+  const btn = document.getElementById('floatCart');
+  btn.classList.remove('bump');
+  void btn.offsetWidth;
+  btn.classList.add('bump');
+  cerrarModal();
+}
+
 cargarMenu();
 checkSchedule();
 setInterval(checkSchedule, 60000);
@@ -769,6 +865,51 @@ setInterval(checkSchedule, 60000);
   .promo-card .promo-name { font-weight: 700; font-size: 13px; color: #fff; margin-bottom: 2px; }
   .promo-card .promo-price { font-family: 'Oswald'; color: var(--yellow); font-size: 16px; }
   .footer-credit strong { color: #666; }
+
+  /* ── PRODUCT MODAL ── */
+  #productModal { display: none; position: fixed; inset: 0; z-index: 1200; background: rgba(0,0,0,0.85); align-items: flex-end; justify-content: center; }
+  #productModal.visible { display: flex; animation: fadeIn 0.2s ease; }
+  @keyframes fadeIn { from{opacity:0} to{opacity:1} }
+  #modalBox { background: var(--surface); width: 100%; max-width: 540px; border-radius: 20px 20px 0 0; overflow: hidden; animation: slideUp 0.3s ease; max-height: 90vh; overflow-y: auto; }
+  @keyframes slideUp { from{transform:translateY(100%)} to{transform:translateY(0)} }
+  #modalImg { width: 100%; aspect-ratio: 1/1; object-fit: cover; display: block; }
+  #modalNoImg { width: 100%; aspect-ratio: 1/1; background: var(--surface2); display: flex; align-items: center; justify-content: center; font-size: 60px; }
+  .modal-content { padding: 20px; }
+  .modal-cat { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+  .modal-name { font-family: 'Oswald'; font-size: 24px; color: var(--text); margin-bottom: 4px; }
+  .modal-price { font-family: 'Oswald'; font-size: 28px; color: var(--yellow); margin-bottom: 12px; }
+  .modal-desc { font-size: 13px; color: var(--muted); line-height: 1.6; margin-bottom: 20px; }
+  .modal-close { position: absolute; top: 12px; right: 12px; width: 36px; height: 36px; background: rgba(0,0,0,0.6); border: none; border-radius: 50%; color: #fff; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 10; }
+  .modal-actions { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .modal-qty { display: flex; align-items: center; background: var(--surface2); border-radius: 20px; border: 1px solid var(--border); height: 44px; }
+  .modal-qty-btn { width: 44px; height: 44px; border: none; background: none; color: var(--yellow); font-size: 20px; cursor: pointer; font-weight: bold; }
+  .modal-qty-btn.plus { background: var(--yellow); color: #000; border-radius: 0 20px 20px 0; }
+  .modal-qty-val { width: 36px; text-align: center; font-weight: 700; font-size: 16px; }
+  .modal-add-btn { flex: 1; padding: 12px; background: var(--yellow); color: #000; border: none; border-radius: 12px; font-family: 'Oswald'; font-size: 16px; font-weight: 700; cursor: pointer; transition: opacity 0.2s; }
+  .modal-add-btn:hover { opacity: 0.85; }
 </style>
+
+<!-- PRODUCT MODAL -->
+<div id="productModal" onclick="if(event.target===this)cerrarModal()">
+  <div id="modalBox" style="position:relative;">
+    <button class="modal-close" onclick="cerrarModal()">✕</button>
+    <div id="modalImgWrap"></div>
+    <div class="modal-content">
+      <div class="modal-cat" id="modalCat"></div>
+      <div class="modal-name" id="modalName"></div>
+      <div class="modal-price" id="modalPrice"></div>
+      <div class="modal-desc" id="modalDesc"></div>
+      <div class="modal-actions">
+        <div class="modal-qty">
+          <button class="modal-qty-btn" onclick="modalDelta(-1)">−</button>
+          <div class="modal-qty-val" id="modalQtyVal">0</div>
+          <button class="modal-qty-btn plus" onclick="modalDelta(1)">+</button>
+        </div>
+        <button class="modal-add-btn" onclick="modalAgregar()">🛒 Agregar al pedido</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
