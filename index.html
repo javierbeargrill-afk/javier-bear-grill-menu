@@ -680,28 +680,90 @@ function actualizarResumen() {
   document.getElementById('cartCount').innerText    = count;
 }
 
+// Ubicación del cliente
+let clienteUbicacion = null;
+
+function solicitarUbicacion() {
+  const btn    = document.getElementById('btnUbicacion');
+  const status = document.getElementById('ubicacionStatus');
+  btn.innerText   = '⏳ Obteniendo ubicación...';
+  btn.style.color = 'var(--yellow)';
+  status.style.display = '';
+  status.innerText = '';
+
+  if (!navigator.geolocation) {
+    btn.innerText   = '❌ Tu navegador no soporta geolocalización';
+    btn.style.color = 'var(--red)';
+    return;
+  }
+
+  navigator.geolocation.getCurrentPosition(
+    pos => {
+      clienteUbicacion = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+      btn.innerText      = '✅ Ubicación obtenida';
+      btn.style.color    = '#25D366';
+      btn.style.border   = '1px solid #25D366';
+      status.innerText   = `📍 ${clienteUbicacion.lat.toFixed(5)}, ${clienteUbicacion.lng.toFixed(5)}`;
+      status.style.color = '#25D366';
+    },
+    err => {
+      btn.innerText   = '⚠️ No se pudo obtener ubicación — toca para reintentar';
+      btn.style.color = 'var(--muted)';
+      status.innerText = 'Asegúrate de permitir el acceso a tu ubicación';
+      clienteUbicacion = null;
+    },
+    { enableHighAccuracy: true, timeout: 10000 }
+  );
+}
+
+function getNumeroOrden() {
+  try {
+    let n = parseInt(localStorage.getItem('jbg_orden') || '0') + 1;
+    localStorage.setItem('jbg_orden', n);
+    return String(n).padStart(4, '0');
+  } catch(e) { return '????'; }
+}
+
+function getPanamaHora() {
+  const now = new Date();
+  return new Date(now.toLocaleString('en-US', { timeZone: 'America/Panama' }));
+}
+
 function enviarPedido() {
-  const nom   = document.getElementById('nombre').value.trim();
-  const zona  = document.getElementById('zona').value;
-  const notas = document.getElementById('notas').value.trim();
+  const nom      = document.getElementById('nombre').value.trim();
+  const zona     = document.getElementById('zona').value;
+  const notas    = document.getElementById('notas').value.trim();
+  const direccion= document.getElementById('direccion').value.trim();
   if (!nom || Object.keys(carrito).length === 0) return alert('Nombre y productos requeridos');
 
+  const orden   = getNumeroOrden();
+  const ahora   = getPanamaHora();
+  const diasSem = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+  const dia     = diasSem[ahora.getDay()];
+  const hora    = ahora.toLocaleTimeString('es-PA', { hour:'2-digit', minute:'2-digit', hour12:true });
+
   let sub = 0;
-  let m = `🔥 *PEDIDO - Javier Bear Grill* 🔥%0A%0A`;
+  let m = `🔥 *PEDIDO %23${orden} — Javier Bear Grill* 🔥%0A`;
+  m += `🕐 ${dia}, ${hora}%0A%0A`;
   m += `🍔 *Productos:*%0A`;
   Object.values(carrito).forEach(i => {
     const lineTotal = i.price * i.qty;
     sub += lineTotal;
-    m += `• ${i.name} x${i.qty} = $${lineTotal.toFixed(2)}%0A`;
+    m += `  • ${i.name} x${i.qty} = $${lineTotal.toFixed(2)}%0A`;
   });
+
   const delivery = (sub > 0 && zona !== 'Fuera de zona') ? 1.25 : 0;
-  const total = sub + delivery;
+  const total    = sub + delivery;
+
   m += `%0A💵 *Subtotal:* $${sub.toFixed(2)}%0A`;
   m += `🚚 *Delivery:* ${zona === 'Fuera de zona' ? 'A coordinar' : '$' + delivery.toFixed(2)}%0A`;
-  m += `✅ *Total:* $${total.toFixed(2)}%0A`;
+  m += `✅ *TOTAL: $${total.toFixed(2)}*%0A`;
   m += `%0A👤 *Cliente:* ${nom}%0A`;
-  m += `📍 *Zona:* ${zona}%0A`;
+  m += `📦 *Zona:* ${zona}%0A`;
+  if (direccion) m += `🏠 *Dirección:* ${direccion}%0A`;
+  if (clienteUbicacion) m += `📍 *Ubicación:* https://maps.google.com/?q=${clienteUbicacion.lat},${clienteUbicacion.lng}%0A`;
   if (notas) m += `📝 *Notas:* ${notas}%0A`;
+
   window.open(`https://wa.me/50765738924?text=${m}`);
 }
 
