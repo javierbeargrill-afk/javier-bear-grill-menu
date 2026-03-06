@@ -231,7 +231,8 @@
       <span>TOTAL:</span><span id="totalVal">$0.00</span>
     </div>
   </div>
-  <div class="form-group"><label>Nombre</label><input type="text" id="nombre"></div>
+  <div class="form-group"><label>Nombre</label><input type="text" id="nombre" placeholder="Tu nombre"></div>
+  <div class="form-group"><label>Dirección de entrega</label><input type="text" id="direccion" placeholder="Ej: Calle 5, Casa 12, frente al parque"></div>
   <div class="form-group">
     <label>Zona de Entrega</label>
     <select id="zona" onchange="actualizarResumen()">
@@ -244,6 +245,15 @@
     </select>
   </div>
   <div class="form-group"><label>Notas</label><input type="text" id="notas" placeholder="Ej. Sin cebolla, casa amarilla..."></div>
+
+  <!-- UBICACIÓN -->
+  <div class="form-group">
+    <button type="button" onclick="solicitarUbicacion()" id="btnUbicacion" style="width:100%; padding:11px; background:var(--surface2); border:1px solid var(--border); border-radius:8px; color:var(--muted); font-family:'Nunito'; font-size:13px; cursor:pointer; text-align:left; transition:all 0.2s;">
+      📍 Compartir mi ubicación actual <span style="font-size:11px; opacity:0.6;">(opcional)</span>
+    </button>
+    <div id="ubicacionStatus" style="font-size:11px; color:var(--muted); margin-top:4px; display:none;"></div>
+  </div>
+
   <button class="btn-send" id="btnEnviar" onclick="enviarPedido()">📲 HACER MI PEDIDO AHORA</button>
 </div>
 
@@ -724,11 +734,6 @@ function getNumeroOrden() {
   } catch(e) { return '????'; }
 }
 
-function getPanamaHora() {
-  const now = new Date();
-  return new Date(now.toLocaleString('en-US', { timeZone: 'America/Panama' }));
-}
-
 function enviarPedido() {
   const nom      = document.getElementById('nombre').value.trim();
   const zona     = document.getElementById('zona').value;
@@ -737,7 +742,7 @@ function enviarPedido() {
   if (!nom || Object.keys(carrito).length === 0) return alert('Nombre y productos requeridos');
 
   const orden   = getNumeroOrden();
-  const ahora   = getPanamaHora();
+  const ahora   = getPanamaDate();
   const diasSem = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
   const dia     = diasSem[ahora.getDay()];
   const hora    = ahora.toLocaleTimeString('es-PA', { hour:'2-digit', minute:'2-digit', hour12:true });
