@@ -8,17 +8,17 @@
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
-    --bg: #0f0f0f; --surface: #1a1a1a; --surface2: #242424;
-    --yellow: #f5c518; --green: #25D366; --text: #f0f0f0; --muted: #888;
-    --border: #2e2e2e; --red: #ff4444;
+    --bg: #1a0800; --surface: #2a1200; --surface2: #3a1a00;
+    --yellow: #FF8732; --green: #25D366; --text: #f5ebe0; --muted: #a07850;
+    --border: #4a2800; --red: #C8102E;
   }
 
   body { background: var(--bg); color: var(--text); font-family: 'Nunito', sans-serif; min-height: 100vh; padding-bottom: 120px; }
 
   /* ── SCHEDULE BAR ── */
-  #scheduleBar { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 10px; font-size: 13px; font-weight: 700; position: sticky; top: 0; z-index: 900; }
+  #scheduleBar { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 10px; font-size: 13px; font-weight: 700; position: sticky; top: 0; z-index: 900; color: #fff; }
   .open-bar  { background: #0d2b1a; color: var(--green); border-bottom: 1px solid #1a4a2a; }
-  .closed-bar{ background: #2b0d0d; color: var(--red);   border-bottom: 1px solid #4a1a1a; }
+  .closed-bar{ background: #2a0008; color: var(--red);   border-bottom: 1px solid #5a0010; }
   .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
   .open-bar  .dot { background: var(--green); animation: pulse 2s infinite; }
   .closed-bar .dot { background: var(--red); }
@@ -26,9 +26,9 @@
   #nextOpen { font-size: 11px; color: var(--muted); margin-left: 6px; }
 
   /* ── HEADER ── */
-  header { text-align: center; padding: 28px 20px 16px; background: linear-gradient(180deg, #1a0a00 0%, #0f0f0f 100%); }
+  header { text-align: center; padding: 28px 20px 16px; background: linear-gradient(180deg, #3a1000 0%, #1a0800 100%); }
   .header-title { font-family: 'Oswald'; font-size: clamp(24px, 6vw, 36px); color: var(--yellow); text-transform: uppercase; letter-spacing: 2px; animation: flame 2.8s ease-in-out infinite; }
-  @keyframes flame { 0%,100%{text-shadow:0 0 8px #f5c518,0 0 20px #ff6b00} 50%{text-shadow:0 0 18px #f5c518,0 0 44px #ff6b00,0 0 70px #ff2200} }
+  @keyframes flame { 0%,100%{text-shadow:0 0 8px #FF8732,0 0 20px #C8102E} 50%{text-shadow:0 0 18px #FF8732,0 0 44px #C8102E,0 0 70px #ff2200} }
 
   /* ── SYNC BAR ── */
 
@@ -86,7 +86,7 @@
   .qty-btn { width: 30px; height: 30px; border: none; background: none; color: var(--yellow); font-weight: bold; cursor: pointer; font-size: 16px; transition: transform 0.1s; }
   .qty-btn:active { transform: scale(0.85); }
   .qty-btn.plus { background: var(--yellow); color: #000; border-radius: 0 20px 20px 0; }
-  .qty-btn.plus:hover { background: #ffd84d; }
+  .qty-btn.plus:hover { background: #ff9f52; }
   .qty-val { width: 25px; text-align: center; font-weight: 700; font-size: 13px; }
 
   /* ── CARRITO ── */
@@ -139,7 +139,7 @@
 
 <!-- HEADER -->
 <header>
-  <img src="https://uazonbacmpwuznugirru.supabase.co/storage/v1/object/public/menu-images/IMG-20230315-WA0300_20250520_112619_0000.png" alt="Javier Bear Grill" style="max-width:220px; width:70%; display:block; margin:0 auto 6px;">
+  <img src="https://uazonbacmpwuznugirru.supabase.co/storage/v1/object/public/menu-images/IMG-20230315-WA0300_20250520_112619_0000.png" alt="Javier Bear Grill" style="max-width:220px; width:70%; display:block; margin:0 auto 6px; filter:brightness(0) invert(1);">
   <p style="color:var(--muted); font-size:10px; letter-spacing:2px;">LA CHORRERA, PANAMÁ</p>
 </header>
 
@@ -242,10 +242,20 @@ function toggleTestMode() {
   document.getElementById('adminMsg').innerText = testMode ? '⚠️ Modo prueba activo' : '✓ Modo prueba desactivado';
 }
 
+function getPanamaDate() {
+  // Obtener fecha/hora actual en zona horaria de Panamá (UTC-5 fijo)
+  const now = new Date();
+  const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+  return new Date(utc + (-5 * 3600000));
+}
+
 function checkSchedule() {
-  const d = new Date(), dia = d.getDay(), hora = d.getHours();
-  const hoy = HORARIOS[dia];
+  const panama = getPanamaDate();
+  const dia  = panama.getDay();
+  const hora = panama.getHours();
+  const hoy  = HORARIOS[dia];
   const isOpen = testMode || (hoy && hora >= hoy.o && hora < hoy.c);
+
   const bar = document.getElementById('scheduleBar');
   bar.className = isOpen ? 'open-bar' : 'closed-bar';
   document.getElementById('btnEnviar').disabled = !isOpen;
@@ -256,7 +266,6 @@ function checkSchedule() {
     nextEl.innerHTML = '';
     stopCountdown();
   } else {
-    const dias = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
     const diasFull = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
     let nextDia = null, nextDiaNum = null;
     for (let i = 1; i <= 7; i++) {
@@ -265,11 +274,15 @@ function checkSchedule() {
     }
     if (nextDia !== null) {
       const h = HORARIOS[nextDia].o;
-      const nextDate = new Date(d);
-      nextDate.setDate(d.getDate() + nextDiaNum);
-      nextDate.setHours(h, 0, 0, 0);
-      document.getElementById('scheduleText').innerText = `🔴 En este momento estamos cerrados, abrimos nuestras puertas el ${diasFull[nextDia]}`;
-      startCountdown(nextDate);
+      // Construir fecha de apertura en UTC desde hora panameña
+      const apertura = new Date(panama);
+      apertura.setDate(panama.getDate() + nextDiaNum);
+      apertura.setHours(h, 0, 0, 0);
+      // Convertir de vuelta a UTC real para el countdown
+      const aperturaUTC = new Date(apertura.getTime() + (5 * 3600000));
+      const textodia = nextDiaNum === 0 ? 'hoy' : (nextDiaNum === 1 ? 'mañana' : `el ${diasFull[nextDia]}`);
+      document.getElementById('scheduleText').innerText = `🔴 En este momento estamos cerrados, abrimos nuestras puertas ${textodia}`;
+      startCountdown(aperturaUTC);
     } else {
       document.getElementById('scheduleText').innerText = '🔴 Cerrados por ahora';
       nextEl.innerHTML = '';
@@ -559,11 +572,27 @@ function actualizarResumen() {
 }
 
 function enviarPedido() {
-  const nom = document.getElementById('nombre').value.trim();
+  const nom   = document.getElementById('nombre').value.trim();
+  const zona  = document.getElementById('zona').value;
+  const notas = document.getElementById('notas').value.trim();
   if (!nom || Object.keys(carrito).length === 0) return alert('Nombre y productos requeridos');
+
+  let sub = 0;
   let m = `🔥 *PEDIDO - Javier Bear Grill* 🔥%0A%0A`;
-  Object.values(carrito).forEach(i => m += `• ${i.name} (x${i.qty})%0A`);
-  m += `%0A👤 *Cliente:* ${nom}%0A📍 *Zona:* ${document.getElementById('zona').value}%0A📝 *Notas:* ${document.getElementById('notas').value}%0A%0A💰 *TOTAL:* ${document.getElementById('totalVal').innerText}`;
+  m += `🍔 *Productos:*%0A`;
+  Object.values(carrito).forEach(i => {
+    const lineTotal = i.price * i.qty;
+    sub += lineTotal;
+    m += `• ${i.name} x${i.qty} = $${lineTotal.toFixed(2)}%0A`;
+  });
+  const delivery = (sub > 0 && zona !== 'Fuera de zona') ? 1.25 : 0;
+  const total = sub + delivery;
+  m += `%0A💵 *Subtotal:* $${sub.toFixed(2)}%0A`;
+  m += `🚚 *Delivery:* ${zona === 'Fuera de zona' ? 'A coordinar' : '$' + delivery.toFixed(2)}%0A`;
+  m += `✅ *Total:* $${total.toFixed(2)}%0A`;
+  m += `%0A👤 *Cliente:* ${nom}%0A`;
+  m += `📍 *Zona:* ${zona}%0A`;
+  if (notas) m += `📝 *Notas:* ${notas}%0A`;
   window.open(`https://wa.me/50765738924?text=${m}`);
 }
 
@@ -688,7 +717,7 @@ setInterval(checkSchedule, 60000);
 </footer>
 
 <style>
-  #footer { background: #0a0a0a; border-top: 1px solid var(--border); padding: 32px 20px 40px; text-align: center; margin-top: 20px; }
+  #footer { background: #120500; border-top: 1px solid var(--border); padding: 32px 20px 40px; text-align: center; margin-top: 20px; }
   .footer-brand { font-family: 'Oswald'; font-size: 22px; color: var(--yellow); margin-bottom: 4px; }
   .footer-sub { font-size: 11px; color: var(--muted); letter-spacing: 2px; margin-bottom: 4px; }
   .footer-address { font-size: 12px; color: #555; margin-bottom: 16px; }
