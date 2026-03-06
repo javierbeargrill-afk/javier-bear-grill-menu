@@ -423,6 +423,7 @@ async function cargarMenu(forzar = false) {
     renderMenu();
     renderCatNav();
     mostrarPromoAleatoria();
+    sincronizarQtysEnPantalla();
   } catch(e) {
     container.innerHTML = `<div id="loadingMsg" style="color:var(--red)">⚠️ No se pudo cargar el menú.<br><small>${e.message}</small></div>`;
   }
@@ -443,6 +444,14 @@ function sortCats(data) {
 // ══════════════════════════════════════════
 //  RENDER MENÚ
 // ══════════════════════════════════════════
+function sincronizarQtysEnPantalla() {
+  Object.entries(carrito).forEach(([id, item]) => {
+    const el = document.getElementById('qty-' + id);
+    if (el) el.innerText = item.qty;
+  });
+  actualizarResumen();
+}
+
 function renderMenu() {
   const container = document.getElementById('menuContainer');
   container.innerHTML = '';
@@ -605,7 +614,19 @@ function update(id, name, price, delta) {
   btn.classList.add('bump');
 }
 
+function guardarCarrito() {
+  try { localStorage.setItem('jbg_carrito', JSON.stringify(carrito)); } catch(e) {}
+}
+
+function cargarCarrito() {
+  try {
+    const saved = localStorage.getItem('jbg_carrito');
+    if (saved) carrito = JSON.parse(saved);
+  } catch(e) {}
+}
+
 function actualizarResumen() {
+  guardarCarrito();
   const lista = document.getElementById('listaItems');
   let sub = 0, count = 0;
   lista.innerHTML = '';
@@ -794,6 +815,7 @@ function modalAgregar() {
   cerrarModal();
 }
 
+cargarCarrito();
 cargarMenu();
 checkSchedule();
 setInterval(checkSchedule, 60000);
