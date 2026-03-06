@@ -217,7 +217,12 @@ const SUPABASE_URL  = 'https://uazonbacmpwuznugirru.supabase.co/functions/v1/loy
 const CACHE_KEY     = 'jbg_menu_v2';
 const CACHE_TTL     = 24 * 60 * 60 * 1000; // 24 horas
 const ADMIN_PASS    = 'javier2026';
-const HORARIOS      = { 5:{o:15,c:24}, 6:{o:13,c:24}, 0:{o:13,c:22} };
+// Horarios: [hora_apertura, min_apertura, hora_cierre, min_cierre]
+const HORARIOS = {
+  5: { o:[15,30], c:[24,0] },  // Viernes 3:30pm - 12mn
+  6: { o:[13,0],  c:[24,0] },  // Sábado  1:00pm - 12mn
+  0: { o:[13,0],  c:[22,0] },  // Domingo 1:00pm - 10pm
+};
 const CAT_ORDER     = [
   'Promociones','Pollo','Combo de hamburguesas','Hamburguesas',
   'CARNE Y CERDO','Picadas','Salchipapas y HodDogs','Chorizos',
@@ -243,48 +248,70 @@ function toggleTestMode() {
 }
 
 function getPanamaDate() {
-  // Obtener fecha/hora actual en zona horaria de Panamá (UTC-5 fijo)
+  // Usar toLocaleString con timeZone para obtener hora panameña real
   const now = new Date();
-  const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
-  return new Date(utc + (-5 * 3600000));
+  return new Date(now.toLocaleString('en-US', { timeZone: 'America/Panama' }));
+}
+
+function minutosDelDia(date) {
+  return date.getHours() * 60 + date.getMinutes();
 }
 
 function checkSchedule() {
-  const panama = getPanamaDate();
-  const dia  = panama.getDay();
-  const hora = panama.getHours();
-  const hoy  = HORARIOS[dia];
-  const isOpen = testMode || (hoy && hora >= hoy.o && hora < hoy.c);
+  const panama  = getPanamaDate();
+  const dia     = panama.getDay();
+  const minNow  = minutosDelDia(panama);
+  const hoy     = HORARIOS[dia];
 
+  // Minutos de apertura y cierre de hoy
+  const minOpen  = hoy ? hoy.o[0] * 60 + hoy.o[1] : null;
+  const minClose = hoy ? hoy.c[0] * 60 + hoy.c[1] : null;
+
+  const isOpen = testMode || (hoy && minNow >= minOpen && minNow < minClose);
   const bar = document.getElementById('scheduleBar');
   bar.className = isOpen ? 'open-bar' : 'closed-bar';
   document.getElementById('btnEnviar').disabled = !isOpen;
-  const nextEl = document.getElementById('nextOpen');
+
+  const textEl  = document.getElementById('scheduleText');
+  const nextEl  = document.getElementById('nextOpen');
+
+  const diasNombre = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+  const horaFmt = (h, m) => `${h === 12 ? 12 : h > 12 ? h-12 : h}:${String(m).padStart(2,'0')}${h < 12 ? 'am' : 'pm'}`;
 
   if (isOpen) {
-    document.getElementById('scheduleText').innerText = '🟢 Estamos abiertos, haz tu pedido';
+    // Calcular cuánto falta para cerrar
+    const cierre = horaFmt(hoy.c[0] === 24 ? 12 : hoy.c[0], hoy.c[1]);
+    textEl.innerText = `🟢 ¡Estamos atendiendo! Hasta las ${hoy.c[0] === 24 ? '12:00mn' : cierre}`;
     nextEl.innerHTML = '';
     stopCountdown();
+  } else if (hoy && minNow < minOpen) {
+    // Hoy abre más tarde — mostrar contador hasta apertura de hoy
+    // Calcular fecha de apertura real usando offset entre now y panama
+    const now = new Date();
+    const offset = now.getTime() - panama.getTime(); // diferencia real entre UTC local y Panama
+    const aperturaPanama = new Date(panama);
+    aperturaPanama.setHours(hoy.o[0], hoy.o[1], 0, 0);
+    const aperturaUTC = new Date(aperturaPanama.getTime() + offset);
+    const abre = horaFmt(hoy.o[0], hoy.o[1]);
+    textEl.innerText = `🕐 Hoy abrimos a las ${abre} — faltan:`;
+    startCountdown(aperturaUTC);
   } else {
-    const diasFull = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
-    let nextDia = null, nextDiaNum = null;
+    // Cerrado — buscar próximo día
+    stopCountdown();
+    let nextDia = null, diasHasta = null;
     for (let i = 1; i <= 7; i++) {
       const nd = (dia + i) % 7;
-      if (HORARIOS[nd]) { nextDia = nd; nextDiaNum = i; break; }
+      if (HORARIOS[nd]) { nextDia = nd; diasHasta = i; break; }
     }
     if (nextDia !== null) {
-      const h = HORARIOS[nextDia].o;
-      // Construir fecha de apertura en UTC desde hora panameña
-      const apertura = new Date(panama);
-      apertura.setDate(panama.getDate() + nextDiaNum);
-      apertura.setHours(h, 0, 0, 0);
-      // Convertir de vuelta a UTC real para el countdown
-      const aperturaUTC = new Date(apertura.getTime() + (5 * 3600000));
-      const textodia = nextDiaNum === 0 ? 'hoy' : (nextDiaNum === 1 ? 'mañana' : `el ${diasFull[nextDia]}`);
-      document.getElementById('scheduleText').innerText = `🔴 En este momento estamos cerrados, abrimos nuestras puertas ${textodia}`;
-      startCountdown(aperturaUTC);
+      const h = HORARIOS[nextDia];
+      const abre    = horaFmt(h.o[0], h.o[1]);
+      const cierra  = h.c[0] === 24 ? '12:00mn' : horaFmt(h.c[0], h.c[1]);
+      const cuando  = diasHasta === 1 ? 'mañana' : `el ${diasNombre[nextDia]}`;
+      textEl.innerText = `🔴 Cerrados por ahora. Atendemos ${cuando} de ${abre} a ${cierra}`;
+      nextEl.innerHTML = '';
     } else {
-      document.getElementById('scheduleText').innerText = '🔴 Cerrados por ahora';
+      textEl.innerText = '🔴 Cerrados por ahora';
       nextEl.innerHTML = '';
     }
   }
