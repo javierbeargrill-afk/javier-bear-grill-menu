@@ -157,13 +157,22 @@
   <div class="dot"></div>
   <span id="scheduleText">Verificando...</span>
   <span id="nextOpen"></span>
+  <img src="https://uazonbacmpwuznugirru.supabase.co/storage/v1/object/public/menu-images/IMG-20230315-WA0300_20250520_112619_0000.png" alt="Javier Bear Grill" style="height:28px; width:auto; margin-left:10px; filter:brightness(0) invert(1); flex-shrink:0;">
 </div>
 
-<!-- HEADER -->
-<header>
-  <img src="https://uazonbacmpwuznugirru.supabase.co/storage/v1/object/public/menu-images/IMG-20230315-WA0300_20250520_112619_0000.png" alt="Javier Bear Grill" style="max-width:220px; width:70%; display:block; margin:0 auto 6px; filter:brightness(0) invert(1);">
-  <p style="color:var(--muted); font-size:10px; letter-spacing:2px;">LA CHORRERA, PANAMÁ</p>
-</header>
+<!-- HERO -->
+<div id="hero" style="display:none; position:relative; width:100%; overflow:hidden;">
+  <img id="heroImg" src="" alt="" style="width:100%; aspect-ratio:16/7; object-fit:cover; display:block;">
+  <div style="position:absolute; inset:0; background:linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.05) 60%);"></div>
+  <div style="position:absolute; bottom:0; left:0; right:0; padding:14px 16px;">
+    <div id="heroName" style="font-family:'Oswald'; font-size:20px; color:#fff; font-weight:700; margin-bottom:2px;"></div>
+    <div id="heroPrice" style="font-family:'Oswald'; font-size:24px; color:var(--yellow); margin-bottom:10px;"></div>
+    <div style="display:flex; gap:8px;">
+      <button id="heroBtn" onclick="heroAgregar()" style="flex:1; background:var(--yellow); color:#000; border:none; border-radius:20px; padding:10px; font-family:'Oswald'; font-size:14px; font-weight:700; cursor:pointer;">🛒 Agregar al carrito</button>
+      <button onclick="heroVerDetalle()" style="flex:1; background:rgba(255,255,255,0.15); color:#fff; border:1px solid rgba(255,255,255,0.3); border-radius:20px; padding:10px; font-family:'Oswald'; font-size:14px; font-weight:700; cursor:pointer; backdrop-filter:blur(4px);">📋 Ver detalle</button>
+    </div>
+  </div>
+</div>
 
 <!-- SEARCH -->
 <div id="searchWrap">
@@ -727,22 +736,89 @@ function limpiarCache() {
 // ══════════════════════════════════════════
 //  INIT
 // ══════════════════════════════════════════
+let heroItems = [], heroIdx = 0, heroTimer = null;
+let footerPromoItem = null;
+
 function mostrarPromoAleatoria() {
-  const promoDiv = document.getElementById('footerPromo');
+  const promoDiv  = document.getElementById('footerPromo');
   const promoCard = document.getElementById('footerPromoCard');
   if (!CATEGORIAS.length) return;
-  const promoCat = CATEGORIAS.find(c => c.n.toLowerCase().includes('promoc'));
-  const fuente = promoCat ? promoCat.i : CATEGORIAS.flatMap(c => c.i);
-  if (!fuente.length) return;
-  const item = fuente[Math.floor(Math.random() * fuente.length)];
-  promoCard.innerHTML = `<div class="promo-card">
-    ${item.img ? `<img src="${item.img}" alt="${item.n}" onerror="this.style.display='none'">` : ''}
+
+  // Items con foto para hero y footer
+  const conFoto = CATEGORIAS.flatMap(c => c.i.filter(i => i.img).map(i => ({...i, cat: c.n})));
+  if (!conFoto.length) return;
+
+  // Footer promo aleatorio
+  footerPromoItem = conFoto[Math.floor(Math.random() * conFoto.length)];
+  promoCard.innerHTML = `<div class="promo-card" onclick="footerAgregar()" style="cursor:pointer;">
+    <img src="${footerPromoItem.img}" alt="${footerPromoItem.n}" onerror="this.style.display='none'">
     <div class="promo-info">
-      <div class="promo-name">${item.n}</div>
-      <div class="promo-price">$${item.p.toFixed(2)}</div>
+      <div class="promo-name">${footerPromoItem.n}</div>
+      <div class="promo-price">$${footerPromoItem.p.toFixed(2)}</div>
+      <div style="font-size:10px;color:var(--muted);margin-top:2px;">Toca para agregar al carrito</div>
     </div>
   </div>`;
   promoDiv.style.display = '';
+
+  // Hero rotativo
+  heroItems = [...conFoto].sort(() => Math.random() - 0.5);
+  heroIdx   = 0;
+  mostrarHeroItem();
+  if (heroTimer) clearInterval(heroTimer);
+  heroTimer = setInterval(() => {
+    heroIdx = (heroIdx + 1) % heroItems.length;
+    mostrarHeroItem();
+  }, 10 * 60 * 1000); // 10 minutos
+}
+
+function mostrarHeroItem() {
+  if (!heroItems.length) return;
+  const item  = heroItems[heroIdx];
+  const hero  = document.getElementById('hero');
+  const img   = document.getElementById('heroImg');
+  const name  = document.getElementById('heroName');
+  const price = document.getElementById('heroPrice');
+  img.src     = item.img;
+  img.alt     = item.n;
+  name.innerText  = item.n;
+  price.innerText = `$${item.p.toFixed(2)}`;
+  hero.style.display = '';
+}
+
+function heroVerDetalle() {
+  if (!heroItems.length) return;
+  const item = heroItems[heroIdx];
+  abrirModal(item.n, item.p, item.img, item.d || null, item.cat || '');
+}
+
+function heroAgregar() {
+  if (!heroItems.length) return;
+  const item = heroItems[heroIdx];
+  const id   = encodeId(item.n);
+  if (!carrito[id]) carrito[id] = { name: item.n, price: item.p, qty: 0 };
+  carrito[id].qty++;
+  const el = document.getElementById('qty-' + id);
+  if (el) el.innerText = carrito[id].qty;
+  actualizarResumen();
+  const btn = document.getElementById('floatCart');
+  btn.classList.remove('bump'); void btn.offsetWidth; btn.classList.add('bump');
+  // Feedback visual
+  const heroBtn = document.getElementById('heroBtn');
+  heroBtn.innerText = '✓ Agregado';
+  heroBtn.style.background = '#25D366';
+  setTimeout(() => { heroBtn.innerText = '+ Agregar'; heroBtn.style.background = ''; }, 1500);
+}
+
+function footerAgregar() {
+  if (!footerPromoItem) return;
+  const id = encodeId(footerPromoItem.n);
+  if (!carrito[id]) carrito[id] = { name: footerPromoItem.n, price: footerPromoItem.p, qty: 0 };
+  carrito[id].qty++;
+  const el = document.getElementById('qty-' + id);
+  if (el) el.innerText = carrito[id].qty;
+  actualizarResumen();
+  const btn = document.getElementById('floatCart');
+  btn.classList.remove('bump'); void btn.offsetWidth; btn.classList.add('bump');
 }
 
 
