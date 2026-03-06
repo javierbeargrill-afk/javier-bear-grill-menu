@@ -728,10 +728,14 @@ function solicitarUbicacion() {
 
 function getNumeroOrden() {
   try {
-    let n = parseInt(localStorage.getItem('jbg_orden') || '0') + 1;
-    localStorage.setItem('jbg_orden', n);
-    return String(n).padStart(4, '0');
-  } catch(e) { return '????'; }
+    const ahora  = getPanamaDate();
+    const dias   = ['DOM','LUN','MAR','MIE','JUE','VIE','SAB'];
+    const dia    = dias[ahora.getDay()];
+    const hh     = String(ahora.getHours()).padStart(2,'0');
+    const mm     = String(ahora.getMinutes()).padStart(2,'0');
+    const rand   = Math.random().toString(36).substring(2,4).toUpperCase();
+    return `${dia}-${hh}${mm}-${rand}`;
+  } catch(e) { return 'XXX'; }
 }
 
 function enviarPedido() {
