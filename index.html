@@ -313,7 +313,9 @@
 // ══════════════════════════════════════════
 //  CONFIG
 // ══════════════════════════════════════════
-const SUPABASE_URL  = 'https://uazonbacmpwuznugirru.supabase.co/functions/v1/loyverse-menu';
+const SUPABASE_URL       = 'https://uazonbacmpwuznugirru.supabase.co/functions/v1/loyverse-menu';
+const SUPABASE_ANON_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVhem9uYmFjbXB3dXpudWdpcnJ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDc3NjkxNzMsImV4cCI6MjA2MzM0NTE3M30.xnQZxvOYXxHaFLBukEHG9BqH6J0FrJyHHCfSBuuBmxc';
+const CACHE_REST_URL     = 'https://uazonbacmpwuznugirru.supabase.co/rest/v1/menu_cache?id=eq.1&select=data,updated_at';
 const CACHE_KEY     = 'jbg_menu_v2';
 const CACHE_TTL     = 24 * 60 * 60 * 1000; // 24 horas
 const ADMIN_PASS    = 'javier2026';
@@ -478,26 +480,21 @@ async function cargarMenu(forzar = false) {
   container.innerHTML = '<div id="loadingMsg"><span class="spinner"></span>Cargando menú...</div>';
 
   try {
-    const res = await fetch(SUPABASE_URL);
+    // Leer directo de Supabase REST (instantáneo)
+    const res = await fetch(CACHE_REST_URL, {
+      headers: {
+        'apikey': SUPABASE_ANON_KEY,
+        'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
+      }
+    });
     if (!res.ok) throw new Error('HTTP ' + res.status);
-    const data = await res.json();
-    if (!Array.isArray(data)) throw new Error('Respuesta inesperada del servidor');
-    CATEGORIAS = sortCats(data);
-
-    // Guardar en caché sin imágenes para ahorrar espacio
-    try {
-      const dataSlim = data.map(cat => ({
-        n: cat.n,
-        i: cat.i.map(item => ({ n: item.n, p: item.p, img: item.img }))
-      }));
-      localStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), data: dataSlim }));
-    } catch(e) {
-      // Si localStorage falla (lleno), usar sessionStorage
-      try {
-        sessionStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), data }));
-      } catch(e2) {}
+    const rows = await res.json();
+    if (!rows.length || !Array.isArray(rows[0].data) || rows[0].data.length === 0) {
+      throw new Error('Caché vacía');
     }
-
+    const data = rows[0].data;
+    CATEGORIAS = sortCats(data);
+    try { localStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), data })); } catch(e) {}
     renderMenu();
     renderCatNav();
     mostrarPromoAleatoria();
@@ -889,7 +886,18 @@ async function sincronizarAdmin() {
   msg.innerText = 'Sincronizando...';
   try {
     localStorage.removeItem(CACHE_KEY);
-    await cargarMenu(true);
+    // Sincronizar con Loyverse y actualizar caché
+    try {
+      const syncRes = await fetch(SUPABASE_URL + '?sync=true');
+      if (!syncRes.ok) throw new Error('HTTP ' + syncRes.status);
+      const data = await syncRes.json();
+      if (!Array.isArray(data)) throw new Error('Respuesta inesperada');
+      CATEGORIAS = sortCats(data);
+      try { localStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), data })); } catch(e) {}
+      renderMenu(); renderCatNav(); mostrarPromoAleatoria(); sincronizarQtysEnPantalla();
+    } catch(err) {
+      alert('Error al sincronizar: ' + err.message);
+    }
     msg.innerText = '✓ Menú sincronizado correctamente';
   } catch(e) {
     msg.innerText = '❌ Error: ' + e.message;
