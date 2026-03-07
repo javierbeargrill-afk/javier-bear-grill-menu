@@ -839,6 +839,93 @@ function enviarPedido() {
   }
 
   window.open(`https://wa.me/50765738924?text=${m}`);
+
+  // Guardar último pedido
+  try {
+    const ultimoPedido = {
+      orden, dia, hora,
+      items: Object.values(carrito).map(i => ({ n: i.name, qty: i.qty, p: i.price })),
+      sub: sub.toFixed(2),
+      delivery: delivery.toFixed(2),
+      total: total.toFixed(2),
+      zona, direccion: document.getElementById('direccion').value.trim(),
+      pago: metodoPago
+    };
+    localStorage.setItem('jbg_ultimo_pedido', JSON.stringify(ultimoPedido));
+  } catch(e) {}
+
+  // Limpiar solo carrito y método de pago
+  carrito = {};
+  localStorage.removeItem('jbg_carrito');
+  actualizarResumen();
+  document.querySelectorAll('[id^="qty-"]').forEach(el => el.innerText = '0');
+  document.getElementById('notas').value = '';
+  document.getElementById('montoEfectivo').value = '';
+  document.getElementById('cambioResult').style.display = 'none';
+  seleccionarPago('efectivo');
+  // Ubicación se mantiene si ya fue compartida
+
+  // Mostrar confirmación
+  mostrarConfirmacionPedido(orden);
+}
+
+function mostrarConfirmacionPedido(orden) {
+  const existing = document.getElementById('confirmacionPedido');
+  if (existing) existing.remove();
+
+  const div = document.createElement('div');
+  div.id = 'confirmacionPedido';
+  div.innerHTML = `
+    <div style="position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:2000; display:flex; align-items:center; justify-content:center; padding:20px;">
+      <div style="background:var(--surface); border:1px solid var(--yellow); border-radius:20px; padding:30px 24px; max-width:320px; width:100%; text-align:center; animation:slideUp 0.3s ease;">
+        <div style="font-size:48px; margin-bottom:12px;">🔥</div>
+        <div style="font-family:'Oswald'; font-size:22px; color:var(--yellow); margin-bottom:6px;">¡Pedido enviado!</div>
+        <div style="font-size:13px; color:var(--muted); margin-bottom:4px;">Orden <strong style="color:var(--text);">#${orden}</strong></div>
+        <div style="font-size:12px; color:var(--muted); margin-bottom:20px;">Te responderemos por WhatsApp en breve 🐻</div>
+        <button onclick="document.getElementById('confirmacionPedido').remove(); verUltimoPedido();"
+          style="width:100%; padding:10px; background:var(--surface2); border:1px solid var(--border); border-radius:10px; color:var(--muted); font-family:'Nunito'; font-size:12px; cursor:pointer; margin-bottom:8px;">
+          📋 Ver mi último pedido
+        </button>
+        <button onclick="document.getElementById('confirmacionPedido').remove();"
+          style="width:100%; padding:12px; background:var(--yellow); border:none; border-radius:10px; color:#000; font-family:'Oswald'; font-size:16px; font-weight:700; cursor:pointer;">
+          Seguir viendo el menú
+        </button>
+      </div>
+    </div>`;
+  document.body.appendChild(div);
+}
+
+function verUltimoPedido() {
+  try {
+    const u = JSON.parse(localStorage.getItem('jbg_ultimo_pedido'));
+    if (!u) return;
+    const pagos = { efectivo: '💵 Efectivo', yappy: '📱 Yappy', tarjeta: '💳 Tarjeta' };
+    let html = `
+      <div style="position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:2000; display:flex; align-items:flex-end; justify-content:center;">
+        <div style="background:var(--surface); border-radius:20px 20px 0 0; width:100%; max-width:540px; padding:24px; max-height:80vh; overflow-y:auto;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+            <div style="font-family:'Oswald'; font-size:18px; color:var(--yellow);">📋 Mi último pedido</div>
+            <button onclick="this.closest('[style*=fixed]').remove()" style="background:none; border:none; color:var(--muted); font-size:22px; cursor:pointer;">✕</button>
+          </div>
+          <div style="font-size:11px; color:var(--muted); margin-bottom:12px;">Orden #${u.orden} · ${u.dia}, ${u.hora}</div>`;
+    u.items.forEach(i => {
+      html += `<div style="display:flex; justify-content:space-between; font-size:13px; padding:6px 0; border-bottom:1px solid var(--border);">
+        <span>${i.n} x${i.qty}</span><span style="color:var(--yellow);">$${(i.p * i.qty).toFixed(2)}</span></div>`;
+    });
+    html += `
+          <div style="margin-top:12px; padding:12px; background:var(--surface2); border-radius:8px; font-size:13px;">
+            <div style="display:flex; justify-content:space-between; margin-bottom:4px;"><span>Subtotal</span><span>$${u.sub}</span></div>
+            <div style="display:flex; justify-content:space-between; margin-bottom:4px;"><span>Delivery</span><span>$${u.delivery}</span></div>
+            <div style="display:flex; justify-content:space-between; font-family:'Oswald'; font-size:16px; color:var(--yellow); margin-top:6px;"><span>TOTAL</span><span>$${u.total}</span></div>
+          </div>
+          <div style="font-size:12px; color:var(--muted); margin-top:10px;">📦 ${u.zona} ${u.direccion ? '· '+u.direccion : ''}</div>
+          <div style="font-size:12px; color:var(--muted);">${pagos[u.pago] || u.pago}</div>
+        </div>
+      </div>`;
+    const div = document.createElement('div');
+    div.innerHTML = html;
+    document.body.appendChild(div);
+  } catch(e) {}
 }
 
 // ══════════════════════════════════════════
