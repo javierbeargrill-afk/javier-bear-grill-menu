@@ -102,6 +102,8 @@
   .btn-send { width: 100%; padding: 16px; background: var(--green); border: none; color: #fff; border-radius: 12px; font-family: 'Oswald'; font-size: 18px; font-weight: 700; cursor: pointer; margin-top: 10px; transition: all 0.2s; }
   .btn-send:not(:disabled):hover { background: #1fba55; transform: translateY(-1px); }
   .btn-send:disabled { background: #333 !important; color: #666 !important; cursor: not-allowed; }
+  .pay-btn { flex:1; padding:10px 6px; background:var(--surface2); border:1px solid var(--border); border-radius:10px; color:var(--muted); font-family:'Nunito'; font-size:12px; font-weight:700; cursor:pointer; transition:all 0.2s; }
+  .pay-btn.active { background:var(--yellow); color:#000; border-color:var(--yellow); }
 
   /* ── FLOAT CART ── */
   #floatCart { position: fixed; bottom: 20px; right: 20px; background: var(--yellow); color: #000; padding: 12px 20px; border-radius: 50px; font-weight: 800; box-shadow: 0 5px 20px rgba(0,0,0,0.5); border: none; z-index: 1000; font-family: 'Oswald'; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; }
@@ -252,6 +254,25 @@
       📍 Compartir mi ubicación actual <span style="font-size:11px; opacity:0.6;">(opcional)</span>
     </button>
     <div id="ubicacionStatus" style="font-size:11px; color:var(--muted); margin-top:4px; display:none;"></div>
+  </div>
+
+  <!-- MÉTODO DE PAGO -->
+  <div class="form-group">
+    <label>Método de pago</label>
+    <div style="display:flex; gap:8px; margin-top:4px;">
+      <button type="button" class="pay-btn active" id="pay-efectivo" onclick="seleccionarPago('efectivo')">💵 Efectivo</button>
+      <button type="button" class="pay-btn" id="pay-yappy" onclick="seleccionarPago('yappy')">📱 Yappy</button>
+      <button type="button" class="pay-btn" id="pay-tarjeta" onclick="seleccionarPago('tarjeta')">💳 Tarjeta</button>
+    </div>
+  </div>
+
+  <!-- CAMBIO (solo efectivo) -->
+  <div id="efectivoWrap" class="form-group">
+    <label>¿Con cuánto pagas?</label>
+    <input type="number" id="montoEfectivo" placeholder="Ej: 10.00" min="0" step="0.25"
+      oninput="calcularCambio()"
+      style="width:100%; padding:11px; background:var(--surface2); border:1px solid var(--border); border-radius:8px; color:var(--text); font-family:'Nunito'; font-size:14px; outline:none;">
+    <div id="cambioResult" style="display:none; margin-top:8px; padding:10px 14px; background:var(--surface2); border:1px solid var(--yellow); border-radius:8px; font-family:'Oswald'; font-size:18px; color:var(--yellow); text-align:center;"></div>
   </div>
 
   <button class="btn-send" id="btnEnviar" onclick="enviarPedido()">📲 HACER MI PEDIDO AHORA</button>
@@ -738,6 +759,36 @@ function getNumeroOrden() {
   } catch(e) { return 'XXX'; }
 }
 
+let metodoPago = 'efectivo';
+
+function seleccionarPago(metodo) {
+  metodoPago = metodo;
+  document.querySelectorAll('.pay-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('pay-' + metodo).classList.add('active');
+  document.getElementById('efectivoWrap').style.display = metodo === 'efectivo' ? '' : 'none';
+  document.getElementById('cambioResult').style.display = 'none';
+  if (metodo !== 'efectivo') document.getElementById('montoEfectivo').value = '';
+}
+
+function calcularCambio() {
+  const totalEl = document.getElementById('totalVal');
+  const total   = parseFloat(totalEl.innerText.replace('$','')) || 0;
+  const monto   = parseFloat(document.getElementById('montoEfectivo').value) || 0;
+  const result  = document.getElementById('cambioResult');
+  if (monto <= 0 || total <= 0) { result.style.display = 'none'; return; }
+  if (monto < total) {
+    result.style.display = '';
+    result.style.borderColor = 'var(--red)';
+    result.style.color = 'var(--red)';
+    result.innerText = `⚠️ Monto insuficiente — faltan $${(total - monto).toFixed(2)}`;
+  } else {
+    result.style.display = '';
+    result.style.borderColor = 'var(--yellow)';
+    result.style.color = 'var(--yellow)';
+    result.innerText = `✅ Tu cambio: $${(monto - total).toFixed(2)}`;
+  }
+}
+
 function enviarPedido() {
   const nom      = document.getElementById('nombre').value.trim();
   const zona     = document.getElementById('zona').value;
@@ -772,6 +823,14 @@ function enviarPedido() {
   if (direccion) m += `🏠 *Dirección:* ${direccion}%0A`;
   if (clienteUbicacion) m += `📍 *Ubicación:* https://maps.google.com/?q=${clienteUbicacion.lat},${clienteUbicacion.lng}%0A`;
   if (notas) m += `📝 *Notas:* ${notas}%0A`;
+
+  // Pago
+  const pagoNombre = { efectivo: '💵 Efectivo', yappy: '📱 Yappy', tarjeta: '💳 Tarjeta' };
+  m += `%0A💳 *Pago:* ${pagoNombre[metodoPago] || metodoPago}%0A`;
+  if (metodoPago === 'efectivo') {
+    const monto = parseFloat(document.getElementById('montoEfectivo').value) || 0;
+    if (monto >= total) m += `💵 *Paga con:* $${monto.toFixed(2)} → Cambio: $${(monto - total).toFixed(2)}%0A`;
+  }
 
   window.open(`https://wa.me/50765738924?text=${m}`);
 }
