@@ -250,10 +250,22 @@
 
   <!-- UBICACIÓN -->
   <div class="form-group">
-    <button type="button" onclick="solicitarUbicacion()" id="btnUbicacion" style="width:100%; padding:11px; background:var(--surface2); border:1px solid var(--border); border-radius:8px; color:var(--muted); font-family:'Nunito'; font-size:13px; cursor:pointer; text-align:left; transition:all 0.2s;">
-      📍 Compartir mi ubicación actual <span style="font-size:11px; opacity:0.6;">(opcional)</span>
-    </button>
-    <div id="ubicacionStatus" style="font-size:11px; color:var(--muted); margin-top:4px; display:none;"></div>
+    <div style="background:var(--surface2); border:1px solid var(--border); border-radius:10px; overflow:hidden;">
+      <div style="background:rgba(255,135,50,0.1); border-bottom:1px solid var(--border); padding:10px 14px; display:flex; align-items:center; gap:8px;">
+        <span style="font-size:18px;">📍</span>
+        <div>
+          <div style="font-size:12px; font-weight:700; color:var(--yellow); font-family:'Oswald'; letter-spacing:0.5px;">UBICACIÓN PARA DELIVERY</div>
+          <div style="font-size:11px; color:var(--muted); line-height:1.4; margin-top:1px;">Comparte tu ubicación exacta para que nuestro repartidor llegue directo a tu puerta sin llamarte.</div>
+        </div>
+      </div>
+      <div style="padding:10px 14px;">
+        <button type="button" onclick="solicitarUbicacion()" id="btnUbicacion"
+          style="width:100%; padding:10px 14px; background:var(--surface); border:1px solid var(--yellow); border-radius:8px; color:var(--yellow); font-family:'Oswald'; font-size:14px; font-weight:700; cursor:pointer; transition:all 0.2s; display:flex; align-items:center; justify-content:center; gap:8px;">
+          <span>📍</span> Compartir mi ubicación <span style="font-size:11px; opacity:0.6; font-family:'Nunito';">(opcional)</span>
+        </button>
+        <div id="ubicacionStatus" style="font-size:11px; color:var(--muted); margin-top:6px; display:none; text-align:center;"></div>
+      </div>
+    </div>
   </div>
 
   <!-- MÉTODO DE PAGO -->
@@ -1086,8 +1098,20 @@ setInterval(checkSchedule, 60000);
     <div id="footerPromoCard"></div>
   </div>
 
-  <a href="https://maps.app.goo.gl/ttfyZQgvAxhtah51A" target="_blank" class="maps-btn">
-    📍 Cómo llegar — Google Maps
+  <a href="https://maps.app.goo.gl/ttfyZQgvAxhtah51A" target="_blank" style="display:block; margin:0 auto 20px; max-width:320px; text-decoration:none;">
+    <div style="background:linear-gradient(135deg, #2a1200, #3a1a00); border:1px solid var(--yellow); border-radius:14px; overflow:hidden;">
+      <div style="background:rgba(255,135,50,0.12); padding:14px 18px; display:flex; align-items:center; gap:12px;">
+        <div style="width:42px; height:42px; background:var(--yellow); border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:20px;">📍</div>
+        <div style="text-align:left;">
+          <div style="font-family:'Oswald'; font-size:15px; color:var(--yellow); letter-spacing:0.5px;">NUESTRA UBICACIÓN</div>
+          <div style="font-size:11px; color:rgba(255,255,255,0.6); margin-top:2px; line-height:1.4;">Residencial La Valdeza, Calle Boulevard<br>Casa 173, La Chorrera, Panamá</div>
+        </div>
+        <div style="margin-left:auto; color:var(--yellow); font-size:20px; flex-shrink:0;">›</div>
+      </div>
+      <div style="background:rgba(255,135,50,0.08); padding:8px 18px; border-top:1px solid rgba(255,135,50,0.2); text-align:center;">
+        <span style="font-size:11px; color:var(--muted); letter-spacing:1px;">ABRIR EN GOOGLE MAPS →</span>
+      </div>
+    </div>
   </a>
 
   <p class="footer-credit">Creada por <strong>Javier el Oso</strong> con la ayuda de <strong>Claude</strong> 🤖</p>
@@ -1106,8 +1130,6 @@ setInterval(checkSchedule, 60000);
   .social-btn:hover { opacity: 0.85; }
   .social-btn.ig { background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); color: #fff; }
   .social-btn.tt { background: #010101; color: #fff; border: 1px solid #333; }
-  .maps-btn { display: inline-block; margin-bottom: 20px; padding: 10px 20px; background: #1a73e8; color: #fff; border-radius: 20px; text-decoration: none; font-size: 13px; font-weight: 700; transition: opacity 0.2s; }
-  .maps-btn:hover { opacity: 0.85; }
   .footer-credit { font-size: 11px; color: #444; }
   .footer-schedule { margin-bottom: 20px; }
   .footer-section-title { font-family: 'Oswald'; color: var(--yellow); font-size: 14px; margin-bottom: 6px; }
