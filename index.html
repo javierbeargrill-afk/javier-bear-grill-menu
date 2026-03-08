@@ -200,7 +200,6 @@
   .horario-input { flex:1; padding:6px 8px; background:var(--bg); border:1px solid var(--border); color:#fff; border-radius:6px; font-size:13px; font-family:'Nunito'; text-align:center; outline:none; }
   .horario-input:focus { border-color:var(--yellow); }
   .horario-sep   { font-size:11px; color:var(--muted); flex-shrink:0; }
-  .horario-activo { width:20px; height:20px; accent-color:var(--yellow); flex-shrink:0; cursor:pointer; }
 
   /* Banner */
   .banner-preview { background:var(--surface2); border-radius:8px; padding:12px; margin-top:10px; display:none; }
@@ -261,9 +260,23 @@
   .promo-card .promo-name  { font-weight:700; font-size:13px; color:#fff; margin-bottom:2px; }
   .promo-card .promo-price { font-family:'Oswald'; color:var(--yellow); font-size:16px; }
 
-  /* Footer credit — disparador secreto */
   #footerCredit { font-size:11px; color:#444; cursor:default; user-select:none; -webkit-tap-highlight-color:transparent; }
   #footerCredit.tapping { color:#6a3a00; }
+
+  /* Zona admin row */
+  .zona-admin-row { background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:10px 12px; margin-bottom:6px; transition:opacity 0.2s; }
+  .zona-admin-row.inactiva { opacity:0.5; border-color:rgba(255,255,255,0.05); }
+  .zona-admin-row .zona-fields { display:flex; align-items:center; gap:6px; }
+  .zona-field-nombre { flex:1; padding:6px 10px; background:var(--bg); border:1px solid var(--border); border-radius:6px; color:#fff; font-size:13px; font-family:'Nunito'; outline:none; }
+  .zona-field-nombre:focus { border-color:var(--yellow); }
+  .zona-field-precio { width:76px; padding:6px 8px; background:var(--bg); border:1px solid var(--border); border-radius:6px; color:var(--yellow); font-family:'Oswald'; font-size:14px; text-align:center; outline:none; }
+  .zona-field-precio:focus { border-color:var(--yellow); }
+  .zona-btn-icon { background:none; border:1px solid var(--border); border-radius:6px; color:var(--muted); padding:5px 8px; font-size:13px; cursor:pointer; flex-shrink:0; transition:all 0.15s; }
+  .zona-btn-icon:hover { border-color:var(--yellow); color:var(--yellow); }
+  .zona-btn-del { background:rgba(200,16,46,0.12); border:1px solid rgba(200,16,46,0.2); border-radius:6px; color:var(--red); padding:5px 8px; font-size:13px; cursor:pointer; flex-shrink:0; }
+  .zona-btn-del:hover { background:rgba(200,16,46,0.25); }
+  .zona-wa-label { width:76px; text-align:center; font-size:10px; color:var(--muted); padding:6px 4px; flex-shrink:0; }
+  .zona-fuera-note { font-size:10px; color:var(--muted); margin-top:4px; margin-left:52px; }
 </style>
 </head>
 <body>
@@ -333,16 +346,10 @@
   <div class="form-group"><label>Dirección de entrega</label><input type="text" id="direccion" placeholder="Ej: Calle 5, Casa 12, frente al parque"></div>
   <div class="form-group">
     <label>Zona de Entrega</label>
-    <select id="zona" onchange="actualizarResumen()">
-      <option value="La Valdeza">La Valdeza ($1.25)</option>
-      <option value="Llano Largo">Llano Largo ($1.25)</option>
-      <option value="Las Praderas">Las Praderas ($1.25)</option>
-      <option value="Valle Bonito">Valle Bonito ($1.25)</option>
-      <option value="Villa del Carmen">Villa del Carmen ($1.25)</option>
-      <option value="Fuera de zona">Fuera de zona (Coord. por WA)</option>
-    </select>
+    <select id="zona" onchange="actualizarResumen()"></select>
   </div>
   <div class="form-group"><label>Notas</label><input type="text" id="notas" placeholder="Ej. Sin cebolla, casa amarilla..."></div>
+
   <!-- UBICACIÓN -->
   <div class="form-group">
     <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;overflow:hidden;">
@@ -361,6 +368,7 @@
       </div>
     </div>
   </div>
+
   <!-- PAGO -->
   <div class="form-group">
     <label>Método de pago</label>
@@ -415,6 +423,7 @@
         <button class="admin-tab" onclick="switchTab('tab-productos',this)">🍔 Productos</button>
         <button class="admin-tab" onclick="switchTab('tab-banner',this)">📢 Banner</button>
         <button class="admin-tab" onclick="switchTab('tab-promos',this)">🎁 Promos</button>
+        <button class="admin-tab" onclick="switchTab('tab-zonas',this)">🗺️ Zonas</button>
         <button class="admin-tab" onclick="switchTab('tab-stats',this)">📊 Stats</button>
       </div>
 
@@ -535,6 +544,36 @@
         <p class="admin-msg" id="promosMsg"></p>
       </div>
 
+      <!-- TAB: ZONAS -->
+      <div id="tab-zonas" class="admin-panel">
+        <p style="font-size:12px;color:var(--muted);margin-bottom:10px;line-height:1.5;">
+          Gestiona las zonas de entrega y sus precios. Los cambios se aplican inmediatamente al carrito.
+        </p>
+        <div style="background:rgba(37,211,102,0.07);border:1px solid rgba(37,211,102,0.2);border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:11px;color:#25D366;line-height:1.5;">
+          💡 El delivery gratis (Promos) aplica sobre el subtotal, independiente del precio de la zona.
+        </div>
+
+        <!-- Lista de zonas -->
+        <div id="zonasLista" style="margin-bottom:10px;"></div>
+
+        <!-- Agregar nueva zona -->
+        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:8px;">
+          <p style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">➕ Agregar nueva zona</p>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+            <input type="text" id="nuevaZonaNombre" class="admin-input" style="margin:0;flex:1;min-width:120px;" placeholder="Nombre de la zona">
+            <input type="number" id="nuevaZonaPrecio" class="admin-input" style="margin:0;width:86px;" placeholder="$0.00" min="0" step="0.25">
+            <button class="admin-btn primary" style="margin:0;width:auto;padding:10px 14px;white-space:nowrap;flex-shrink:0;" onclick="agregarZona()">+ Añadir</button>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;margin-top:8px;">
+            <input type="checkbox" id="nuevaZonaEsFuera" style="accent-color:var(--yellow);width:16px;height:16px;cursor:pointer;flex-shrink:0;">
+            <label for="nuevaZonaEsFuera" style="font-size:11px;color:var(--muted);cursor:pointer;line-height:1.4;">Precio a coordinar por WhatsApp (no cobra automáticamente)</label>
+          </div>
+        </div>
+
+        <button class="admin-btn secondary" onclick="resetZonas()">↺ Restaurar zonas por defecto</button>
+        <p class="admin-msg" id="zonasMsg"></p>
+      </div>
+
       <!-- TAB: STATS -->
       <div id="tab-stats" class="admin-panel">
         <div class="stat-grid" style="margin-bottom:12px;">
@@ -616,7 +655,6 @@
       </div>
     </div>
   </a>
-  <!-- ★ DISPARADOR SECRETO — 5 toques aquí ★ -->
   <p id="footerCredit">Creada por <strong>Javier el Oso</strong> con la ayuda de <strong>Claude</strong> 🤖</p>
 </footer>
 
@@ -665,12 +703,139 @@ try {
   if (bc) { bannerConfig = bc; bannerColorBg = bc.bg; bannerColorTxt = bc.color; }
 } catch(e) {}
 
-// Delivery gratis
-let deliveryGratisConfig = { activo: false, monto: 5.00 };
+// Delivery gratis — activo por defecto con $5.00
+let deliveryGratisConfig = { activo: true, monto: 5.00 };
 try {
   const dg = JSON.parse(localStorage.getItem('jbg_delivery_gratis'));
   if (dg) deliveryGratisConfig = dg;
 } catch(e) {}
+
+// ══════════════════════════════════════════
+//  ZONAS DE DELIVERY
+// ══════════════════════════════════════════
+const ZONAS_DEFAULT = [
+  { nombre: 'La Valdeza',       precio: 1.25, fuera: false, activa: true },
+  { nombre: 'Llano Largo',      precio: 1.25, fuera: false, activa: true },
+  { nombre: 'Las Praderas',     precio: 1.25, fuera: false, activa: true },
+  { nombre: 'Valle Bonito',     precio: 1.25, fuera: false, activa: true },
+  { nombre: 'Villa del Carmen', precio: 1.25, fuera: false, activa: true },
+  { nombre: 'Fuera de zona',    precio: 0,    fuera: true,  activa: true },
+];
+
+let zonasConfig = [];
+try {
+  const z = JSON.parse(localStorage.getItem('jbg_zonas'));
+  zonasConfig = Array.isArray(z) && z.length ? z : [...ZONAS_DEFAULT.map(z=>({...z}))];
+} catch(e) { zonasConfig = [...ZONAS_DEFAULT.map(z=>({...z}))]; }
+
+function getZonaActual() {
+  const val = document.getElementById('zona').value;
+  return zonasConfig.find(z => z.nombre === val) || null;
+}
+
+function renderZonaSelect() {
+  const sel = document.getElementById('zona');
+  const prev = sel.value;
+  sel.innerHTML = zonasConfig
+    .filter(z => z.activa)
+    .map(z => {
+      const label = z.fuera
+        ? `${z.nombre} (Coord. por WA)`
+        : `${z.nombre} ($${z.precio.toFixed(2)})`;
+      return `<option value="${z.nombre}">${label}</option>`;
+    }).join('');
+  if ([...sel.options].some(o => o.value === prev)) sel.value = prev;
+  actualizarResumen();
+}
+
+function renderZonasAdmin() {
+  const lista = document.getElementById('zonasLista');
+  if (!lista) return;
+  if (!zonasConfig.length) {
+    lista.innerHTML = '<div style="color:var(--muted);font-size:13px;text-align:center;padding:10px;">No hay zonas configuradas</div>';
+    return;
+  }
+  lista.innerHTML = zonasConfig.map((z, i) => `
+    <div class="zona-admin-row ${z.activa ? '' : 'inactiva'}">
+      <div class="zona-fields">
+        <label class="toggle" title="${z.activa ? 'Zona activa' : 'Zona oculta'}">
+          <input type="checkbox" ${z.activa ? 'checked' : ''} onchange="toggleZona(${i},this.checked)">
+          <span class="toggle-slider"></span>
+        </label>
+        <input type="text" class="zona-field-nombre" value="${z.nombre.replace(/"/g,'&quot;')}"
+          onchange="editarZona(${i},'nombre',this.value)" placeholder="Nombre zona">
+        ${z.fuera
+          ? `<div class="zona-wa-label">Coord. WA</div>`
+          : `<div style="display:flex;align-items:center;gap:3px;">
+              <span style="color:var(--yellow);font-family:'Oswald';font-size:13px;">$</span>
+              <input type="number" class="zona-field-precio" value="${z.precio.toFixed(2)}"
+                min="0" step="0.25" onchange="editarZona(${i},'precio',parseFloat(this.value)||0)">
+            </div>`
+        }
+        <button class="zona-btn-icon" title="${z.fuera ? 'Cambiar a precio fijo' : 'Cambiar a Coord. WA'}"
+          onclick="editarZona(${i},'fuera',${!z.fuera})">
+          ${z.fuera ? '💲' : '📱'}
+        </button>
+        <button class="zona-btn-del" onclick="eliminarZona(${i})">🗑</button>
+      </div>
+      ${z.fuera ? '<div class="zona-fuera-note">Se coordina por WhatsApp, no se cobra automáticamente</div>' : ''}
+    </div>
+  `).join('');
+}
+
+function guardarZonasStorage() {
+  localStorage.setItem('jbg_zonas', JSON.stringify(zonasConfig));
+  renderZonaSelect();
+}
+
+function editarZona(i, campo, valor) {
+  if (!zonasConfig[i]) return;
+  zonasConfig[i][campo] = valor;
+  guardarZonasStorage();
+  renderZonasAdmin();
+  setAdminMsg('zonasMsg', `✓ Zona actualizada`, 'ok');
+}
+
+function toggleZona(i, activa) {
+  zonasConfig[i].activa = activa;
+  guardarZonasStorage();
+  renderZonasAdmin();
+  setAdminMsg('zonasMsg', `✓ Zona "${zonasConfig[i].nombre}" ${activa ? 'activada' : 'desactivada'}`, 'ok');
+}
+
+function agregarZona() {
+  const nombre = document.getElementById('nuevaZonaNombre').value.trim();
+  const precio = parseFloat(document.getElementById('nuevaZonaPrecio').value) || 0;
+  const fuera  = document.getElementById('nuevaZonaEsFuera').checked;
+  if (!nombre) { setAdminMsg('zonasMsg', '❌ Escribe el nombre de la zona', 'error'); return; }
+  if (zonasConfig.some(z => z.nombre.toLowerCase() === nombre.toLowerCase())) {
+    setAdminMsg('zonasMsg', '❌ Ya existe una zona con ese nombre', 'error'); return;
+  }
+  zonasConfig.push({ nombre, precio, fuera, activa: true });
+  document.getElementById('nuevaZonaNombre').value = '';
+  document.getElementById('nuevaZonaPrecio').value = '';
+  document.getElementById('nuevaZonaEsFuera').checked = false;
+  guardarZonasStorage();
+  renderZonasAdmin();
+  setAdminMsg('zonasMsg', `✓ Zona "${nombre}" añadida correctamente`, 'ok');
+}
+
+function eliminarZona(i) {
+  const nombre = zonasConfig[i].nombre;
+  if (!confirm(`¿Eliminar la zona "${nombre}"?`)) return;
+  zonasConfig.splice(i, 1);
+  guardarZonasStorage();
+  renderZonasAdmin();
+  setAdminMsg('zonasMsg', `✓ Zona "${nombre}" eliminada`, 'ok');
+}
+
+function resetZonas() {
+  if (!confirm('¿Restaurar las zonas por defecto? Se perderán los cambios actuales.')) return;
+  zonasConfig = [...ZONAS_DEFAULT.map(z=>({...z}))];
+  guardarZonasStorage();
+  renderZonasAdmin();
+  setAdminMsg('zonasMsg', '✓ Zonas restauradas al estado original', 'ok');
+}
 
 // ══════════════════════════════════════════
 //  DISPARADOR SECRETO — FOOTER CREDIT
@@ -682,10 +847,7 @@ document.getElementById('footerCredit').addEventListener('click', function() {
   setTimeout(() => this.classList.remove('tapping'), 200);
   clearTimeout(creditTimer);
   creditTimer = setTimeout(() => { creditTaps = 0; }, 3000);
-  if (creditTaps >= 5) {
-    creditTaps = 0;
-    abrirAdmin();
-  }
+  if (creditTaps >= 5) { creditTaps = 0; abrirAdmin(); }
 });
 
 // ══════════════════════════════════════════
@@ -814,7 +976,6 @@ async function cargarMenu(forzar = false) {
     if (!rows.length || !Array.isArray(rows[0].data) || !rows[0].data.length)
       throw new Error('Caché vacía');
 
-    // Aplicar badges del CSV si existen
     let data = rows[0].data;
     const badgesGuardados = JSON.parse(localStorage.getItem('jbg_badges') || 'null');
     if (badgesGuardados) data = aplicarBadgesAData(data, badgesGuardados);
@@ -823,7 +984,6 @@ async function cargarMenu(forzar = false) {
     try { localStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), data })); } catch(e) {}
     renderMenu(); renderCatNav(); mostrarPromoAleatoria(); sincronizarQtysEnPantalla();
 
-    // Info de sincronización en admin
     if (rows[0].updated_at) {
       const upd = new Date(rows[0].updated_at);
       document.getElementById('adminSyncInfo').innerText = `Última sync: ${upd.toLocaleDateString('es-PA')} ${upd.toLocaleTimeString('es-PA',{hour:'2-digit',minute:'2-digit'})}`;
@@ -867,7 +1027,6 @@ function renderMenu() {
   const container = document.getElementById('menuContainer');
   container.innerHTML = '';
   CATEGORIAS.forEach((cat, ci) => {
-    // Filtrar productos ocultos
     const items = cat.i.filter(item => !productosOcultos.includes(item.n));
     if (!items.length) return;
     const block = document.createElement('div');
@@ -1035,20 +1194,27 @@ function actualizarResumen() {
     sub+=i.price*i.qty; count+=i.qty;
     lista.innerHTML+=`<div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px;animation:slideIn 0.2s ease"><span>${i.name} (x${i.qty})</span><span>$${(i.price*i.qty).toFixed(2)}</span></div>`;
   });
-  const zona=document.getElementById('zona').value;
-  const esFueraDeZona=zona==='Fuera de zona';
-  const deliveryGratis=deliveryGratisConfig.activo && sub>=deliveryGratisConfig.monto;
-  const delivery=(sub>0&&!esFueraDeZona&&!deliveryGratis)?1.25:0;
-  document.getElementById('subtotalVal').innerText=`$${sub.toFixed(2)}`;
+
+  const zonaData = getZonaActual();
+  const esFueraDeZona = zonaData ? zonaData.fuera : false;
+  const precioDelivery = (zonaData && !zonaData.fuera) ? zonaData.precio : 1.25;
+  const deliveryGratis = deliveryGratisConfig.activo && sub >= deliveryGratisConfig.monto;
+  const delivery = (sub > 0 && !esFueraDeZona && !deliveryGratis) ? precioDelivery : 0;
+
+  document.getElementById('subtotalVal').innerText = `$${sub.toFixed(2)}`;
+
   if (esFueraDeZona) {
-    document.getElementById('deliveryVal').innerText='A coord.';
-  } else if (deliveryGratis && sub>0) {
-    document.getElementById('deliveryVal').innerHTML=`<span style="text-decoration:line-through;color:var(--muted);font-size:12px;">$1.25</span> <span style="color:#25D366;font-weight:700;">¡GRATIS! 🎉</span>`;
+    document.getElementById('deliveryVal').innerText = 'A coord.';
+  } else if (sub === 0) {
+    document.getElementById('deliveryVal').innerText = '$0.00';
+  } else if (deliveryGratis) {
+    document.getElementById('deliveryVal').innerHTML = `<span style="text-decoration:line-through;color:var(--muted);font-size:12px;">$${precioDelivery.toFixed(2)}</span> <span style="color:#25D366;font-weight:700;">¡GRATIS! 🎉</span>`;
   } else {
-    document.getElementById('deliveryVal').innerText=sub>0?'$1.25':'$0.00';
+    document.getElementById('deliveryVal').innerText = `$${precioDelivery.toFixed(2)}`;
   }
-  document.getElementById('totalVal').innerText=`$${(sub+delivery).toFixed(2)}`;
-  document.getElementById('cartCount').innerText=count;
+
+  document.getElementById('totalVal').innerText = `$${(sub + delivery).toFixed(2)}`;
+  document.getElementById('cartCount').innerText = count;
 }
 
 let clienteUbicacion = null;
@@ -1131,13 +1297,15 @@ function enviarPedido() {
   m+=`🍔 *Productos:*%0A`;
   Object.values(carrito).forEach(i => { const lt=i.price*i.qty; sub+=lt; m+=`  • ${i.name} x${i.qty} = $${lt.toFixed(2)}%0A`; });
 
-  const esFueraDeZona2=zona==='Fuera de zona';
-  const deliveryGratis2=deliveryGratisConfig.activo && sub>=deliveryGratisConfig.monto;
-  const delivery=(sub>0&&!esFueraDeZona2&&!deliveryGratis2)?1.25:0;
-  const total=sub+delivery;
+  const zonaData2 = getZonaActual();
+  const esFueraDeZona2 = zonaData2 ? zonaData2.fuera : false;
+  const precioDelivery2 = (zonaData2 && !zonaData2.fuera) ? zonaData2.precio : 1.25;
+  const deliveryGratis2 = deliveryGratisConfig.activo && sub >= deliveryGratisConfig.monto;
+  const delivery = (sub > 0 && !esFueraDeZona2 && !deliveryGratis2) ? precioDelivery2 : 0;
+  const total = sub + delivery;
 
   m+=`%0A💵 *Subtotal:* $${sub.toFixed(2)}%0A`;
-  m+=`🚚 *Delivery:* ${esFueraDeZona2?'A coordinar':deliveryGratis2?'¡GRATIS! 🎉':'$'+delivery.toFixed(2)}%0A`;
+  m+=`🚚 *Delivery:* ${esFueraDeZona2 ? 'A coordinar' : deliveryGratis2 ? `¡GRATIS! 🎉 (antes $${precioDelivery2.toFixed(2)})` : '$'+delivery.toFixed(2)}%0A`;
   m+=`✅ *TOTAL: $${total.toFixed(2)}*%0A`;
   m+=`%0A👤 *Cliente:* ${nom}%0A`;
   m+=`📦 *Zona:* ${zona}%0A`;
@@ -1219,14 +1387,14 @@ function switchTab(tabId, btn) {
   document.querySelectorAll('.admin-tab').forEach(t=>t.classList.remove('active'));
   document.getElementById(tabId).classList.add('active');
   btn.classList.add('active');
-  // Carga lazy según tab
-  if (tabId==='tab-pedidos') cargarPedidos();
-  if (tabId==='tab-stats')   cargarStats();
-  if (tabId==='tab-horarios') renderHorariosEditor();
+  if (tabId==='tab-pedidos')   cargarPedidos();
+  if (tabId==='tab-stats')     cargarStats();
+  if (tabId==='tab-horarios')  renderHorariosEditor();
   if (tabId==='tab-productos') renderProductosToggle();
-  if (tabId==='tab-banner') cargarBannerEnForm();
-  if (tabId==='tab-promos') cargarPromosEnForm();
-  if (tabId==='tab-general') cargarStatsGenerales();
+  if (tabId==='tab-banner')    cargarBannerEnForm();
+  if (tabId==='tab-promos')    cargarPromosEnForm();
+  if (tabId==='tab-zonas')     renderZonasAdmin();
+  if (tabId==='tab-general')   cargarStatsGenerales();
 }
 
 // ══════════════════════════════════════════
@@ -1257,7 +1425,6 @@ function loginAdmin() {
   }
 }
 
-// Cerrar admin tocando fuera del box
 document.getElementById('adminOverlay').addEventListener('click', function(e) {
   if (e.target === this) cerrarAdmin();
 });
@@ -1270,7 +1437,6 @@ async function cargarStatsGenerales() {
   CATEGORIAS.forEach(cat => { totalCats++; totalProductos+=cat.i.length; });
   document.getElementById('statProductos').innerText=totalProductos||'—';
   document.getElementById('statCategorias').innerText=totalCats||'—';
-
   try {
     const hoy=getPanamaDate().toISOString().split('T')[0];
     const res=await fetch(`${PEDIDOS_REST_URL}?select=total&created_at=gte.${hoy}T00:00:00`,{
@@ -1325,12 +1491,9 @@ function procesarCSV(file) {
   csvStatus.style.color = 'var(--muted)';
   csvStatus.innerText = '⏳ Procesando CSV...';
   document.getElementById('badgesPreview').style.display = 'none';
-
-  // Intentar UTF-8 primero, si falla con caracteres raros releer con latin1
   const reader = new FileReader();
   reader.onload = function(e) {
     let texto = e.target.result;
-    // Quitar BOM si existe
     if (texto.charCodeAt(0) === 0xFEFF) texto = texto.slice(1);
     parsearCSV(texto, csvStatus, file);
   };
@@ -1342,7 +1505,6 @@ function procesarCSV(file) {
 }
 
 function parsearCSV(texto, csvStatus, fileOriginal) {
-  // Si hay caracteres corruptos (encoding incorrecto), releer como latin1
   if (texto.includes('\uFFFD') || (texto.includes('Art') && !texto.includes('Artículo') && !texto.includes('Articulo'))) {
     const r2 = new FileReader();
     r2.onload = function(e2) {
@@ -1360,52 +1522,34 @@ function _procesarTextoCSV(texto, csvStatus) {
   try {
     const lines = texto.split('\n').filter(l => l.trim());
     if (!lines.length) throw new Error('Archivo vacío');
-
-    // Detectar separador
     const sep = lines[0].includes(';') ? ';' : ',';
     const headers = lines[0].split(sep).map(h => h.trim().replace(/"/g, '').toLowerCase());
-
-    // Buscar columnas tolerando tildes rotas
-    let colArticulo = headers.findIndex(h =>
-      h.includes('artículo') || h.includes('articulo') || h.includes('art\xedculo') || h.includes('item name') || h === 'item'
-    );
-    if (colArticulo === -1) colArticulo = 0; // primera columna
-
+    let colArticulo = headers.findIndex(h => h.includes('artículo') || h.includes('articulo') || h.includes('art\xedculo') || h.includes('item name') || h === 'item');
+    if (colArticulo === -1) colArticulo = 0;
     let colCantidad = headers.findIndex(h => h.includes('vendidos') || h.includes('sold') || h.includes('cantidad'));
-    if (colCantidad === -1) colCantidad = 3; // cuarta columna (posición estándar en Loyverse)
-
+    if (colCantidad === -1) colCantidad = 3;
     let colCategoria = headers.findIndex(h => h.includes('categor'));
     if (colCategoria === -1) colCategoria = 2;
-
     const EXCLUIR_CSV = ['delivery', 'merma', 'tocino', 'ingredientes', 'bebidas para combos', 'salsas para combos', 'acompa'];
     const ventas = {};
-
     for (let i = 1; i < lines.length; i++) {
-      // Dividir respetando comas dentro de comillas
       const cols = lines[i].match(/(".*?"|[^,]+)(?=,|$)/g) || lines[i].split(sep);
       const clean = cols.map(c => c.trim().replace(/^"|"$/g, ''));
       if (clean.length < 2) continue;
-
       const nombre   = (clean[colArticulo] || '').trim();
       const cantidad = parseFloat((clean[colCantidad] || '0').replace(',', '.').replace('%', '')) || 0;
       const categoria = (colCategoria >= 0 ? clean[colCategoria] || '' : '').toLowerCase();
-
       if (!nombre || cantidad <= 0) continue;
       if (EXCLUIR_CSV.some(ex => categoria.includes(ex))) continue;
-
-      // Sumar filas repetidas del mismo producto
       ventas[nombre] = (ventas[nombre] || 0) + cantidad;
     }
-
     const sorted = Object.entries(ventas).sort((a, b) => b[1] - a[1]).slice(0, 20);
     if (!sorted.length) throw new Error('No se encontraron ventas válidas. Verifica que el archivo sea el reporte de artículos de Loyverse.');
-
     csvBadgesData = {};
     sorted.forEach(([nombre, qty], idx) => {
       if (idx === 0) csvBadgesData[nombre] = '⭐ Producto estrella';
       else if (idx <= 3) csvBadgesData[nombre] = '🔥 Más pedido';
     });
-
     const list = document.getElementById('badgesList');
     list.innerHTML = sorted.slice(0, 10).map(([n, q], i) => `<div class="badge-item">
       <span class="badge-item-name">${i===0?'⭐':i<=3?'🔥':'　'} ${n}</span>
@@ -1423,12 +1567,10 @@ function _procesarTextoCSV(texto, csvStatus) {
 function aplicarBadgesDesdeCSV() {
   if (!csvBadgesData) return;
   localStorage.setItem('jbg_badges', JSON.stringify(csvBadgesData));
-  // Actualizar en CATEGORIAS en memoria
   CATEGORIAS=CATEGORIAS.map(cat=>({
     ...cat,
     i:cat.i.map(item=>({...item,badge:csvBadgesData[item.n]||null}))
   }));
-  // Actualizar caché
   try {
     const raw=localStorage.getItem(CACHE_KEY);
     if (raw) {
@@ -1476,7 +1618,7 @@ async function cargarPedidos() {
 // ══════════════════════════════════════════
 function renderHorariosEditor() {
   const editor=document.getElementById('horariosEditor');
-  const dias=[0,5,6]; // Domingo, Viernes, Sábado
+  const dias=[0,5,6];
   editor.innerHTML=dias.map(d=>{
     const h=HORARIOS[d];
     const abre=`${String(h.o[0]).padStart(2,'0')}:${String(h.o[1]).padStart(2,'0')}`;
@@ -1576,7 +1718,7 @@ function guardarDeliveryGratis() {
   actualizarDeliveryGratisStatus();
   setAdminMsg('promosMsg', activo
     ? `✓ Delivery gratis activado para pedidos de $${monto.toFixed(2)} o más`
-    : '✓ Delivery gratis desactivado — vuelve el $1.25 normal', activo ? 'ok' : '');
+    : '✓ Delivery gratis desactivado', activo ? 'ok' : '');
 }
 
 function actualizarDeliveryGratisStatus() {
@@ -1589,7 +1731,7 @@ function actualizarDeliveryGratisStatus() {
   } else {
     el.style.display = '';
     el.style.color   = 'var(--muted)';
-    el.innerHTML     = '⚪ Desactivado — se cobra $1.25 de delivery normalmente';
+    el.innerHTML     = '⚪ Desactivado — se cobra el precio de delivery de la zona normalmente';
   }
 }
 
@@ -1635,7 +1777,6 @@ function guardarBanner() {
   setAdminMsg('bannerMsg',activo&&texto?'✓ Banner publicado en el menú':'✓ Banner guardado (desactivado)','ok');
 }
 
-// Listeners para preview en tiempo real
 ['bannerTexto','bannerEmoji'].forEach(id=>{ const el=document.getElementById(id); if(el) el.addEventListener('input',actualizarBannerPreview); });
 
 // ══════════════════════════════════════════
@@ -1653,8 +1794,6 @@ async function cargarStats() {
     const totalVentas=rows.reduce((s,r)=>s+(parseFloat(r.total)||0),0);
     document.getElementById('statTotal7d').innerText=rows.length;
     document.getElementById('statVentas7d').innerText='$'+totalVentas.toFixed(2);
-
-    // Top productos
     const conteo={};
     rows.forEach(r=>{
       if (!Array.isArray(r.items)) return;
@@ -1793,6 +1932,7 @@ function modalAgregar() {
 //  INIT
 // ══════════════════════════════════════════
 cargarCarrito();
+renderZonaSelect();
 cargarMenu();
 checkSchedule();
 setInterval(checkSchedule, 60000);
@@ -1802,4 +1942,3 @@ actualizarResumen();
 </script>
 </body>
 </html>
- 
