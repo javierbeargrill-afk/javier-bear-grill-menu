@@ -414,6 +414,7 @@
         <button class="admin-tab" onclick="switchTab('tab-horarios',this)">🕐 Horarios</button>
         <button class="admin-tab" onclick="switchTab('tab-productos',this)">🍔 Productos</button>
         <button class="admin-tab" onclick="switchTab('tab-banner',this)">📢 Banner</button>
+        <button class="admin-tab" onclick="switchTab('tab-promos',this)">🎁 Promos</button>
         <button class="admin-tab" onclick="switchTab('tab-stats',this)">📊 Stats</button>
       </div>
 
@@ -506,6 +507,33 @@
           <div id="bannerPreviewInner" style="padding:10px 16px;border-radius:8px;text-align:center;font-family:'Oswald';font-size:15px;"></div>
         </div>
         <p class="admin-msg" id="bannerMsg"></p>
+      </div>
+
+      <!-- TAB: PROMOS -->
+      <div id="tab-promos" class="admin-panel">
+        <p style="font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.5;">Activa promociones puntuales. Se aplican en tiempo real al carrito de todos los clientes.</p>
+
+        <!-- DELIVERY GRATIS -->
+        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:12px;">
+          <div style="background:rgba(37,211,102,0.08);border-bottom:1px solid var(--border);padding:10px 14px;display:flex;align-items:center;justify-content:space-between;gap:8px;">
+            <div>
+              <div style="font-family:'Oswald';font-size:14px;color:#25D366;letter-spacing:0.3px;">🚚 Delivery gratis</div>
+              <div style="font-size:11px;color:var(--muted);margin-top:1px;">El delivery se cobra $0 si el pedido supera el monto mínimo</div>
+            </div>
+            <label class="toggle"><input type="checkbox" id="deliveryGratisActivo" onchange="guardarDeliveryGratis()"><span class="toggle-slider"></span></label>
+          </div>
+          <div style="padding:12px 14px;">
+            <label class="admin-label">Monto mínimo del pedido</label>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span style="font-size:18px;color:var(--yellow);font-family:'Oswald';">$</span>
+              <input type="number" id="deliveryGratisMonto" class="admin-input" style="margin:0;width:100px;padding:8px 12px;font-size:18px;font-family:'Oswald';color:var(--yellow);" min="0" step="0.25" value="5.00" onchange="guardarDeliveryGratis()">
+              <span style="font-size:12px;color:var(--muted);">o más en productos</span>
+            </div>
+            <div id="deliveryGratisStatus" style="font-size:11px;color:var(--muted);margin-top:8px;padding:6px 10px;background:var(--bg);border-radius:6px;display:none;"></div>
+          </div>
+        </div>
+
+        <p class="admin-msg" id="promosMsg"></p>
       </div>
 
       <!-- TAB: STATS -->
@@ -636,6 +664,13 @@ let bannerConfig = { activo:false, texto:'', emoji:'🔥', bg:'#C8102E', color:'
 try {
   const bc = JSON.parse(localStorage.getItem('jbg_banner'));
   if (bc) { bannerConfig = bc; bannerColorBg = bc.bg; bannerColorTxt = bc.color; }
+} catch(e) {}
+
+// Delivery gratis
+let deliveryGratisConfig = { activo: false, monto: 5.00 };
+try {
+  const dg = JSON.parse(localStorage.getItem('jbg_delivery_gratis'));
+  if (dg) deliveryGratisConfig = dg;
 } catch(e) {}
 
 // ══════════════════════════════════════════
@@ -1002,9 +1037,17 @@ function actualizarResumen() {
     lista.innerHTML+=`<div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px;animation:slideIn 0.2s ease"><span>${i.name} (x${i.qty})</span><span>$${(i.price*i.qty).toFixed(2)}</span></div>`;
   });
   const zona=document.getElementById('zona').value;
-  const delivery=(sub>0&&zona!=='Fuera de zona')?1.25:0;
+  const esFueraDeZona=zona==='Fuera de zona';
+  const deliveryGratis=deliveryGratisConfig.activo && sub>=deliveryGratisConfig.monto;
+  const delivery=(sub>0&&!esFueraDeZona&&!deliveryGratis)?1.25:0;
   document.getElementById('subtotalVal').innerText=`$${sub.toFixed(2)}`;
-  document.getElementById('deliveryVal').innerText=zona==='Fuera de zona'?'A coord.':`$${delivery.toFixed(2)}`;
+  if (esFueraDeZona) {
+    document.getElementById('deliveryVal').innerText='A coord.';
+  } else if (deliveryGratis && sub>0) {
+    document.getElementById('deliveryVal').innerHTML=`<span style="text-decoration:line-through;color:var(--muted);font-size:12px;">$1.25</span> <span style="color:#25D366;font-weight:700;">¡GRATIS! 🎉</span>`;
+  } else {
+    document.getElementById('deliveryVal').innerText=sub>0?'$1.25':'$0.00';
+  }
   document.getElementById('totalVal').innerText=`$${(sub+delivery).toFixed(2)}`;
   document.getElementById('cartCount').innerText=count;
 }
@@ -1089,11 +1132,13 @@ function enviarPedido() {
   m+=`🍔 *Productos:*%0A`;
   Object.values(carrito).forEach(i => { const lt=i.price*i.qty; sub+=lt; m+=`  • ${i.name} x${i.qty} = $${lt.toFixed(2)}%0A`; });
 
-  const delivery=(sub>0&&zona!=='Fuera de zona')?1.25:0;
+  const esFueraDeZona2=zona==='Fuera de zona';
+  const deliveryGratis2=deliveryGratisConfig.activo && sub>=deliveryGratisConfig.monto;
+  const delivery=(sub>0&&!esFueraDeZona2&&!deliveryGratis2)?1.25:0;
   const total=sub+delivery;
 
   m+=`%0A💵 *Subtotal:* $${sub.toFixed(2)}%0A`;
-  m+=`🚚 *Delivery:* ${zona==='Fuera de zona'?'A coordinar':'$'+delivery.toFixed(2)}%0A`;
+  m+=`🚚 *Delivery:* ${esFueraDeZona2?'A coordinar':deliveryGratis2?'¡GRATIS! 🎉':'$'+delivery.toFixed(2)}%0A`;
   m+=`✅ *TOTAL: $${total.toFixed(2)}*%0A`;
   m+=`%0A👤 *Cliente:* ${nom}%0A`;
   m+=`📦 *Zona:* ${zona}%0A`;
@@ -1181,6 +1226,7 @@ function switchTab(tabId, btn) {
   if (tabId==='tab-horarios') renderHorariosEditor();
   if (tabId==='tab-productos') renderProductosToggle();
   if (tabId==='tab-banner') cargarBannerEnForm();
+  if (tabId==='tab-promos') cargarPromosEnForm();
   if (tabId==='tab-general') cargarStatsGenerales();
 }
 
@@ -1470,6 +1516,43 @@ function resetProductosOcultos() {
   renderMenu(); renderCatNav();
   renderProductosToggle();
   setAdminMsg('productosMsg','✓ Todos los productos visibles','ok');
+}
+
+// ══════════════════════════════════════════
+//  ADMIN — TAB PROMOS
+// ══════════════════════════════════════════
+function cargarPromosEnForm() {
+  const cb  = document.getElementById('deliveryGratisActivo');
+  const inp = document.getElementById('deliveryGratisMonto');
+  if (cb)  cb.checked  = deliveryGratisConfig.activo;
+  if (inp) inp.value   = deliveryGratisConfig.monto.toFixed(2);
+  actualizarDeliveryGratisStatus();
+}
+
+function guardarDeliveryGratis() {
+  const activo = document.getElementById('deliveryGratisActivo').checked;
+  const monto  = parseFloat(document.getElementById('deliveryGratisMonto').value) || 5.00;
+  deliveryGratisConfig = { activo, monto };
+  localStorage.setItem('jbg_delivery_gratis', JSON.stringify(deliveryGratisConfig));
+  actualizarResumen();
+  actualizarDeliveryGratisStatus();
+  setAdminMsg('promosMsg', activo
+    ? `✓ Delivery gratis activado para pedidos de $${monto.toFixed(2)} o más`
+    : '✓ Delivery gratis desactivado — vuelve el $1.25 normal', activo ? 'ok' : '');
+}
+
+function actualizarDeliveryGratisStatus() {
+  const el = document.getElementById('deliveryGratisStatus');
+  if (!el) return;
+  if (deliveryGratisConfig.activo) {
+    el.style.display = '';
+    el.style.color   = '#25D366';
+    el.innerHTML     = `🟢 <strong>ACTIVO</strong> — Clientes que pidan $${deliveryGratisConfig.monto.toFixed(2)}+ no pagan delivery`;
+  } else {
+    el.style.display = '';
+    el.style.color   = 'var(--muted)';
+    el.innerHTML     = '⚪ Desactivado — se cobra $1.25 de delivery normalmente';
+  }
 }
 
 // ══════════════════════════════════════════
