@@ -436,15 +436,14 @@
       <div id="tab-badges" class="admin-panel">
         <p style="font-size:12px;color:var(--muted);margin-bottom:8px;line-height:1.5;">Sube el reporte de ventas de Loyverse para actualizar los badges ⭐ y 🔥 del menú.</p>
         <p style="font-size:10px;color:#555;margin-bottom:10px;">Loyverse → Informes → Resumen por artículo → Exportar CSV</p>
-        <div class="csv-drop" id="csvDrop"
-          onclick="document.getElementById('csvFileInput').click()"
+        <label class="csv-drop" id="csvDrop" for="csvFileInput"
           ondragover="event.preventDefault();this.classList.add('drag')"
           ondragleave="this.classList.remove('drag')"
           ondrop="handleCsvDrop(event)">
-          <input type="file" id="csvFileInput" accept=".csv" style="display:none" onchange="procesarCSV(this.files[0])">
+          <input type="file" id="csvFileInput" style="display:none" onchange="procesarCSV(this.files[0])">
           <div class="csv-drop-icon">📂</div>
           <div class="csv-drop-text"><strong>Toca para seleccionar</strong> o arrastra aquí<br>el archivo CSV de ventas de Loyverse</div>
-        </div>
+        </label>
         <div id="csvStatus" style="font-size:12px;color:var(--muted);text-align:center;margin-bottom:6px;min-height:16px;"></div>
         <div id="badgesPreview" style="display:none;">
           <p style="font-size:10px;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.5px;">Top productos detectados:</p>
@@ -1322,64 +1321,103 @@ function handleCsvDrop(e) {
 
 function procesarCSV(file) {
   if (!file) return;
-  const csvStatus=document.getElementById('csvStatus');
-  csvStatus.innerText='⏳ Procesando CSV...';
-  document.getElementById('badgesPreview').style.display='none';
+  const csvStatus = document.getElementById('csvStatus');
+  csvStatus.style.color = 'var(--muted)';
+  csvStatus.innerText = '⏳ Procesando CSV...';
+  document.getElementById('badgesPreview').style.display = 'none';
 
-  const reader=new FileReader();
-  reader.onload=function(e) {
-    try {
-      const lines=e.target.result.split('\n').filter(l=>l.trim());
-      if (!lines.length) throw new Error('Archivo vacío');
-
-      // Detectar separador
-      const sep=lines[0].includes(';')?';':',';
-      const headers=lines[0].split(sep).map(h=>h.trim().replace(/"/g,'').toLowerCase());
-
-      const colArticulo=headers.findIndex(h=>h.includes('artículo')||h.includes('articulo')||h.includes('item'));
-      const colCantidad=headers.findIndex(h=>h.includes('vendidos')||h.includes('sold')||h.includes('cantidad'));
-      const colCategoria=headers.findIndex(h=>h.includes('categoria')||h.includes('categoría')||h.includes('category'));
-
-      if (colArticulo===-1||colCantidad===-1) throw new Error('No se encontraron columnas esperadas en el CSV');
-
-      const EXCLUIR_CSV=['delivery','merma','tocino','ingredientes','bebidas para combos','salsas para combos','acompañantes combos'];
-      const ventas={};
-
-      for (let i=1; i<lines.length; i++) {
-        const cols=lines[i].split(sep).map(c=>c.trim().replace(/"/g,''));
-        if (cols.length < 2) continue;
-        const nombre=cols[colArticulo]||'';
-        const cantidad=parseFloat((cols[colCantidad]||'0').replace(',','.').replace('%',''))||0;
-        const categoria=(colCategoria>=0?cols[colCategoria]:'').toLowerCase();
-        if (!nombre||cantidad<=0) continue;
-        if (EXCLUIR_CSV.some(ex=>categoria.includes(ex))) continue;
-        ventas[nombre]=(ventas[nombre]||0)+cantidad;
-      }
-
-      const sorted=Object.entries(ventas).sort((a,b)=>b[1]-a[1]).slice(0,20);
-      if (!sorted.length) throw new Error('No se encontraron ventas válidas');
-
-      csvBadgesData={};
-      sorted.forEach(([nombre,qty],idx) => {
-        if (idx===0) csvBadgesData[nombre]='⭐ Producto estrella';
-        else if (idx<=3) csvBadgesData[nombre]='🔥 Más pedido';
-      });
-
-      // Mostrar preview
-      const list=document.getElementById('badgesList');
-      list.innerHTML=sorted.slice(0,10).map(([n,q],i)=>`<div class="badge-item">
-        <span class="badge-item-name">${i===0?'⭐':i<=3?'🔥':'  '} ${n}</span>
-        <span class="badge-item-num">${q.toFixed(0)} uds</span>
-      </div>`).join('');
-      document.getElementById('badgesPreview').style.display='';
-      csvStatus.innerText=`✓ ${sorted.length} productos encontrados de ${lines.length-1} filas`;
-      csvStatus.style.color='#25D366';
-    } catch(err) {
-      csvStatus.innerText='❌ Error: '+err.message;
-      csvStatus.style.color='var(--red)';
-    }
+  // Intentar UTF-8 primero, si falla con caracteres raros releer con latin1
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    let texto = e.target.result;
+    // Quitar BOM si existe
+    if (texto.charCodeAt(0) === 0xFEFF) texto = texto.slice(1);
+    parsearCSV(texto, csvStatus, file);
+  };
+  reader.onerror = function() {
+    csvStatus.innerText = '❌ No se pudo leer el archivo';
+    csvStatus.style.color = 'var(--red)';
   };
   reader.readAsText(file, 'UTF-8');
+}
+
+function parsearCSV(texto, csvStatus, fileOriginal) {
+  // Si hay caracteres corruptos (encoding incorrecto), releer como latin1
+  if (texto.includes('\uFFFD') || (texto.includes('Art') && !texto.includes('Artículo') && !texto.includes('Articulo'))) {
+    const r2 = new FileReader();
+    r2.onload = function(e2) {
+      let t2 = e2.target.result;
+      if (t2.charCodeAt(0) === 0xFEFF) t2 = t2.slice(1);
+      _procesarTextoCSV(t2, csvStatus);
+    };
+    r2.readAsText(fileOriginal, 'latin1');
+    return;
+  }
+  _procesarTextoCSV(texto, csvStatus);
+}
+
+function _procesarTextoCSV(texto, csvStatus) {
+  try {
+    const lines = texto.split('\n').filter(l => l.trim());
+    if (!lines.length) throw new Error('Archivo vacío');
+
+    // Detectar separador
+    const sep = lines[0].includes(';') ? ';' : ',';
+    const headers = lines[0].split(sep).map(h => h.trim().replace(/"/g, '').toLowerCase());
+
+    // Buscar columnas tolerando tildes rotas
+    let colArticulo = headers.findIndex(h =>
+      h.includes('artículo') || h.includes('articulo') || h.includes('art\xedculo') || h.includes('item name') || h === 'item'
+    );
+    if (colArticulo === -1) colArticulo = 0; // primera columna
+
+    let colCantidad = headers.findIndex(h => h.includes('vendidos') || h.includes('sold') || h.includes('cantidad'));
+    if (colCantidad === -1) colCantidad = 3; // cuarta columna (posición estándar en Loyverse)
+
+    let colCategoria = headers.findIndex(h => h.includes('categor'));
+    if (colCategoria === -1) colCategoria = 2;
+
+    const EXCLUIR_CSV = ['delivery', 'merma', 'tocino', 'ingredientes', 'bebidas para combos', 'salsas para combos', 'acompa'];
+    const ventas = {};
+
+    for (let i = 1; i < lines.length; i++) {
+      // Dividir respetando comas dentro de comillas
+      const cols = lines[i].match(/(".*?"|[^,]+)(?=,|$)/g) || lines[i].split(sep);
+      const clean = cols.map(c => c.trim().replace(/^"|"$/g, ''));
+      if (clean.length < 2) continue;
+
+      const nombre   = (clean[colArticulo] || '').trim();
+      const cantidad = parseFloat((clean[colCantidad] || '0').replace(',', '.').replace('%', '')) || 0;
+      const categoria = (colCategoria >= 0 ? clean[colCategoria] || '' : '').toLowerCase();
+
+      if (!nombre || cantidad <= 0) continue;
+      if (EXCLUIR_CSV.some(ex => categoria.includes(ex))) continue;
+
+      // Sumar filas repetidas del mismo producto
+      ventas[nombre] = (ventas[nombre] || 0) + cantidad;
+    }
+
+    const sorted = Object.entries(ventas).sort((a, b) => b[1] - a[1]).slice(0, 20);
+    if (!sorted.length) throw new Error('No se encontraron ventas válidas. Verifica que el archivo sea el reporte de artículos de Loyverse.');
+
+    csvBadgesData = {};
+    sorted.forEach(([nombre, qty], idx) => {
+      if (idx === 0) csvBadgesData[nombre] = '⭐ Producto estrella';
+      else if (idx <= 3) csvBadgesData[nombre] = '🔥 Más pedido';
+    });
+
+    const list = document.getElementById('badgesList');
+    list.innerHTML = sorted.slice(0, 10).map(([n, q], i) => `<div class="badge-item">
+      <span class="badge-item-name">${i===0?'⭐':i<=3?'🔥':'　'} ${n}</span>
+      <span class="badge-item-num">${q.toFixed(0)} uds</span>
+    </div>`).join('');
+    document.getElementById('badgesPreview').style.display = '';
+    csvStatus.innerText = `✓ ${sorted.length} productos encontrados en ${lines.length - 1} filas`;
+    csvStatus.style.color = '#25D366';
+  } catch(err) {
+    csvStatus.innerText = '❌ Error: ' + err.message;
+    csvStatus.style.color = 'var(--red)';
+  }
 }
 
 function aplicarBadgesDesdeCSV() {
