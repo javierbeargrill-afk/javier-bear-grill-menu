@@ -105,6 +105,31 @@
   .pay-btn { flex:1; padding:10px 6px; background:var(--surface2); border:1px solid var(--border); border-radius:10px; color:var(--muted); font-family:'Nunito'; font-size:12px; font-weight:700; cursor:pointer; transition:all 0.2s; }
   .pay-btn.active { background:var(--yellow); color:#000; border-color:var(--yellow); }
 
+  /* ── ITEM CARRITO ── */
+  .carrito-item {
+    display: flex; align-items: center; gap: 8px;
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 10px; padding: 10px 12px; margin-bottom: 8px;
+    animation: slideIn 0.2s ease;
+  }
+  .carrito-item-name { flex: 1; min-width: 0; font-size: 13px; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .carrito-item-precio { font-family: 'Oswald'; font-size: 14px; color: var(--yellow); flex-shrink: 0; min-width: 48px; text-align: right; }
+  .carrito-qty-controls { display: flex; align-items: center; background: var(--bg); border-radius: 20px; border: 1px solid var(--border); height: 28px; flex-shrink: 0; }
+  .carrito-qty-btn { width: 28px; height: 28px; border: none; background: none; color: var(--yellow); font-weight: bold; cursor: pointer; font-size: 15px; transition: transform 0.1s; border-radius: 20px 0 0 20px; }
+  .carrito-qty-btn:active { transform: scale(0.85); }
+  .carrito-qty-btn.cplus { background: var(--yellow); color: #000; border-radius: 0 20px 20px 0; }
+  .carrito-qty-btn.cplus:hover { background: #ff9f52; }
+  .carrito-qty-val { width: 24px; text-align: center; font-weight: 700; font-size: 13px; }
+  .carrito-del-btn {
+    width: 28px; height: 28px; border: none; flex-shrink: 0;
+    background: rgba(200,16,46,0.15); border: 1px solid rgba(200,16,46,0.35);
+    color: var(--red); border-radius: 8px; cursor: pointer; font-size: 13px;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.15s, transform 0.1s;
+  }
+  .carrito-del-btn:hover { background: rgba(200,16,46,0.35); }
+  .carrito-del-btn:active { transform: scale(0.85); }
+
   /* ── FLOAT CART ── */
   #floatCart { position: fixed; bottom: 20px; right: 20px; background: var(--yellow); color: #000; padding: 12px 20px; border-radius: 50px; font-weight: 800; box-shadow: 0 5px 20px rgba(0,0,0,0.5); border: none; z-index: 1000; font-family: 'Oswald'; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; }
   #floatCart:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(245,197,24,0.4); }
@@ -127,18 +152,12 @@
   .admin-header h2 { font-family:'Oswald'; color:var(--yellow); font-size:20px; }
   .admin-header p { font-size:11px; color:var(--muted); margin-top:2px; }
   .admin-close-btn { background:var(--surface2); border:1px solid var(--border); color:var(--muted); width:32px; height:32px; border-radius:50%; cursor:pointer; font-size:16px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
-
-  /* Tabs */
   .admin-tabs { display:flex; overflow-x:auto; background:#1e0900; border-bottom:1px solid var(--border); scrollbar-width:none; }
   .admin-tabs::-webkit-scrollbar { display:none; }
   .admin-tab { flex-shrink:0; padding:10px 13px; font-size:11px; font-family:'Oswald'; color:var(--muted); cursor:pointer; border:none; border-bottom:2px solid transparent; background:none; white-space:nowrap; transition:all 0.2s; letter-spacing:0.3px; }
   .admin-tab.active { color:var(--yellow); border-bottom-color:var(--yellow); }
-
-  /* Panels */
   .admin-panel { display:none; padding:16px; }
   .admin-panel.active { display:block; }
-
-  /* Buttons */
   .admin-btn { width:100%; padding:11px 14px; border:none; border-radius:8px; font-family:'Oswald'; font-size:14px; font-weight:600; cursor:pointer; margin-bottom:8px; transition:opacity 0.2s; display:flex; align-items:center; justify-content:center; gap:6px; }
   .admin-btn:hover { opacity:0.85; }
   .admin-btn.primary   { background:var(--yellow); color:#000; }
@@ -146,29 +165,21 @@
   .admin-btn.danger    { background:var(--red); color:#fff; }
   .admin-btn.success   { background:#25D366; color:#fff; }
   .admin-btn:disabled  { opacity:0.4; cursor:not-allowed; }
-
-  /* Inputs */
   .admin-input { width:100%; padding:10px 14px; background:var(--bg); border:1px solid var(--border); color:#fff; border-radius:8px; font-family:'Nunito'; font-size:14px; margin-bottom:10px; outline:none; }
   .admin-input:focus { border-color:var(--yellow); }
   .admin-label { font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px; display:block; }
   .admin-msg { font-size:12px; color:var(--muted); text-align:center; min-height:18px; padding:4px 0; }
   .admin-msg.ok    { color:#25D366; }
   .admin-msg.error { color:var(--red); }
-
-  /* Stat cards */
   .stat-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:8px; margin-bottom:14px; }
   .stat-card { background:var(--surface2); border:1px solid var(--border); border-radius:10px; padding:12px; text-align:center; }
   .stat-num { font-family:'Oswald'; font-size:22px; color:var(--yellow); line-height:1; }
   .stat-lbl { font-size:10px; color:var(--muted); margin-top:2px; text-transform:uppercase; }
-
-  /* Pedidos */
   .pedido-row { background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:10px 12px; margin-bottom:6px; }
   .pedido-top { display:flex; justify-content:space-between; align-items:center; margin-bottom:3px; }
   .pedido-orden { font-family:'Oswald'; font-size:13px; color:var(--yellow); }
   .pedido-total { font-family:'Oswald'; font-size:14px; color:#fff; }
   .pedido-meta  { font-size:11px; color:var(--muted); }
-
-  /* Toggle */
   .toggle-row { display:flex; justify-content:space-between; align-items:center; padding:9px 0; border-bottom:1px solid var(--border); }
   .toggle-row:last-child { border-bottom:none; }
   .toggle-label { font-size:13px; color:var(--text); }
@@ -179,43 +190,31 @@
   .toggle-slider:before { content:''; position:absolute; width:18px; height:18px; left:3px; bottom:3px; background:#fff; border-radius:50%; transition:0.2s; }
   .toggle input:checked + .toggle-slider { background:var(--yellow); }
   .toggle input:checked + .toggle-slider:before { transform:translateX(20px); }
-
-  /* CSV drop */
   .csv-drop { border:2px dashed var(--border); border-radius:10px; padding:22px; text-align:center; cursor:pointer; transition:border-color 0.2s,background 0.2s; margin-bottom:10px; }
   .csv-drop:hover,.csv-drop.drag { border-color:var(--yellow); background:rgba(255,135,50,0.05); }
   .csv-drop-icon { font-size:28px; margin-bottom:6px; }
   .csv-drop-text { font-size:12px; color:var(--muted); line-height:1.5; }
   .csv-drop-text strong { color:var(--yellow); }
-
-  /* Badge preview */
   .badge-preview { background:var(--surface2); border-radius:8px; padding:10px; max-height:160px; overflow-y:auto; margin-top:6px; }
   .badge-item { display:flex; justify-content:space-between; align-items:center; font-size:11px; padding:3px 0; border-bottom:1px solid rgba(255,255,255,0.04); gap:8px; }
   .badge-item:last-child { border-bottom:none; }
   .badge-item-name { flex:1; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   .badge-item-num  { color:var(--yellow); font-family:'Oswald'; font-size:12px; flex-shrink:0; }
-
-  /* Horario editor */
   .horario-row { display:flex; align-items:center; gap:8px; margin-bottom:8px; background:var(--surface2); padding:10px 12px; border-radius:8px; border:1px solid var(--border); }
   .horario-dia   { width:64px; font-size:12px; color:var(--muted); font-weight:700; flex-shrink:0; }
   .horario-input { flex:1; padding:6px 8px; background:var(--bg); border:1px solid var(--border); color:#fff; border-radius:6px; font-size:13px; font-family:'Nunito'; text-align:center; outline:none; }
   .horario-input:focus { border-color:var(--yellow); }
   .horario-sep   { font-size:11px; color:var(--muted); flex-shrink:0; }
-
-  /* Banner */
   .banner-preview { background:var(--surface2); border-radius:8px; padding:12px; margin-top:10px; display:none; }
   .banner-preview.visible { display:block; }
   .color-chips { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:10px; }
   .color-chip { padding:5px 12px; border-radius:6px; font-size:12px; cursor:pointer; font-family:'Oswald'; border:2px solid transparent; transition:border-color 0.2s; }
   .color-chip.active { border-color:#fff; }
-
-  /* Stats */
   .stats-rank-item { display:flex; align-items:center; gap:8px; padding:6px 0; border-bottom:1px solid var(--border); }
   .stats-rank-item:last-child { border-bottom:none; }
   .stats-rank-num  { font-family:'Oswald'; font-size:16px; color:var(--yellow); width:22px; text-align:center; flex-shrink:0; }
   .stats-rank-name { flex:1; font-size:12px; color:var(--text); }
   .stats-rank-qty  { font-size:11px; color:var(--muted); flex-shrink:0; }
-
-  /* Product modal */
   #productModal { display:none; position:fixed; inset:0; z-index:1200; background:rgba(0,0,0,0.85); align-items:flex-end; justify-content:center; }
   #productModal.visible { display:flex; animation:fadeIn 0.2s ease; }
   @keyframes fadeIn { from{opacity:0} to{opacity:1} }
@@ -236,8 +235,6 @@
   .modal-qty-val { width:36px; text-align:center; font-weight:700; font-size:16px; }
   .modal-add-btn { flex:1; padding:12px; background:var(--yellow); color:#000; border:none; border-radius:12px; font-family:'Oswald'; font-size:16px; font-weight:700; cursor:pointer; transition:opacity 0.2s; }
   .modal-add-btn:hover { opacity:0.85; }
-
-  /* Footer */
   #footer { background:#120500; border-top:1px solid var(--border); padding:32px 20px 40px; text-align:center; margin-top:20px; }
   .footer-brand    { font-family:'Oswald'; font-size:22px; color:var(--yellow); margin-bottom:4px; }
   .footer-sub      { font-size:11px; color:var(--muted); letter-spacing:2px; margin-bottom:4px; }
@@ -259,11 +256,8 @@
   .promo-card .promo-info { text-align:left; }
   .promo-card .promo-name  { font-weight:700; font-size:13px; color:#fff; margin-bottom:2px; }
   .promo-card .promo-price { font-family:'Oswald'; color:var(--yellow); font-size:16px; }
-
   #footerCredit { font-size:11px; color:#444; cursor:default; user-select:none; -webkit-tap-highlight-color:transparent; }
   #footerCredit.tapping { color:#6a3a00; }
-
-  /* Zona admin row */
   .zona-admin-row { background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:10px 12px; margin-bottom:6px; transition:opacity 0.2s; }
   .zona-admin-row.inactiva { opacity:0.5; border-color:rgba(255,255,255,0.05); }
   .zona-admin-row .zona-fields { display:flex; align-items:center; gap:6px; }
@@ -389,8 +383,6 @@
 <!-- ══════════ ADMIN PANEL ══════════ -->
 <div id="adminOverlay">
   <div id="adminBox">
-
-    <!-- LOGIN -->
     <div id="adminLoginSection">
       <div class="admin-header">
         <div><h2>⚙️ Panel Admin</h2><p>Acceso restringido</p></div>
@@ -403,18 +395,11 @@
         <p class="admin-msg" id="adminLoginMsg"></p>
       </div>
     </div>
-
-    <!-- CONTROLES -->
     <div id="adminControls" style="display:none;">
       <div class="admin-header">
-        <div>
-          <h2>⚙️ Panel Admin</h2>
-          <p id="adminSyncInfo">Javier Bear Grill</p>
-        </div>
+        <div><h2>⚙️ Panel Admin</h2><p id="adminSyncInfo">Javier Bear Grill</p></div>
         <button class="admin-close-btn" onclick="cerrarAdmin()">✕</button>
       </div>
-
-      <!-- TABS -->
       <div class="admin-tabs">
         <button class="admin-tab active" onclick="switchTab('tab-general',this)">🏠 General</button>
         <button class="admin-tab" onclick="switchTab('tab-badges',this)">🏅 Badges</button>
@@ -426,8 +411,6 @@
         <button class="admin-tab" onclick="switchTab('tab-zonas',this)">🗺️ Zonas</button>
         <button class="admin-tab" onclick="switchTab('tab-stats',this)">📊 Stats</button>
       </div>
-
-      <!-- TAB: GENERAL -->
       <div id="tab-general" class="admin-panel active">
         <div class="stat-grid">
           <div class="stat-card"><div class="stat-num" id="statProductos">—</div><div class="stat-lbl">Productos</div></div>
@@ -440,8 +423,6 @@
         <button class="admin-btn danger"    onclick="limpiarCache()">🗑️ Limpiar caché local</button>
         <p class="admin-msg" id="adminMsg"></p>
       </div>
-
-      <!-- TAB: BADGES -->
       <div id="tab-badges" class="admin-panel">
         <p style="font-size:12px;color:var(--muted);margin-bottom:8px;line-height:1.5;">Sube el reporte de ventas de Loyverse para actualizar los badges ⭐ y 🔥 del menú.</p>
         <p style="font-size:10px;color:#555;margin-bottom:10px;">Loyverse → Informes → Resumen por artículo → Exportar CSV</p>
@@ -461,8 +442,6 @@
         </div>
         <p class="admin-msg" id="csvApplyMsg"></p>
       </div>
-
-      <!-- TAB: PEDIDOS -->
       <div id="tab-pedidos" class="admin-panel">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
           <span style="font-size:11px;color:var(--muted);">Pedidos guardados en Supabase</span>
@@ -473,16 +452,12 @@
         </div>
         <p class="admin-msg" id="pedidosMsg"></p>
       </div>
-
-      <!-- TAB: HORARIOS -->
       <div id="tab-horarios" class="admin-panel">
         <p style="font-size:12px;color:var(--muted);margin-bottom:12px;line-height:1.5;">Modifica los horarios de atención. Se aplican en tiempo real.</p>
         <div id="horariosEditor"></div>
         <button class="admin-btn primary" onclick="guardarHorarios()" style="margin-top:6px;">💾 Guardar horarios</button>
         <p class="admin-msg" id="horariosMsg"></p>
       </div>
-
-      <!-- TAB: PRODUCTOS -->
       <div id="tab-productos" class="admin-panel">
         <p style="font-size:12px;color:var(--muted);margin-bottom:10px;line-height:1.5;">Oculta productos del menú sin tocar Loyverse. Los cambios se guardan localmente en este dispositivo.</p>
         <input type="search" class="admin-input" id="productSearch" placeholder="🔍 Buscar producto..." oninput="filtrarProductosAdmin(this.value)">
@@ -490,8 +465,6 @@
         <button class="admin-btn secondary" onclick="resetProductosOcultos()" style="margin-top:8px;">↺ Mostrar todos los productos</button>
         <p class="admin-msg" id="productosMsg"></p>
       </div>
-
-      <!-- TAB: BANNER -->
       <div id="tab-banner" class="admin-panel">
         <p style="font-size:12px;color:var(--muted);margin-bottom:10px;line-height:1.5;">Muestra un banner de promoción especial en la parte superior del menú.</p>
         <div class="toggle-row" style="margin-bottom:12px;">
@@ -516,12 +489,8 @@
         </div>
         <p class="admin-msg" id="bannerMsg"></p>
       </div>
-
-      <!-- TAB: PROMOS -->
       <div id="tab-promos" class="admin-panel">
         <p style="font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.5;">Activa promociones puntuales. Se aplican en tiempo real al carrito de todos los clientes.</p>
-
-        <!-- DELIVERY GRATIS -->
         <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:12px;">
           <div style="background:rgba(37,211,102,0.08);border-bottom:1px solid var(--border);padding:10px 14px;display:flex;align-items:center;justify-content:space-between;gap:8px;">
             <div>
@@ -540,23 +509,14 @@
             <div id="deliveryGratisStatus" style="font-size:11px;color:var(--muted);margin-top:8px;padding:6px 10px;background:var(--bg);border-radius:6px;display:none;"></div>
           </div>
         </div>
-
         <p class="admin-msg" id="promosMsg"></p>
       </div>
-
-      <!-- TAB: ZONAS -->
       <div id="tab-zonas" class="admin-panel">
-        <p style="font-size:12px;color:var(--muted);margin-bottom:10px;line-height:1.5;">
-          Gestiona las zonas de entrega y sus precios. Los cambios se aplican inmediatamente al carrito.
-        </p>
+        <p style="font-size:12px;color:var(--muted);margin-bottom:10px;line-height:1.5;">Gestiona las zonas de entrega y sus precios. Los cambios se aplican inmediatamente al carrito.</p>
         <div style="background:rgba(37,211,102,0.07);border:1px solid rgba(37,211,102,0.2);border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:11px;color:#25D366;line-height:1.5;">
           💡 El delivery gratis (Promos) aplica sobre el subtotal, independiente del precio de la zona.
         </div>
-
-        <!-- Lista de zonas -->
         <div id="zonasLista" style="margin-bottom:10px;"></div>
-
-        <!-- Agregar nueva zona -->
         <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:8px;">
           <p style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">➕ Agregar nueva zona</p>
           <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
@@ -569,12 +529,9 @@
             <label for="nuevaZonaEsFuera" style="font-size:11px;color:var(--muted);cursor:pointer;line-height:1.4;">Precio a coordinar por WhatsApp (no cobra automáticamente)</label>
           </div>
         </div>
-
         <button class="admin-btn secondary" onclick="resetZonas()">↺ Restaurar zonas por defecto</button>
         <p class="admin-msg" id="zonasMsg"></p>
       </div>
-
-      <!-- TAB: STATS -->
       <div id="tab-stats" class="admin-panel">
         <div class="stat-grid" style="margin-bottom:12px;">
           <div class="stat-card"><div class="stat-num" id="statTotal7d">—</div><div class="stat-lbl">Pedidos 7 días</div></div>
@@ -585,10 +542,9 @@
         <button class="admin-btn secondary" onclick="cargarStats()" style="margin-top:10px;">↻ Actualizar estadísticas</button>
         <p class="admin-msg" id="statsMsg"></p>
       </div>
-
-    </div><!-- /adminControls -->
-  </div><!-- /adminBox -->
-</div><!-- /adminOverlay -->
+    </div>
+  </div>
+</div>
 
 <!-- PRODUCT MODAL -->
 <div id="productModal" onclick="if(event.target===this)cerrarModal()">
@@ -683,32 +639,19 @@ let csvBadgesData    = null;
 let bannerColorBg    = '#C8102E';
 let bannerColorTxt   = '#fff';
 
-// Horarios editables
 let HORARIOS = {
   5: { o:[15,30], c:[24,0], nombre:'Viernes' },
   6: { o:[13,0],  c:[24,0], nombre:'Sábado'  },
   0: { o:[13,0],  c:[22,0], nombre:'Domingo' },
 };
-try {
-  const h = JSON.parse(localStorage.getItem('jbg_horarios'));
-  if (h) HORARIOS = h;
-} catch(e) {}
-
+try { const h = JSON.parse(localStorage.getItem('jbg_horarios')); if (h) HORARIOS = h; } catch(e) {}
 try { productosOcultos = JSON.parse(localStorage.getItem('jbg_ocultos') || '[]'); } catch(e) {}
 
-// Banner persistente
 let bannerConfig = { activo:false, texto:'', emoji:'🔥', bg:'#C8102E', color:'#fff' };
-try {
-  const bc = JSON.parse(localStorage.getItem('jbg_banner'));
-  if (bc) { bannerConfig = bc; bannerColorBg = bc.bg; bannerColorTxt = bc.color; }
-} catch(e) {}
+try { const bc = JSON.parse(localStorage.getItem('jbg_banner')); if (bc) { bannerConfig = bc; bannerColorBg = bc.bg; bannerColorTxt = bc.color; } } catch(e) {}
 
-// Delivery gratis — activo por defecto con $5.00
 let deliveryGratisConfig = { activo: true, monto: 5.00 };
-try {
-  const dg = JSON.parse(localStorage.getItem('jbg_delivery_gratis'));
-  if (dg) deliveryGratisConfig = dg;
-} catch(e) {}
+try { const dg = JSON.parse(localStorage.getItem('jbg_delivery_gratis')); if (dg) deliveryGratisConfig = dg; } catch(e) {}
 
 // ══════════════════════════════════════════
 //  ZONAS DE DELIVERY
@@ -739,9 +682,7 @@ function renderZonaSelect() {
   sel.innerHTML = zonasConfig
     .filter(z => z.activa)
     .map(z => {
-      const label = z.fuera
-        ? `${z.nombre} (Coord. por WA)`
-        : `${z.nombre} ($${z.precio.toFixed(2)})`;
+      const label = z.fuera ? `${z.nombre} (Coord. por WA)` : `${z.nombre} ($${z.precio.toFixed(2)})`;
       return `<option value="${z.nombre}">${label}</option>`;
     }).join('');
   if ([...sel.options].some(o => o.value === prev)) sel.value = prev;
@@ -751,10 +692,7 @@ function renderZonaSelect() {
 function renderZonasAdmin() {
   const lista = document.getElementById('zonasLista');
   if (!lista) return;
-  if (!zonasConfig.length) {
-    lista.innerHTML = '<div style="color:var(--muted);font-size:13px;text-align:center;padding:10px;">No hay zonas configuradas</div>';
-    return;
-  }
+  if (!zonasConfig.length) { lista.innerHTML = '<div style="color:var(--muted);font-size:13px;text-align:center;padding:10px;">No hay zonas configuradas</div>'; return; }
   lista.innerHTML = zonasConfig.map((z, i) => `
     <div class="zona-admin-row ${z.activa ? '' : 'inactiva'}">
       <div class="zona-fields">
@@ -772,10 +710,7 @@ function renderZonasAdmin() {
                 min="0" step="0.25" onchange="editarZona(${i},'precio',parseFloat(this.value)||0)">
             </div>`
         }
-        <button class="zona-btn-icon" title="${z.fuera ? 'Cambiar a precio fijo' : 'Cambiar a Coord. WA'}"
-          onclick="editarZona(${i},'fuera',${!z.fuera})">
-          ${z.fuera ? '💲' : '📱'}
-        </button>
+        <button class="zona-btn-icon" onclick="editarZona(${i},'fuera',${!z.fuera})">${z.fuera ? '💲' : '📱'}</button>
         <button class="zona-btn-del" onclick="eliminarZona(${i})">🗑</button>
       </div>
       ${z.fuera ? '<div class="zona-fuera-note">Se coordina por WhatsApp, no se cobra automáticamente</div>' : ''}
@@ -791,15 +726,13 @@ function guardarZonasStorage() {
 function editarZona(i, campo, valor) {
   if (!zonasConfig[i]) return;
   zonasConfig[i][campo] = valor;
-  guardarZonasStorage();
-  renderZonasAdmin();
-  setAdminMsg('zonasMsg', `✓ Zona actualizada`, 'ok');
+  guardarZonasStorage(); renderZonasAdmin();
+  setAdminMsg('zonasMsg', '✓ Zona actualizada', 'ok');
 }
 
 function toggleZona(i, activa) {
   zonasConfig[i].activa = activa;
-  guardarZonasStorage();
-  renderZonasAdmin();
+  guardarZonasStorage(); renderZonasAdmin();
   setAdminMsg('zonasMsg', `✓ Zona "${zonasConfig[i].nombre}" ${activa ? 'activada' : 'desactivada'}`, 'ok');
 }
 
@@ -808,15 +741,12 @@ function agregarZona() {
   const precio = parseFloat(document.getElementById('nuevaZonaPrecio').value) || 0;
   const fuera  = document.getElementById('nuevaZonaEsFuera').checked;
   if (!nombre) { setAdminMsg('zonasMsg', '❌ Escribe el nombre de la zona', 'error'); return; }
-  if (zonasConfig.some(z => z.nombre.toLowerCase() === nombre.toLowerCase())) {
-    setAdminMsg('zonasMsg', '❌ Ya existe una zona con ese nombre', 'error'); return;
-  }
+  if (zonasConfig.some(z => z.nombre.toLowerCase() === nombre.toLowerCase())) { setAdminMsg('zonasMsg', '❌ Ya existe una zona con ese nombre', 'error'); return; }
   zonasConfig.push({ nombre, precio, fuera, activa: true });
   document.getElementById('nuevaZonaNombre').value = '';
   document.getElementById('nuevaZonaPrecio').value = '';
   document.getElementById('nuevaZonaEsFuera').checked = false;
-  guardarZonasStorage();
-  renderZonasAdmin();
+  guardarZonasStorage(); renderZonasAdmin();
   setAdminMsg('zonasMsg', `✓ Zona "${nombre}" añadida correctamente`, 'ok');
 }
 
@@ -824,21 +754,19 @@ function eliminarZona(i) {
   const nombre = zonasConfig[i].nombre;
   if (!confirm(`¿Eliminar la zona "${nombre}"?`)) return;
   zonasConfig.splice(i, 1);
-  guardarZonasStorage();
-  renderZonasAdmin();
+  guardarZonasStorage(); renderZonasAdmin();
   setAdminMsg('zonasMsg', `✓ Zona "${nombre}" eliminada`, 'ok');
 }
 
 function resetZonas() {
-  if (!confirm('¿Restaurar las zonas por defecto? Se perderán los cambios actuales.')) return;
+  if (!confirm('¿Restaurar las zonas por defecto?')) return;
   zonasConfig = [...ZONAS_DEFAULT.map(z=>({...z}))];
-  guardarZonasStorage();
-  renderZonasAdmin();
+  guardarZonasStorage(); renderZonasAdmin();
   setAdminMsg('zonasMsg', '✓ Zonas restauradas al estado original', 'ok');
 }
 
 // ══════════════════════════════════════════
-//  DISPARADOR SECRETO — FOOTER CREDIT
+//  DISPARADOR SECRETO
 // ══════════════════════════════════════════
 let creditTaps = 0, creditTimer = null;
 document.getElementById('footerCredit').addEventListener('click', function() {
@@ -952,7 +880,6 @@ function aplicarBannerGuardado() {
 // ══════════════════════════════════════════
 async function cargarMenu(forzar = false) {
   const container = document.getElementById('menuContainer');
-
   if (!forzar) {
     try {
       const raw = localStorage.getItem(CACHE_KEY) || sessionStorage.getItem(CACHE_KEY);
@@ -966,24 +893,18 @@ async function cargarMenu(forzar = false) {
       }
     } catch(e) { localStorage.removeItem(CACHE_KEY); sessionStorage.removeItem(CACHE_KEY); }
   }
-
   container.innerHTML = '<div id="loadingMsg"><span class="spinner"></span>Cargando menú...</div>';
-
   try {
     const res = await fetch(CACHE_REST_URL + '&apikey=' + SUPABASE_ANON_KEY);
     if (!res.ok) throw new Error('HTTP ' + res.status);
     const rows = await res.json();
-    if (!rows.length || !Array.isArray(rows[0].data) || !rows[0].data.length)
-      throw new Error('Caché vacía');
-
+    if (!rows.length || !Array.isArray(rows[0].data) || !rows[0].data.length) throw new Error('Caché vacía');
     let data = rows[0].data;
     const badgesGuardados = JSON.parse(localStorage.getItem('jbg_badges') || 'null');
     if (badgesGuardados) data = aplicarBadgesAData(data, badgesGuardados);
-
     CATEGORIAS = sortCats(data);
     try { localStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), data })); } catch(e) {}
     renderMenu(); renderCatNav(); mostrarPromoAleatoria(); sincronizarQtysEnPantalla();
-
     if (rows[0].updated_at) {
       const upd = new Date(rows[0].updated_at);
       document.getElementById('adminSyncInfo').innerText = `Última sync: ${upd.toLocaleDateString('es-PA')} ${upd.toLocaleTimeString('es-PA',{hour:'2-digit',minute:'2-digit'})}`;
@@ -994,10 +915,7 @@ async function cargarMenu(forzar = false) {
 }
 
 function aplicarBadgesAData(data, badges) {
-  return data.map(cat => ({
-    ...cat,
-    i: cat.i.map(item => ({ ...item, badge: badges[item.n] || null }))
-  }));
+  return data.map(cat => ({ ...cat, i: cat.i.map(item => ({ ...item, badge: badges[item.n] || null })) }));
 }
 
 function sortCats(data) {
@@ -1058,9 +976,7 @@ function cardHTML(item, cat) {
   const descClean= (item.d||'').replace(/'/g,"\\'").replace(/"/g,'&quot;');
   const badgeHTML = item.badge==='⭐ Producto estrella'
     ? `<span class="item-badge estrella">${item.badge}</span>`
-    : item.badge
-      ? `<span class="item-badge popular">${item.badge}</span>`
-      : '';
+    : item.badge ? `<span class="item-badge popular">${item.badge}</span>` : '';
   if (item.img) {
     return `<div class="card has-img" data-n="${nameEsc}" data-p="${item.p}" data-img="${item.img}" data-d="${descClean}" data-cat="${catClean}">
       <div class="img-wrap" style="cursor:pointer" onclick="abrirModalDesdeCard(this.closest('.card'))">
@@ -1177,6 +1093,36 @@ function update(id, name, price, delta) {
   btn.classList.remove('bump'); void btn.offsetWidth; btn.classList.add('bump');
 }
 
+// ── Nueva función: cambiar cantidad desde el carrito ──
+function cartUpdate(id, delta) {
+  if (!carrito[id]) return;
+  carrito[id].qty += delta;
+  if (carrito[id].qty <= 0) {
+    delete carrito[id];
+    // resetear contador en la card del menú
+    const el = document.getElementById('qty-'+id);
+    if (el) el.innerText = '0';
+  } else {
+    // sincronizar con la card del menú
+    const el = document.getElementById('qty-'+id);
+    if (el) el.innerText = carrito[id].qty;
+  }
+  actualizarResumen();
+  const btn = document.getElementById('floatCart');
+  btn.classList.remove('bump'); void btn.offsetWidth; btn.classList.add('bump');
+}
+
+// ── Nueva función: eliminar item completo del carrito ──
+function cartDelete(id) {
+  if (!carrito[id]) return;
+  delete carrito[id];
+  const el = document.getElementById('qty-'+id);
+  if (el) el.innerText = '0';
+  actualizarResumen();
+  const btn = document.getElementById('floatCart');
+  btn.classList.remove('bump'); void btn.offsetWidth; btn.classList.add('bump');
+}
+
 function guardarCarrito() {
   try { localStorage.setItem('jbg_carrito', JSON.stringify(carrito)); } catch(e) {}
 }
@@ -1187,12 +1133,26 @@ function cargarCarrito() {
 
 function actualizarResumen() {
   guardarCarrito();
-  const lista=document.getElementById('listaItems');
-  let sub=0, count=0;
-  lista.innerHTML='';
-  Object.values(carrito).forEach(i => {
-    sub+=i.price*i.qty; count+=i.qty;
-    lista.innerHTML+=`<div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px;animation:slideIn 0.2s ease"><span>${i.name} (x${i.qty})</span><span>$${(i.price*i.qty).toFixed(2)}</span></div>`;
+  const lista = document.getElementById('listaItems');
+  let sub = 0, count = 0;
+  lista.innerHTML = '';
+
+  Object.entries(carrito).forEach(([id, i]) => {
+    sub += i.price * i.qty;
+    count += i.qty;
+    const div = document.createElement('div');
+    div.className = 'carrito-item';
+    div.innerHTML = `
+      <span class="carrito-item-name" title="${i.name}">${i.name}</span>
+      <div class="carrito-qty-controls">
+        <button class="carrito-qty-btn" onclick="cartUpdate('${id}',-1)">−</button>
+        <div class="carrito-qty-val">${i.qty}</div>
+        <button class="carrito-qty-btn cplus" onclick="cartUpdate('${id}',1)">+</button>
+      </div>
+      <span class="carrito-item-precio">$${(i.price * i.qty).toFixed(2)}</span>
+      <button class="carrito-del-btn" onclick="cartDelete('${id}')" title="Eliminar">🗑️</button>
+    `;
+    lista.appendChild(div);
   });
 
   const zonaData = getZonaActual();
@@ -1202,7 +1162,6 @@ function actualizarResumen() {
   const delivery = (sub > 0 && !esFueraDeZona && !deliveryGratis) ? precioDelivery : 0;
 
   document.getElementById('subtotalVal').innerText = `$${sub.toFixed(2)}`;
-
   if (esFueraDeZona) {
     document.getElementById('deliveryVal').innerText = 'A coord.';
   } else if (sub === 0) {
@@ -1212,7 +1171,6 @@ function actualizarResumen() {
   } else {
     document.getElementById('deliveryVal').innerText = `$${precioDelivery.toFixed(2)}`;
   }
-
   document.getElementById('totalVal').innerText = `$${(sub + delivery).toFixed(2)}`;
   document.getElementById('cartCount').innerText = count;
 }
@@ -1320,7 +1278,6 @@ function enviarPedido() {
   }
 
   window.open(`https://wa.me/50765738924?text=${m}`);
-
   guardarPedidoEnSupabase({orden,dia,hora,items:Object.values(carrito).map(i=>({n:i.name,qty:i.qty,p:i.price})),sub,delivery,total,nom,zona,direccion,pago:metodoPago});
 
   try { localStorage.setItem('jbg_ultimo_pedido',JSON.stringify({orden,dia,hora,items:Object.values(carrito).map(i=>({n:i.name,qty:i.qty,p:i.price})),sub:sub.toFixed(2),delivery:delivery.toFixed(2),total:total.toFixed(2),zona,direccion,pago:metodoPago})); } catch(e) {}
@@ -1397,9 +1354,6 @@ function switchTab(tabId, btn) {
   if (tabId==='tab-general')   cargarStatsGenerales();
 }
 
-// ══════════════════════════════════════════
-//  ADMIN — ABRIR / CERRAR / LOGIN
-// ══════════════════════════════════════════
 function abrirAdmin() {
   document.getElementById('adminOverlay').classList.add('visible');
   document.getElementById('adminLoginSection').style.display='';
@@ -1409,9 +1363,7 @@ function abrirAdmin() {
   setTimeout(()=>document.getElementById('adminPass').focus(),150);
 }
 
-function cerrarAdmin() {
-  document.getElementById('adminOverlay').classList.remove('visible');
-}
+function cerrarAdmin() { document.getElementById('adminOverlay').classList.remove('visible'); }
 
 function loginAdmin() {
   const pass=document.getElementById('adminPass').value;
@@ -1429,9 +1381,6 @@ document.getElementById('adminOverlay').addEventListener('click', function(e) {
   if (e.target === this) cerrarAdmin();
 });
 
-// ══════════════════════════════════════════
-//  ADMIN — TAB GENERAL
-// ══════════════════════════════════════════
 async function cargarStatsGenerales() {
   let totalProductos=0, totalCats=0;
   CATEGORIAS.forEach(cat => { totalCats++; totalProductos+=cat.i.length; });
@@ -1475,9 +1424,6 @@ function limpiarCache() {
   setAdminMsg('adminMsg','✓ Caché limpiada. Recarga la página para ver cambios.','ok');
 }
 
-// ══════════════════════════════════════════
-//  ADMIN — TAB BADGES (CSV)
-// ══════════════════════════════════════════
 function handleCsvDrop(e) {
   e.preventDefault();
   document.getElementById('csvDrop').classList.remove('drag');
@@ -1497,23 +1443,15 @@ function procesarCSV(file) {
     if (texto.charCodeAt(0) === 0xFEFF) texto = texto.slice(1);
     parsearCSV(texto, csvStatus, file);
   };
-  reader.onerror = function() {
-    csvStatus.innerText = '❌ No se pudo leer el archivo';
-    csvStatus.style.color = 'var(--red)';
-  };
+  reader.onerror = function() { csvStatus.innerText = '❌ No se pudo leer el archivo'; csvStatus.style.color = 'var(--red)'; };
   reader.readAsText(file, 'UTF-8');
 }
 
 function parsearCSV(texto, csvStatus, fileOriginal) {
   if (texto.includes('\uFFFD') || (texto.includes('Art') && !texto.includes('Artículo') && !texto.includes('Articulo'))) {
     const r2 = new FileReader();
-    r2.onload = function(e2) {
-      let t2 = e2.target.result;
-      if (t2.charCodeAt(0) === 0xFEFF) t2 = t2.slice(1);
-      _procesarTextoCSV(t2, csvStatus);
-    };
-    r2.readAsText(fileOriginal, 'latin1');
-    return;
+    r2.onload = function(e2) { let t2 = e2.target.result; if (t2.charCodeAt(0) === 0xFEFF) t2 = t2.slice(1); _procesarTextoCSV(t2, csvStatus); };
+    r2.readAsText(fileOriginal, 'latin1'); return;
   }
   _procesarTextoCSV(texto, csvStatus);
 }
@@ -1544,7 +1482,7 @@ function _procesarTextoCSV(texto, csvStatus) {
       ventas[nombre] = (ventas[nombre] || 0) + cantidad;
     }
     const sorted = Object.entries(ventas).sort((a, b) => b[1] - a[1]).slice(0, 20);
-    if (!sorted.length) throw new Error('No se encontraron ventas válidas. Verifica que el archivo sea el reporte de artículos de Loyverse.');
+    if (!sorted.length) throw new Error('No se encontraron ventas válidas.');
     csvBadgesData = {};
     sorted.forEach(([nombre, qty], idx) => {
       if (idx === 0) csvBadgesData[nombre] = '⭐ Producto estrella';
@@ -1558,34 +1496,21 @@ function _procesarTextoCSV(texto, csvStatus) {
     document.getElementById('badgesPreview').style.display = '';
     csvStatus.innerText = `✓ ${sorted.length} productos encontrados en ${lines.length - 1} filas`;
     csvStatus.style.color = '#25D366';
-  } catch(err) {
-    csvStatus.innerText = '❌ Error: ' + err.message;
-    csvStatus.style.color = 'var(--red)';
-  }
+  } catch(err) { csvStatus.innerText = '❌ Error: ' + err.message; csvStatus.style.color = 'var(--red)'; }
 }
 
 function aplicarBadgesDesdeCSV() {
   if (!csvBadgesData) return;
   localStorage.setItem('jbg_badges', JSON.stringify(csvBadgesData));
-  CATEGORIAS=CATEGORIAS.map(cat=>({
-    ...cat,
-    i:cat.i.map(item=>({...item,badge:csvBadgesData[item.n]||null}))
-  }));
+  CATEGORIAS=CATEGORIAS.map(cat=>({ ...cat, i:cat.i.map(item=>({...item,badge:csvBadgesData[item.n]||null})) }));
   try {
     const raw=localStorage.getItem(CACHE_KEY);
-    if (raw) {
-      const c=JSON.parse(raw);
-      c.data=aplicarBadgesAData(c.data,csvBadgesData);
-      localStorage.setItem(CACHE_KEY,JSON.stringify(c));
-    }
+    if (raw) { const c=JSON.parse(raw); c.data=aplicarBadgesAData(c.data,csvBadgesData); localStorage.setItem(CACHE_KEY,JSON.stringify(c)); }
   } catch(e) {}
   renderMenu(); renderCatNav();
   setAdminMsg('csvApplyMsg','✓ Badges aplicados al menú correctamente','ok');
 }
 
-// ══════════════════════════════════════════
-//  ADMIN — TAB PEDIDOS
-// ══════════════════════════════════════════
 async function cargarPedidos() {
   const lista=document.getElementById('pedidosList');
   lista.innerHTML='<div style="text-align:center;color:var(--muted);font-size:13px;padding:20px;">Cargando...</div>';
@@ -1601,10 +1526,7 @@ async function cargarPedidos() {
       const fechaStr=fecha.toLocaleDateString('es-PA')+' '+fecha.toLocaleTimeString('es-PA',{hour:'2-digit',minute:'2-digit'});
       const itemsStr=Array.isArray(r.items)?r.items.map(i=>`${i.n} x${i.qty}`).join(', '):'';
       return `<div class="pedido-row">
-        <div class="pedido-top">
-          <span class="pedido-orden">#${r.orden}</span>
-          <span class="pedido-total">$${parseFloat(r.total).toFixed(2)}</span>
-        </div>
+        <div class="pedido-top"><span class="pedido-orden">#${r.orden}</span><span class="pedido-total">$${parseFloat(r.total).toFixed(2)}</span></div>
         <div class="pedido-meta">👤 ${r.cliente} · 📦 ${r.zona}</div>
         ${itemsStr?`<div style="font-size:10px;color:#666;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${itemsStr}</div>`:''}
         <div class="pedido-meta" style="margin-top:2px;">🕐 ${fechaStr}</div>
@@ -1613,9 +1535,6 @@ async function cargarPedidos() {
   } catch(e) { lista.innerHTML=`<div style="text-align:center;color:var(--red);font-size:12px;padding:20px;">Error: ${e.message}</div>`; }
 }
 
-// ══════════════════════════════════════════
-//  ADMIN — TAB HORARIOS
-// ══════════════════════════════════════════
 function renderHorariosEditor() {
   const editor=document.getElementById('horariosEditor');
   const dias=[0,5,6];
@@ -1627,7 +1546,7 @@ function renderHorariosEditor() {
       <span class="horario-dia">${h.nombre}</span>
       <input type="time" class="horario-input" id="hor-abre-${d}" value="${abre}" title="Apertura">
       <span class="horario-sep">→</span>
-      <input type="time" class="horario-input" id="hor-cierra-${d}" value="${cierra}" title="Cierre (00:00 = medianoche)">
+      <input type="time" class="horario-input" id="hor-cierra-${d}" value="${cierra}" title="Cierre">
     </div>`;
   }).join('');
 }
@@ -1642,8 +1561,7 @@ function guardarHorarios() {
       HORARIOS[d].c=(cia===0&&cim===0)?[24,0]:[cia,cim];
     });
     localStorage.setItem('jbg_horarios',JSON.stringify(HORARIOS));
-    checkSchedule();
-    actualizarFooterHorarios();
+    checkSchedule(); actualizarFooterHorarios();
     setAdminMsg('horariosMsg','✓ Horarios guardados y aplicados','ok');
   } catch(e) { setAdminMsg('horariosMsg','❌ Error al guardar','error'); }
 }
@@ -1656,9 +1574,6 @@ function actualizarFooterHorarios() {
   const el0=document.getElementById('footerHorarioDom'); if(el0) el0.innerText=`Domingo: ${horaFmt(h0.o[0],h0.o[1])} – ${h0.c[0]===24?'12:00am':horaFmt(h0.c[0],h0.c[1])}`;
 }
 
-// ══════════════════════════════════════════
-//  ADMIN — TAB PRODUCTOS
-// ══════════════════════════════════════════
 function renderProductosToggle(filtro='') {
   const lista=document.getElementById('productosToggleList');
   if (!CATEGORIAS.length) { lista.innerHTML='<div style="color:var(--muted);font-size:13px;padding:10px;text-align:center;">Carga el menú primero</div>'; return; }
@@ -1681,11 +1596,8 @@ function renderProductosToggle(filtro='') {
 function filtrarProductosAdmin(q) { renderProductosToggle(q); }
 
 function toggleProducto(nombre, visible) {
-  if (visible) {
-    productosOcultos=productosOcultos.filter(n=>n!==nombre);
-  } else {
-    if (!productosOcultos.includes(nombre)) productosOcultos.push(nombre);
-  }
+  if (visible) { productosOcultos=productosOcultos.filter(n=>n!==nombre); }
+  else { if (!productosOcultos.includes(nombre)) productosOcultos.push(nombre); }
   localStorage.setItem('jbg_ocultos',JSON.stringify(productosOcultos));
   renderMenu(); renderCatNav();
   setAdminMsg('productosMsg',`✓ ${nombre} ${visible?'activado':'ocultado'}${visible?'':' del menú'}`,visible?'ok':'');
@@ -1693,14 +1605,10 @@ function toggleProducto(nombre, visible) {
 
 function resetProductosOcultos() {
   productosOcultos=[]; localStorage.removeItem('jbg_ocultos');
-  renderMenu(); renderCatNav();
-  renderProductosToggle();
+  renderMenu(); renderCatNav(); renderProductosToggle();
   setAdminMsg('productosMsg','✓ Todos los productos visibles','ok');
 }
 
-// ══════════════════════════════════════════
-//  ADMIN — TAB PROMOS
-// ══════════════════════════════════════════
 function cargarPromosEnForm() {
   const cb  = document.getElementById('deliveryGratisActivo');
   const inp = document.getElementById('deliveryGratisMonto');
@@ -1714,30 +1622,22 @@ function guardarDeliveryGratis() {
   const monto  = parseFloat(document.getElementById('deliveryGratisMonto').value) || 5.00;
   deliveryGratisConfig = { activo, monto };
   localStorage.setItem('jbg_delivery_gratis', JSON.stringify(deliveryGratisConfig));
-  actualizarResumen();
-  actualizarDeliveryGratisStatus();
-  setAdminMsg('promosMsg', activo
-    ? `✓ Delivery gratis activado para pedidos de $${monto.toFixed(2)} o más`
-    : '✓ Delivery gratis desactivado', activo ? 'ok' : '');
+  actualizarResumen(); actualizarDeliveryGratisStatus();
+  setAdminMsg('promosMsg', activo ? `✓ Delivery gratis activado para pedidos de $${monto.toFixed(2)} o más` : '✓ Delivery gratis desactivado', activo ? 'ok' : '');
 }
 
 function actualizarDeliveryGratisStatus() {
   const el = document.getElementById('deliveryGratisStatus');
   if (!el) return;
   if (deliveryGratisConfig.activo) {
-    el.style.display = '';
-    el.style.color   = '#25D366';
-    el.innerHTML     = `🟢 <strong>ACTIVO</strong> — Clientes que pidan $${deliveryGratisConfig.monto.toFixed(2)}+ no pagan delivery`;
+    el.style.display = ''; el.style.color = '#25D366';
+    el.innerHTML = `🟢 <strong>ACTIVO</strong> — Clientes que pidan $${deliveryGratisConfig.monto.toFixed(2)}+ no pagan delivery`;
   } else {
-    el.style.display = '';
-    el.style.color   = 'var(--muted)';
-    el.innerHTML     = '⚪ Desactivado — se cobra el precio de delivery de la zona normalmente';
+    el.style.display = ''; el.style.color = 'var(--muted)';
+    el.innerHTML = '⚪ Desactivado — se cobra el precio de delivery de la zona normalmente';
   }
 }
 
-// ══════════════════════════════════════════
-//  ADMIN — TAB BANNER
-// ══════════════════════════════════════════
 function setBannerColor(bg, color, chip) {
   bannerColorBg=bg; bannerColorTxt=color;
   document.querySelectorAll('.color-chip').forEach(c=>c.classList.remove('active'));
@@ -1752,8 +1652,7 @@ function actualizarBannerPreview() {
   const inner=document.getElementById('bannerPreviewInner');
   if (texto) {
     box.classList.add('visible');
-    inner.style.background=bannerColorBg;
-    inner.style.color=bannerColorTxt;
+    inner.style.background=bannerColorBg; inner.style.color=bannerColorTxt;
     inner.innerText=`${emoji} ${texto} ${emoji}`;
   } else { box.classList.remove('visible'); }
 }
@@ -1762,8 +1661,7 @@ function cargarBannerEnForm() {
   document.getElementById('bannerActivo').checked=bannerConfig.activo;
   document.getElementById('bannerTexto').value=bannerConfig.texto||'';
   document.getElementById('bannerEmoji').value=bannerConfig.emoji||'🔥';
-  bannerColorBg=bannerConfig.bg||'#C8102E';
-  bannerColorTxt=bannerConfig.color||'#fff';
+  bannerColorBg=bannerConfig.bg||'#C8102E'; bannerColorTxt=bannerConfig.color||'#fff';
   actualizarBannerPreview();
 }
 
@@ -1779,9 +1677,6 @@ function guardarBanner() {
 
 ['bannerTexto','bannerEmoji'].forEach(id=>{ const el=document.getElementById(id); if(el) el.addEventListener('input',actualizarBannerPreview); });
 
-// ══════════════════════════════════════════
-//  ADMIN — TAB STATS
-// ══════════════════════════════════════════
 async function cargarStats() {
   setAdminMsg('statsMsg','⏳ Cargando estadísticas...');
   try {
@@ -1795,20 +1690,11 @@ async function cargarStats() {
     document.getElementById('statTotal7d').innerText=rows.length;
     document.getElementById('statVentas7d').innerText='$'+totalVentas.toFixed(2);
     const conteo={};
-    rows.forEach(r=>{
-      if (!Array.isArray(r.items)) return;
-      r.items.forEach(i=>{ conteo[i.n]=(conteo[i.n]||0)+(i.qty||1); });
-    });
+    rows.forEach(r=>{ if (!Array.isArray(r.items)) return; r.items.forEach(i=>{ conteo[i.n]=(conteo[i.n]||0)+(i.qty||1); }); });
     const sorted=Object.entries(conteo).sort((a,b)=>b[1]-a[1]).slice(0,10);
     const top=document.getElementById('statsTopProductos');
     if (!sorted.length) { top.innerHTML='<div style="text-align:center;color:var(--muted);font-size:12px;padding:10px;">Sin datos aún</div>'; }
-    else {
-      top.innerHTML=sorted.map(([n,q],i)=>`<div class="stats-rank-item">
-        <span class="stats-rank-num">${i+1}</span>
-        <span class="stats-rank-name">${n}</span>
-        <span class="stats-rank-qty">${q} uds</span>
-      </div>`).join('');
-    }
+    else { top.innerHTML=sorted.map(([n,q],i)=>`<div class="stats-rank-item"><span class="stats-rank-num">${i+1}</span><span class="stats-rank-name">${n}</span><span class="stats-rank-qty">${q} uds</span></div>`).join(''); }
     setAdminMsg('statsMsg','');
   } catch(e) { setAdminMsg('statsMsg','❌ Error: '+e.message,'error'); }
 }
