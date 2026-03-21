@@ -380,7 +380,7 @@
   <button class="btn-send" id="btnEnviar" onclick="enviarPedido()">📲 HACER MI PEDIDO AHORA</button>
 </div>
 
-<!-- ══════════ ADMIN PANEL ══════════ -->
+<!-- ══════════════ ADMIN PANEL ══════════════ -->
 <div id="adminOverlay">
   <div id="adminBox">
     <div id="adminLoginSection">
@@ -503,7 +503,7 @@
             <label class="admin-label">Monto mínimo del pedido</label>
             <div style="display:flex;align-items:center;gap:8px;">
               <span style="font-size:18px;color:var(--yellow);font-family:'Oswald';">$</span>
-              <input type="number" id="deliveryGratisMonto" class="admin-input" style="margin:0;width:100px;padding:8px 12px;font-size:18px;font-family:'Oswald';color:var(--yellow);" min="0" step="0.25" value="5.00" onchange="guardarDeliveryGratis()">
+              <input type="number" id="deliveryGratisMonto" class="admin-input" style="margin:0;width:100px;padding:8px 12px;font-size:18px;font-family:'Oswald';color:var(--yellow);" min="0" step="0.25" value="9.25" onchange="guardarDeliveryGratis()">
               <span style="font-size:12px;color:var(--muted);">o más en productos</span>
             </div>
             <div id="deliveryGratisStatus" style="font-size:11px;color:var(--muted);margin-top:8px;padding:6px 10px;background:var(--bg);border-radius:6px;display:none;"></div>
@@ -624,6 +624,9 @@ const CACHE_REST_URL    = 'https://uazonbacmpwuznugirru.supabase.co/rest/v1/menu
 const PEDIDOS_REST_URL  = 'https://uazonbacmpwuznugirru.supabase.co/rest/v1/pedidos';
 const CACHE_KEY         = 'jbg_menu_v2';
 const CACHE_TTL         = 24 * 60 * 60 * 1000;
+const CONFIG_REST_URL   = 'https://uazonbacmpwuznugirru.supabase.co/rest/v1/jbg_config?select=key,value';
+const CONFIG_CACHE_KEY  = 'jbg_config_cache';
+const CONFIG_TTL        = 30 * 60 * 1000;
 const ADMIN_PASS        = 'javier2026';
 
 const CAT_ORDER = [
@@ -650,7 +653,8 @@ try { productosOcultos = JSON.parse(localStorage.getItem('jbg_ocultos') || '[]')
 let bannerConfig = { activo:false, texto:'', emoji:'🔥', bg:'#C8102E', color:'#fff' };
 try { const bc = JSON.parse(localStorage.getItem('jbg_banner')); if (bc) { bannerConfig = bc; bannerColorBg = bc.bg; bannerColorTxt = bc.color; } } catch(e) {}
 
-let deliveryGratisConfig = { activo: true, monto: 5.00 };
+// Delivery gratis: activado por defecto con monto 9.25
+let deliveryGratisConfig = { activo: true, monto: 9.25 };
 try { const dg = JSON.parse(localStorage.getItem('jbg_delivery_gratis')); if (dg) deliveryGratisConfig = dg; } catch(e) {}
 
 // ══════════════════════════════════════════
@@ -720,6 +724,7 @@ function renderZonasAdmin() {
 
 function guardarZonasStorage() {
   localStorage.setItem('jbg_zonas', JSON.stringify(zonasConfig));
+  guardarConfigEnSupabase('zonas', zonasConfig);
   renderZonaSelect();
 }
 
@@ -814,7 +819,7 @@ function checkSchedule() {
   const textEl = document.getElementById('scheduleText');
   const nextEl = document.getElementById('nextOpen');
   const diasNombre = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
-  const horaFmt = (h,m) => `${h===12?12:h>12?h-12:h}:${String(m).padStart(2,'0')}${h<12?'am':'pm'}`;
+  const horaFmt = (h,m) => `${h===0||h===12?12:h>12?h-12:h}:${String(m).padStart(2,'0')}${h<12?'am':'pm'}`;
 
   if (isOpen) {
     textEl.innerText = `🟢 ¡Estamos atendiendo! Hasta las ${hoy.c[0]===24?'12:00mn':horaFmt(hoy.c[0],hoy.c[1])}`;
@@ -873,6 +878,55 @@ function aplicarBannerGuardado() {
   } else {
     bar.style.display = 'none';
   }
+}
+
+// ══════════════════════════════════════════
+//  CONFIG GLOBAL DESDE SUPABASE
+// ══════════════════════════════════════════
+async function cargarConfig() {
+  try {
+    const raw = localStorage.getItem(CONFIG_CACHE_KEY);
+    if (raw) {
+      const { ts, data } = JSON.parse(raw);
+      if (Date.now() - ts < CONFIG_TTL) { aplicarConfig(data); return; }
+    }
+  } catch(e) {}
+  try {
+    const res = await fetch(CONFIG_REST_URL + '&apikey=' + SUPABASE_ANON_KEY);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const rows = await res.json();
+    const data = {};
+    rows.forEach(r => { data[r.key] = r.value; });
+    localStorage.setItem(CONFIG_CACHE_KEY, JSON.stringify({ ts: Date.now(), data }));
+    aplicarConfig(data);
+  } catch(e) { console.log('Config: usando valores locales', e.message); }
+}
+
+function aplicarConfig(data) {
+  if (data.horarios)          { HORARIOS = data.horarios; actualizarFooterHorarios(); checkSchedule(); }
+  if (data.banner)            { bannerConfig = data.banner; bannerColorBg = data.banner.bg; bannerColorTxt = data.banner.color; aplicarBannerGuardado(); }
+  if (data.zonas)             { zonasConfig = data.zonas; renderZonaSelect(); }
+  if (data.delivery_gratis)   { deliveryGratisConfig = data.delivery_gratis; actualizarResumen(); }
+  if (data.productos_ocultos) { productosOcultos = data.productos_ocultos; }
+}
+
+async function guardarConfigEnSupabase(key, value) {
+  try {
+    await fetch(
+      `https://uazonbacmpwuznugirru.supabase.co/rest/v1/jbg_config?key=eq.${key}`,
+      {
+        method: 'PATCH',
+        headers: {
+          'apikey': SUPABASE_ANON_KEY,
+          'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
+          'Content-Type': 'application/json',
+          'Prefer': 'return=minimal'
+        },
+        body: JSON.stringify({ value, updated_at: new Date().toISOString() })
+      }
+    );
+    localStorage.removeItem(CONFIG_CACHE_KEY);
+  } catch(e) { console.log('Error guardando config:', e); }
 }
 
 // ══════════════════════════════════════════
@@ -1023,7 +1077,7 @@ function initLazyImages() {
       entries.forEach(e => {
         if (e.isIntersecting) { const img=e.target; img.src=img.dataset.src; img.removeAttribute('data-src'); obs.unobserve(img); }
       });
-    }, { rootMargin:'600px' });
+    }, { rootMargin:'400px' });
     imgs.forEach(img => io.observe(img));
   } else { imgs.forEach(img => { img.src=img.dataset.src; }); }
 }
@@ -1093,17 +1147,14 @@ function update(id, name, price, delta) {
   btn.classList.remove('bump'); void btn.offsetWidth; btn.classList.add('bump');
 }
 
-// ── Nueva función: cambiar cantidad desde el carrito ──
 function cartUpdate(id, delta) {
   if (!carrito[id]) return;
   carrito[id].qty += delta;
   if (carrito[id].qty <= 0) {
     delete carrito[id];
-    // resetear contador en la card del menú
     const el = document.getElementById('qty-'+id);
     if (el) el.innerText = '0';
   } else {
-    // sincronizar con la card del menú
     const el = document.getElementById('qty-'+id);
     if (el) el.innerText = carrito[id].qty;
   }
@@ -1112,7 +1163,6 @@ function cartUpdate(id, delta) {
   btn.classList.remove('bump'); void btn.offsetWidth; btn.classList.add('bump');
 }
 
-// ── Nueva función: eliminar item completo del carrito ──
 function cartDelete(id) {
   if (!carrito[id]) return;
   delete carrito[id];
@@ -1311,11 +1361,11 @@ function verUltimoPedido() {
   try {
     const u=JSON.parse(localStorage.getItem('jbg_ultimo_pedido')); if(!u) return;
     const pagos={efectivo:'💵 Efectivo',yappy:'📱 Yappy',tarjeta:'💳 Tarjeta'};
-    let html=`<div style="position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:2000;display:flex;align-items:flex-end;justify-content:center;">
+    let html=`<div id="ultimoPedidoModal" style="position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:2000;display:flex;align-items:flex-end;justify-content:center;">
       <div style="background:var(--surface);border-radius:20px 20px 0 0;width:100%;max-width:540px;padding:24px;max-height:80vh;overflow-y:auto;">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
           <div style="font-family:'Oswald';font-size:18px;color:var(--yellow);">📋 Mi último pedido</div>
-          <button onclick="this.closest('[style*=fixed]').remove()" style="background:none;border:none;color:var(--muted);font-size:22px;cursor:pointer;">✕</button>
+          <button onclick="document.getElementById('ultimoPedidoModal').remove()" style="background:none;border:none;color:var(--muted);font-size:22px;cursor:pointer;">✕</button>
         </div>
         <div style="font-size:11px;color:var(--muted);margin-bottom:12px;">Orden #${u.orden} · ${u.dia}, ${u.hora}</div>`;
     u.items.forEach(i => { html+=`<div style="display:flex;justify-content:space-between;font-size:13px;padding:6px 0;border-bottom:1px solid var(--border);"><span>${i.n} x${i.qty}</span><span style="color:var(--yellow);">$${(i.p*i.qty).toFixed(2)}</span></div>`; });
@@ -1561,13 +1611,14 @@ function guardarHorarios() {
       HORARIOS[d].c=(cia===0&&cim===0)?[24,0]:[cia,cim];
     });
     localStorage.setItem('jbg_horarios',JSON.stringify(HORARIOS));
+    guardarConfigEnSupabase('horarios', HORARIOS);
     checkSchedule(); actualizarFooterHorarios();
     setAdminMsg('horariosMsg','✓ Horarios guardados y aplicados','ok');
   } catch(e) { setAdminMsg('horariosMsg','❌ Error al guardar','error'); }
 }
 
 function actualizarFooterHorarios() {
-  const horaFmt=(h,m)=>`${h===12?12:h>12?h-12:h}:${String(m).padStart(2,'0')}${h<12?'am':'pm'}`;
+  const horaFmt=(h,m)=>`${h===0||h===12?12:h>12?h-12:h}:${String(m).padStart(2,'0')}${h<12?'am':'pm'}`;
   const h5=HORARIOS[5], h6=HORARIOS[6], h0=HORARIOS[0];
   const el5=document.getElementById('footerHorarioVie'); if(el5) el5.innerText=`Viernes: ${horaFmt(h5.o[0],h5.o[1])} – ${h5.c[0]===24?'12:00am':horaFmt(h5.c[0],h5.c[1])}`;
   const el6=document.getElementById('footerHorarioSab'); if(el6) el6.innerText=`Sábado: ${horaFmt(h6.o[0],h6.o[1])} – ${h6.c[0]===24?'12:00am':horaFmt(h6.c[0],h6.c[1])}`;
@@ -1599,12 +1650,14 @@ function toggleProducto(nombre, visible) {
   if (visible) { productosOcultos=productosOcultos.filter(n=>n!==nombre); }
   else { if (!productosOcultos.includes(nombre)) productosOcultos.push(nombre); }
   localStorage.setItem('jbg_ocultos',JSON.stringify(productosOcultos));
+  guardarConfigEnSupabase('productos_ocultos', productosOcultos);
   renderMenu(); renderCatNav();
   setAdminMsg('productosMsg',`✓ ${nombre} ${visible?'activado':'ocultado'}${visible?'':' del menú'}`,visible?'ok':'');
 }
 
 function resetProductosOcultos() {
   productosOcultos=[]; localStorage.removeItem('jbg_ocultos');
+  guardarConfigEnSupabase('productos_ocultos', []);
   renderMenu(); renderCatNav(); renderProductosToggle();
   setAdminMsg('productosMsg','✓ Todos los productos visibles','ok');
 }
@@ -1622,6 +1675,7 @@ function guardarDeliveryGratis() {
   const monto  = parseFloat(document.getElementById('deliveryGratisMonto').value) || 5.00;
   deliveryGratisConfig = { activo, monto };
   localStorage.setItem('jbg_delivery_gratis', JSON.stringify(deliveryGratisConfig));
+  guardarConfigEnSupabase('delivery_gratis', deliveryGratisConfig);
   actualizarResumen(); actualizarDeliveryGratisStatus();
   setAdminMsg('promosMsg', activo ? `✓ Delivery gratis activado para pedidos de $${monto.toFixed(2)} o más` : '✓ Delivery gratis desactivado', activo ? 'ok' : '');
 }
@@ -1671,6 +1725,7 @@ function guardarBanner() {
   const activo=document.getElementById('bannerActivo').checked;
   bannerConfig={activo,texto,emoji,bg:bannerColorBg,color:bannerColorTxt};
   localStorage.setItem('jbg_banner',JSON.stringify(bannerConfig));
+  guardarConfigEnSupabase('banner', bannerConfig);
   aplicarBannerGuardado();
   setAdminMsg('bannerMsg',activo&&texto?'✓ Banner publicado en el menú':'✓ Banner guardado (desactivado)','ok');
 }
@@ -1818,8 +1873,10 @@ function modalAgregar() {
 //  INIT
 // ══════════════════════════════════════════
 cargarCarrito();
-renderZonaSelect();
-cargarMenu();
+cargarConfig().then(() => {
+  renderZonaSelect();
+  cargarMenu();
+});
 checkSchedule();
 setInterval(checkSchedule, 60000);
 aplicarBannerGuardado();
