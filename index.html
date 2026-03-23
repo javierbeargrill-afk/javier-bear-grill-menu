@@ -380,7 +380,7 @@
   <button class="btn-send" id="btnEnviar" onclick="enviarPedido()">📲 HACER MI PEDIDO AHORA</button>
 </div>
 
-<!-- ══════════════ ADMIN PANEL ══════════════ -->
+<!-- ══════════ ADMIN PANEL ══════════ -->
 <div id="adminOverlay">
   <div id="adminBox">
     <div id="adminLoginSection">
@@ -503,7 +503,7 @@
             <label class="admin-label">Monto mínimo del pedido</label>
             <div style="display:flex;align-items:center;gap:8px;">
               <span style="font-size:18px;color:var(--yellow);font-family:'Oswald';">$</span>
-              <input type="number" id="deliveryGratisMonto" class="admin-input" style="margin:0;width:100px;padding:8px 12px;font-size:18px;font-family:'Oswald';color:var(--yellow);" min="0" step="0.25" value="9.25" onchange="guardarDeliveryGratis()">
+              <input type="number" id="deliveryGratisMonto" class="admin-input" style="margin:0;width:100px;padding:8px 12px;font-size:18px;font-family:'Oswald';color:var(--yellow);" min="0" step="0.25" value="5.00" onchange="guardarDeliveryGratis()">
               <span style="font-size:12px;color:var(--muted);">o más en productos</span>
             </div>
             <div id="deliveryGratisStatus" style="font-size:11px;color:var(--muted);margin-top:8px;padding:6px 10px;background:var(--bg);border-radius:6px;display:none;"></div>
@@ -590,7 +590,7 @@
     <p class="footer-section-title">🕐 Horario de atención</p>
     <p class="footer-hours" id="footerHorarioVie">Viernes: 3:30pm – 12:00am</p>
     <p class="footer-hours" id="footerHorarioSab">Sábado: 1:00pm – 12:00am</p>
-    <p class="footer-hours" id="footerHorarioDom">Domingo: 1:00pm – 10:00pm</p>
+    <p class="footer-hours" id="footerHorarioDom">Domingo: 1:00pm – 12:00am</p>
   </div>
   <div class="footer-promo" id="footerPromo" style="display:none;">
     <p class="footer-section-title">🔥 Promoción del momento</p>
@@ -645,7 +645,7 @@ let bannerColorTxt   = '#fff';
 let HORARIOS = {
   5: { o:[15,30], c:[24,0], nombre:'Viernes' },
   6: { o:[13,0],  c:[24,0], nombre:'Sábado'  },
-  0: { o:[13,0],  c:[22,0], nombre:'Domingo' },
+  0: { o:[13,0],  c:[24,0], nombre:'Domingo' },
 };
 try { const h = JSON.parse(localStorage.getItem('jbg_horarios')); if (h) HORARIOS = h; } catch(e) {}
 try { productosOcultos = JSON.parse(localStorage.getItem('jbg_ocultos') || '[]'); } catch(e) {}
@@ -653,8 +653,7 @@ try { productosOcultos = JSON.parse(localStorage.getItem('jbg_ocultos') || '[]')
 let bannerConfig = { activo:false, texto:'', emoji:'🔥', bg:'#C8102E', color:'#fff' };
 try { const bc = JSON.parse(localStorage.getItem('jbg_banner')); if (bc) { bannerConfig = bc; bannerColorBg = bc.bg; bannerColorTxt = bc.color; } } catch(e) {}
 
-// Delivery gratis: activado por defecto con monto 9.25
-let deliveryGratisConfig = { activo: true, monto: 9.25 };
+let deliveryGratisConfig = { activo: true, monto: 5.00 };
 try { const dg = JSON.parse(localStorage.getItem('jbg_delivery_gratis')); if (dg) deliveryGratisConfig = dg; } catch(e) {}
 
 // ══════════════════════════════════════════
@@ -1147,14 +1146,17 @@ function update(id, name, price, delta) {
   btn.classList.remove('bump'); void btn.offsetWidth; btn.classList.add('bump');
 }
 
+// ── Nueva función: cambiar cantidad desde el carrito ──
 function cartUpdate(id, delta) {
   if (!carrito[id]) return;
   carrito[id].qty += delta;
   if (carrito[id].qty <= 0) {
     delete carrito[id];
+    // resetear contador en la card del menú
     const el = document.getElementById('qty-'+id);
     if (el) el.innerText = '0';
   } else {
+    // sincronizar con la card del menú
     const el = document.getElementById('qty-'+id);
     if (el) el.innerText = carrito[id].qty;
   }
@@ -1163,6 +1165,7 @@ function cartUpdate(id, delta) {
   btn.classList.remove('bump'); void btn.offsetWidth; btn.classList.add('bump');
 }
 
+// ── Nueva función: eliminar item completo del carrito ──
 function cartDelete(id) {
   if (!carrito[id]) return;
   delete carrito[id];
