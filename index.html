@@ -653,7 +653,7 @@ try { productosOcultos = JSON.parse(localStorage.getItem('jbg_ocultos') || '[]')
 let bannerConfig = { activo:false, texto:'', emoji:'🔥', bg:'#C8102E', color:'#fff' };
 try { const bc = JSON.parse(localStorage.getItem('jbg_banner')); if (bc) { bannerConfig = bc; bannerColorBg = bc.bg; bannerColorTxt = bc.color; } } catch(e) {}
 
-let deliveryGratisConfig = { activo: true, monto: 5.00 };
+let deliveryGratisConfig = { activo: false, monto: 5.00 };
 try { const dg = JSON.parse(localStorage.getItem('jbg_delivery_gratis')); if (dg) deliveryGratisConfig = dg; } catch(e) {}
 
 // ══════════════════════════════════════════
@@ -1887,4 +1887,4 @@ actualizarFooterHorarios();
 actualizarResumen();
 </script>
 </body>
-</html>
+         </html>
