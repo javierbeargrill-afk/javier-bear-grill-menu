@@ -63,17 +63,15 @@
   .category-toggle { width: 100%; padding: 18px 16px 8px; background: var(--bg); border: none; color: var(--text); font-family: 'Oswald'; text-align: left; font-size: 20px; font-weight: 700; cursor: default; pointer-events: none; display: block; letter-spacing: 0.3px; }
   .arrow { display: none; }
 
-  /* ── HORIZONTAL SCROLL DE PRODUCTOS ── */
-  .cat-scroll { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 0; padding: 4px 0 16px; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
-  .cat-scroll::-webkit-scrollbar { display: none; }
-  .cat-page { display: grid; grid-template-columns: repeat(2, calc(50vw - 20px)); grid-template-rows: auto auto; gap: 10px; flex-shrink: 0; scroll-snap-align: start; padding: 0 16px; box-sizing: content-box; width: calc(100vw - 32px); }
+  /* ── GRID VERTICAL DE PRODUCTOS ── */
+  .cat-scroll { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 4px 16px 16px; }
   @media (min-width: 600px) {
-    .cat-page { grid-template-columns: repeat(2, calc(50vw - 28px)); width: calc(100vw - 40px); padding: 0 20px; }
+    .cat-scroll { padding: 4px 20px 16px; }
   }
   @media (min-width: 900px) {
     #catNav { padding: 0 24px; }
     #searchWrap { padding: 12px 24px; }
-    .cat-page { grid-template-columns: repeat(2, 260px); width: 572px; padding: 0 24px; }
+    .cat-scroll { grid-template-columns: repeat(2, 260px); padding: 4px 24px 16px; }
   }
 
   /* ── CARDS (vertical grid, estilo app) ── */
@@ -1002,15 +1000,9 @@ function renderMenu() {
     toggle.className = 'category-toggle';
     toggle.innerHTML = `${cat.n}`;
 
-    // Agrupar en páginas de 4 (2 columnas × 2 filas)
-    const pages = [];
-    for (let i = 0; i < items.length; i += 4) pages.push(items.slice(i, i + 4));
-
     const scroll = document.createElement('div');
     scroll.className = 'cat-scroll';
-    scroll.innerHTML = pages.map(pageItems =>
-      `<div class="cat-page">${pageItems.map(item => cardHTML(item, cat.n)).join('')}</div>`
-    ).join('');
+    scroll.innerHTML = items.map(item => cardHTML(item, cat.n)).join('');
 
     block.appendChild(toggle);
     block.appendChild(scroll);
@@ -1115,11 +1107,6 @@ function buscar(query) {
       const match=nombre.includes(q);
       card.style.display=match?'':'none';
       if (match) catOk=true;
-    });
-    // Mostrar/ocultar páginas vacías
-    block.querySelectorAll('.cat-page').forEach(pg => {
-      const visible = [...pg.querySelectorAll('.card')].some(c => c.style.display !== 'none');
-      pg.style.display = visible ? '' : 'none';
     });
     block.style.display=catOk?'':'none';
     if (catOk) hayResultados=true;
