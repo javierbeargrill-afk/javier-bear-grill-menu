@@ -1801,7 +1801,7 @@ function abrirModalDesdeCard(card) {
 
 function abrirModal(itemN,itemP,itemImg,itemD,catName) {
   modalItem={n:itemN,p:itemP,img:itemImg,d:itemD}; modalCatName=catName;
-  const id=encodeId(itemN); modalQty=carrito[id]?carrito[id].qty:0;
+  const id=encodeId(itemN); modalQty=carrito[id]?carrito[id].qty:1;
   document.getElementById('modalCat').innerText=catName;
   document.getElementById('modalName').innerText=itemN;
   document.getElementById('modalPrice').innerText=`$${itemP.toFixed(2)}`;
