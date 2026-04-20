@@ -15,75 +15,81 @@
 
   body { background: var(--bg); color: var(--text); font-family: 'Nunito', sans-serif; min-height: 100vh; padding-bottom: 120px; }
 
-  /* ── SCHEDULE BAR ── */
-  #scheduleBar { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 10px; font-size: 13px; font-weight: 700; position: sticky; top: 0; z-index: 900; color: #fff; }
-  .open-bar   { background: #0d2b1a; color: var(--green); border-bottom: 1px solid #1a4a2a; }
-  .closed-bar { background: #2a0008; color: var(--red);   border-bottom: 1px solid #5a0010; }
+  /* ── STICKY TOP WRAPPER ── */
+  #stickyTop { position: sticky; top: 0; z-index: 900; box-shadow: 0 2px 12px rgba(0,0,0,0.5); }
+
+  /* ── HEADER (RESTAURANT BAR) ── */
+  #scheduleBar { display: flex; align-items: center; gap: 12px; padding: 10px 16px; min-height: 76px; transition: background 0.3s; }
+  .open-bar   { background: linear-gradient(135deg, #0a2016 0%, #1a1200 100%); border-bottom: 1px solid #1a4a2a; }
+  .closed-bar { background: linear-gradient(135deg, #200008 0%, #1a0000 100%); border-bottom: 1px solid #5a0010; }
+  .header-logo { height: 56px; width: auto; border-radius: 10px; flex-shrink: 0; border: 2px solid rgba(255,135,50,0.35); object-fit: contain; }
+  .header-info { flex: 1; min-width: 0; }
+  .header-brand { font-family: 'Oswald'; font-size: 18px; color: var(--yellow); font-weight: 700; display: block; letter-spacing: 0.5px; animation: flame 2.8s ease-in-out infinite; }
+  .header-location { font-size: 11px; color: var(--muted); display: block; margin-top: 2px; }
+  .header-status { display: flex; align-items: center; gap: 5px; flex-shrink: 0; flex-direction: column; align-items: flex-end; }
   .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-  .open-bar  .dot { background: var(--green); animation: pulse 2s infinite; }
+  .open-bar   .dot { background: var(--green); animation: pulse 2s infinite; }
   .closed-bar .dot { background: var(--red); }
   @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
-  #nextOpen { font-size: 11px; color: var(--muted); margin-left: 6px; }
+  .status-row { display: flex; align-items: center; gap: 5px; }
+  .open-bar   .status-label { font-size: 11px; font-weight: 700; color: var(--green); }
+  .closed-bar .status-label { font-size: 11px; font-weight: 700; color: var(--red); }
+  #scheduleText { display: none; }
+  #nextOpen { font-size: 10px; color: var(--muted); text-align: right; max-width: 90px; }
 
-  /* ── HEADER ── */
-  header { text-align: center; padding: 28px 20px 16px; background: linear-gradient(180deg, #3a1000 0%, #1a0800 100%); }
-  .header-title { font-family: 'Oswald'; font-size: clamp(24px, 6vw, 36px); color: var(--yellow); text-transform: uppercase; letter-spacing: 2px; animation: flame 2.8s ease-in-out infinite; }
   @keyframes priceBlink { 0%,100%{opacity:1;text-shadow:0 0 20px rgba(255,135,50,0.6)} 50%{opacity:0.6;text-shadow:0 0 35px rgba(255,135,50,1)} }
   @keyframes flame { 0%,100%{text-shadow:0 0 8px #FF8732,0 0 20px #C8102E} 50%{text-shadow:0 0 18px #FF8732,0 0 44px #C8102E,0 0 70px #ff2200} }
 
   /* ── BANNER PROMO ── */
   #bannerPromoBar { display: none; padding: 10px 16px; text-align: center; font-family: 'Oswald'; font-size: 15px; letter-spacing: 0.5px; animation: fadeUp 0.4s ease; }
 
+  /* ── CATEGORY PILLS (tab style, sticky via parent) ── */
+  #catNav { display: flex; gap: 0; overflow-x: auto; padding: 0 12px; scrollbar-width: none; -webkit-overflow-scrolling: touch; background: var(--surface); border-bottom: 2px solid var(--border); height: 46px; align-items: center; }
+  #catNav::-webkit-scrollbar { display: none; }
+  .cat-pill { flex-shrink: 0; padding: 0 14px; background: transparent; border: none; border-bottom: 3px solid transparent; margin-bottom: -2px; font-size: 12px; color: var(--muted); cursor: pointer; white-space: nowrap; height: 100%; font-family: 'Nunito'; font-weight: 700; transition: color 0.2s, border-color 0.2s; }
+  .cat-pill:hover, .cat-pill.active { color: var(--yellow); border-bottom-color: var(--yellow); }
+
   /* ── SEARCH ── */
-  #searchWrap { padding: 8px 12px; position: sticky; top: 42px; z-index: 850; background: var(--bg); border-bottom: 1px solid var(--border); }
+  #searchWrap { padding: 10px 16px; background: var(--bg); }
   .search-container { position: relative; }
   #searchInput { width: 100%; padding: 10px 16px 10px 38px; background: var(--surface); border: 1px solid var(--border); border-radius: 25px; color: var(--text); font-family: 'Nunito'; font-size: 14px; outline: none; transition: border-color 0.2s; }
   #searchInput:focus { border-color: var(--yellow); }
   #searchIcon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-size: 15px; pointer-events: none; }
 
-  /* ── CATEGORY PILLS ── */
-  #catNav { display: flex; gap: 6px; overflow-x: auto; padding: 8px 12px; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
-  #catNav::-webkit-scrollbar { display: none; }
-  .cat-pill { flex-shrink: 0; padding: 5px 12px; background: var(--surface); border: 1px solid var(--border); border-radius: 20px; font-size: 11px; color: var(--muted); cursor: pointer; white-space: nowrap; transition: all 0.2s; font-family: 'Nunito'; font-weight: 600; }
-  .cat-pill:hover, .cat-pill.active { background: var(--yellow); color: #000; border-color: var(--yellow); }
-
-  /* ── MENU ── */
-  .category-block { margin: 8px 12px; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; animation: fadeUp 0.35s ease both; }
-  @keyframes fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
-  .category-toggle { width: 100%; padding: 14px; background: var(--surface); border: none; color: var(--yellow); font-family: 'Oswald'; text-align: left; font-size: 16px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
-  .arrow { transition: transform 0.25s; display: inline-block; }
-  .category-toggle.open .arrow { transform: rotate(180deg); }
-  .category-body { display: none; padding: 8px; background: var(--bg); gap: 8px; grid-template-columns: 1fr; }
-  .category-body.open { display: grid; }
-  @media (min-width: 540px)  { .category-body { grid-template-columns: repeat(2, 1fr); } }
-  @media (min-width: 900px)  {
-    .category-body { grid-template-columns: repeat(3, 1fr); }
-    .category-block { margin: 8px 20px; }
-    #searchWrap { padding: 8px 20px; }
-    #catNav { padding: 8px 20px; }
+  /* ── MENU (secciones estilo PedidosYa) ── */
+  #menuContainer { padding: 0 0 8px; }
+  .category-block { margin: 0; animation: fadeUp 0.35s ease both; border-top: 6px solid var(--surface); }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+  .category-toggle { width: 100%; padding: 16px 16px 8px; background: var(--bg); border: none; color: var(--text); font-family: 'Oswald'; text-align: left; font-size: 20px; font-weight: 700; cursor: default; pointer-events: none; display: block; letter-spacing: 0.3px; }
+  .arrow { display: none; }
+  .category-body { display: grid !important; padding: 0 16px 4px; background: var(--bg); grid-template-columns: 1fr; gap: 0; }
+  @media (min-width: 900px) {
+    #catNav { padding: 0 24px; }
+    #searchWrap { padding: 10px 24px; }
+    .category-body { max-width: 720px; }
+    .category-toggle { padding: 16px 16px 8px; }
   }
 
-  /* ── CARDS ── */
-  .card { background: var(--surface); border-radius: 10px; border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 12px; transition: border-color 0.15s, transform 0.1s; }
-  .card:active { transform: scale(0.98); }
-  .card:hover { border-color: #3a3a3a; }
+  /* ── CARDS (PedidosYa horizontal) ── */
+  .card { background: var(--bg); border-radius: 0; border: none; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; padding: 14px 0; transition: background 0.12s; cursor: pointer; }
+  .card:last-child { border-bottom: none; }
+  .card:active, .card:hover { background: rgba(255,135,50,0.04); }
   .card-info { flex: 1; min-width: 0; }
-  .card-name { font-weight: 600; font-size: 14px; color: #fff; display: block; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .card-price { color: var(--yellow); font-family: 'Oswald'; font-size: 16px; }
+  .card-name { font-weight: 700; font-size: 14px; color: #fff; display: block; margin-bottom: 3px; }
+  .card-price { color: var(--yellow); font-family: 'Oswald'; font-size: 17px; display: block; margin-top: 5px; }
   .item-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 20px; margin-bottom: 4px; }
   .item-badge.estrella { background: rgba(255,215,0,0.2); color: gold; border: 1px solid rgba(255,215,0,0.4); }
   .item-badge.popular  { background: rgba(255,135,50,0.2); color: var(--yellow); border: 1px solid rgba(255,135,50,0.4); }
-  .card-desc { font-size: 11px; color: var(--muted); margin-top: 2px; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-  .card.has-img { padding: 0; overflow: hidden; flex-direction: column; align-items: stretch; }
-  .card.has-img .img-wrap { position: relative; width: 100%; aspect-ratio: 1/1; background: var(--surface2); overflow: hidden; }
-  .card-img { opacity: 0; transition: opacity 0.5s ease; }
+  .card-desc { font-size: 12px; color: var(--muted); margin-top: 3px; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  /* Card with image — aside on right */
+  .card.has-img { padding: 14px 0; align-items: center; }
+  .card-aside { display: flex; flex-direction: column; align-items: center; gap: 8px; flex-shrink: 0; }
+  .card-aside .img-wrap { width: 88px; height: 88px; border-radius: 12px; overflow: hidden; position: relative; background: var(--surface2); }
+  .card-img { opacity: 0; transition: opacity 0.45s ease; width: 88px; height: 88px; object-fit: cover; display: block; }
   .card-img.loaded { opacity: 1; }
-  .card.has-img .card-img { width: 100%; height: 100%; object-fit: cover; display: block; position: relative; z-index: 2; }
-  .img-placeholder { position: absolute; inset: 0; z-index: 1; background: linear-gradient(90deg, var(--surface2) 25%, #2e2e2e 50%, var(--surface2) 75%); background-size: 200% 100%; animation: shimmer 1.4s infinite; }
+  .img-placeholder { position: absolute; inset: 0; background: linear-gradient(90deg, var(--surface2) 25%, #2e2e2e 50%, var(--surface2) 75%); background-size: 200% 100%; animation: shimmer 1.4s infinite; }
   .img-placeholder.hidden { display: none; }
   @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
-  .card.has-img .card-bottom { display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; gap: 8px; }
-  .card.has-img .card-info { flex: 1; min-width: 0; }
 
   /* ── QTY CONTROLS ── */
   .qty-controls { display: flex; align-items: center; background: var(--surface2); border-radius: 20px; border: 1px solid var(--border); height: 30px; flex-shrink: 0; }
@@ -275,31 +281,44 @@
 </head>
 <body>
 
-<!-- SCHEDULE BAR -->
-<div id="scheduleBar">
-  <div class="dot"></div>
-  <span id="scheduleText">Verificando...</span>
-  <span id="nextOpen"></span>
-  <img src="https://uazonbacmpwuznugirru.supabase.co/storage/v1/object/public/menu-images/IMG-20230315-WA0300_20250520_112619_0000.png" alt="Javier Bear Grill" style="height:28px;width:auto;margin-left:10px;filter:brightness(0) invert(1);flex-shrink:0;">
+<!-- STICKY TOP: Header + Category Pills -->
+<div id="stickyTop">
+  <div id="scheduleBar">
+    <img src="https://uazonbacmpwuznugirru.supabase.co/storage/v1/object/public/menu-images/IMG-20230315-WA0300_20250520_112619_0000.png"
+         alt="Javier Bear Grill" class="header-logo">
+    <div class="header-info">
+      <span class="header-brand">🐻 Javier Bear Grill</span>
+      <span class="header-location">📍 La Chorrera, Panamá</span>
+    </div>
+    <div class="header-status">
+      <div class="status-row">
+        <div class="dot"></div>
+        <span class="status-label" id="statusLabel">...</span>
+      </div>
+      <span id="nextOpen"></span>
+    </div>
+    <span id="scheduleText" style="display:none;"></span>
+  </div>
+  <!-- CATEGORY PILLS -->
+  <div id="catNav"></div>
 </div>
 
-<!-- HERO -->
-<section id="hero" style="display:none;position:relative;width:100%;overflow:hidden;" itemscope itemtype="https://schema.org/Restaurant" aria-label="Javier Bear Grill - Menú destacado">
+<!-- HERO (200px banner compacto) -->
+<section id="hero" style="display:none;position:relative;width:100%;height:200px;overflow:hidden;" itemscope itemtype="https://schema.org/Restaurant" aria-label="Javier Bear Grill - Menú destacado">
   <span itemprop="name" style="display:none">Javier Bear Grill</span>
   <span itemprop="address" style="display:none">Residencial La Valdeza, Calle Boulevard, Casa 173, La Chorrera, Panamá</span>
   <span itemprop="telephone" style="display:none">+507 6573-8924</span>
   <span itemprop="servesCuisine" style="display:none">Hamburguesas, Pollo, Parrilla, Combos</span>
-  <img id="heroImg" src="" alt="" style="width:100%;aspect-ratio:1/1;object-fit:cover;display:block;opacity:0;transition:opacity 0.6s ease;">
-  <div style="position:absolute;inset:0;background:rgba(0,0,0,0.52);"></div>
-  <div style="position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:20px;text-align:center;">
-    <h1 style="font-family:'Oswald';font-size:clamp(24px,7vw,36px);color:#fff;font-weight:700;margin-bottom:10px;text-shadow:0 2px 16px rgba(0,0,0,0.9);line-height:1.2;">¿Hambre? Estás en el lugar correcto 🐻🔥</h1>
-    <p style="font-size:clamp(12px,3.5vw,15px);color:rgba(255,255,255,0.85);margin-bottom:6px;line-height:1.5;text-shadow:0 1px 8px rgba(0,0,0,0.8);">Bienvenido al menú de <strong>Javier Bear Grill</strong>, tu restaurante de hamburguesas y parrilla en La Chorrera, Panamá.</p>
-    <p style="font-size:clamp(11px,3vw,13px);color:rgba(255,255,255,0.6);margin-bottom:16px;text-shadow:0 1px 6px rgba(0,0,0,0.8);">Explora nuestros platillos y combos 👇 — ¡Disfrútalo!</p>
-    <div id="heroName"  style="font-family:'Oswald';font-size:clamp(16px,4.5vw,22px);color:#fff;font-weight:700;margin-bottom:4px;text-shadow:0 2px 10px rgba(0,0,0,0.8);"></div>
-    <div id="heroPrice" style="font-family:'Oswald';font-size:clamp(24px,7vw,34px);color:var(--yellow);margin-bottom:16px;text-shadow:0 0 20px rgba(255,135,50,0.6);animation:priceBlink 1.4s ease-in-out infinite;"></div>
-    <div style="display:flex;gap:10px;width:100%;max-width:340px;">
-      <button id="heroBtn" onclick="heroAgregar()" style="flex:1;background:var(--yellow);color:#000;border:none;border-radius:24px;padding:12px;font-family:'Oswald';font-size:15px;font-weight:700;cursor:pointer;box-shadow:0 4px 15px rgba(255,135,50,0.4);">🛒 Agregar</button>
-      <button onclick="heroVerDetalle()" style="flex:1;background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.35);border-radius:24px;padding:12px;font-family:'Oswald';font-size:15px;font-weight:700;cursor:pointer;backdrop-filter:blur(6px);">📋 Ver más</button>
+  <img id="heroImg" src="" alt="" style="width:100%;height:200px;object-fit:cover;display:block;opacity:0;transition:opacity 0.6s ease;">
+  <div style="position:absolute;inset:0;background:linear-gradient(to top, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.15) 55%, transparent 100%);"></div>
+  <div style="position:absolute;bottom:0;left:0;right:0;padding:12px 16px;display:flex;align-items:flex-end;justify-content:space-between;gap:10px;">
+    <div style="flex:1;min-width:0;">
+      <div id="heroName" style="font-family:'Oswald';font-size:17px;color:#fff;font-weight:700;line-height:1.2;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"></div>
+      <div id="heroPrice" style="font-family:'Oswald';font-size:22px;color:var(--yellow);animation:priceBlink 1.4s ease-in-out infinite;line-height:1;"></div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end;flex-shrink:0;">
+      <button id="heroBtn" onclick="heroAgregar()" style="background:var(--yellow);color:#000;border:none;border-radius:20px;padding:7px 16px;font-family:'Oswald';font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;">🛒 Agregar</button>
+      <button onclick="heroVerDetalle()" style="background:rgba(255,255,255,0.12);color:#fff;border:1px solid rgba(255,255,255,0.3);border-radius:20px;padding:5px 14px;font-family:'Oswald';font-size:12px;font-weight:700;cursor:pointer;backdrop-filter:blur(4px);white-space:nowrap;">📋 Ver más</button>
     </div>
   </div>
 </section>
@@ -314,9 +333,6 @@
     <input type="search" id="searchInput" placeholder="Buscar producto..." oninput="buscar(this.value)" autocomplete="off">
   </div>
 </div>
-
-<!-- CATEGORY PILLS -->
-<div id="catNav"></div>
 
 <!-- MENU -->
 <div id="menuContainer">
@@ -791,6 +807,8 @@ function checkSchedule() {
 
   document.getElementById('scheduleBar').className = isOpen ? 'open-bar' : 'closed-bar';
   document.getElementById('btnEnviar').disabled = !isOpen;
+  const labelEl = document.getElementById('statusLabel');
+  if (labelEl) labelEl.innerText = isOpen ? 'Abierto' : 'Cerrado';
 
   const textEl = document.getElementById('scheduleText');
   const nextEl = document.getElementById('nextOpen');
@@ -988,7 +1006,7 @@ function renderMenu() {
       this.classList.toggle('open');
     };
     const body = document.createElement('div');
-    body.className = 'category-body';
+    body.className = 'category-body open';
     body.innerHTML = items.map(item => cardHTML(item, cat.n)).join('');
     block.appendChild(toggle);
     block.appendChild(body);
@@ -1006,32 +1024,30 @@ function cardHTML(item, cat) {
   const badgeHTML = item.badge==='⭐ Producto estrella'
     ? `<span class="item-badge estrella">${item.badge}</span>`
     : item.badge ? `<span class="item-badge popular">${item.badge}</span>` : '';
+
+  const infoHTML = `<div class="card-info" onclick="abrirModalDesdeCard(this.closest('.card'))">
+      ${badgeHTML}
+      <span class="card-name">${item.n}</span>
+      ${item.d?`<span class="card-desc">${item.d}</span>`:''}
+      <span class="card-price">${precio}</span>
+    </div>`;
+
   if (item.img) {
     return `<div class="card has-img" data-n="${nameEsc}" data-p="${item.p}" data-img="${item.img}" data-d="${descClean}" data-cat="${catClean}">
-      <div class="img-wrap" style="cursor:pointer" onclick="abrirModalDesdeCard(this.closest('.card'))">
-        <div class="img-placeholder"></div>
-        <img class="card-img" data-src="${item.img}" alt="${nameEsc}"
-          onload="this.classList.add('loaded');this.previousElementSibling.style.opacity='0';setTimeout(()=>this.previousElementSibling.classList.add('hidden'),400)"
-          onerror="this.closest('.card').classList.remove('has-img');this.closest('.img-wrap').remove()">
-      </div>
-      <div class="card-bottom">
-        <div class="card-info">
-          ${badgeHTML}
-          <span class="card-name">${item.n}</span>
-          <span class="card-price">${precio}</span>
-          ${item.d?`<span class="card-desc">${item.d}</span>`:''}
+      ${infoHTML}
+      <div class="card-aside">
+        <div class="img-wrap">
+          <div class="img-placeholder"></div>
+          <img class="card-img" data-src="${item.img}" alt="${nameEsc}"
+            onload="this.classList.add('loaded');this.previousElementSibling.style.opacity='0';setTimeout(()=>this.previousElementSibling.classList.add('hidden'),400)"
+            onerror="this.closest('.card').classList.remove('has-img');this.closest('.card-aside').querySelector('.img-wrap').remove()">
         </div>
         ${qtyHTML(id, item)}
       </div>
     </div>`;
   }
   return `<div class="card" data-n="${nameEsc}" data-p="${item.p}" data-img="" data-d="${descClean}" data-cat="${catClean}">
-    <div class="card-info" style="cursor:pointer" onclick="abrirModalDesdeCard(this.closest('.card'))">
-      ${badgeHTML}
-      <span class="card-name">${item.n}</span>
-      <span class="card-price">${precio}</span>
-      ${item.d?`<span class="card-desc">${item.d}</span>`:''}
-    </div>
+    ${infoHTML}
     ${qtyHTML(id, item)}
   </div>`;
 }
@@ -1073,9 +1089,9 @@ function irACat(catName, pillEl) {
   pillEl.classList.add('active');
   document.querySelectorAll('.category-block').forEach(block => {
     if (block.dataset.cat === catName) {
-      const body=block.querySelector('.category-body'), toggle=block.querySelector('.category-toggle');
-      if (!body.classList.contains('open')) { body.classList.add('open'); toggle.classList.add('open'); }
-      setTimeout(() => block.scrollIntoView({behavior:'smooth',block:'start'}), 50);
+      const stickyH = (document.getElementById('stickyTop') || { offsetHeight: 122 }).offsetHeight;
+      const top = block.getBoundingClientRect().top + window.scrollY - stickyH - 4;
+      window.scrollTo({ top, behavior: 'smooth' });
     }
   });
 }
@@ -1831,4 +1847,4 @@ actualizarFooterHorarios();
 actualizarResumen();
 </script>
 </body>
-                                                          </html>
+</html>
