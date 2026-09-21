@@ -2,8 +2,19 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🔥 Javier Bear Grill 🔥</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#3d1800">
+<meta name="description" content="Menú oficial de Javier Bear Grill. Hamburguesas smash, pollo crujiente, combos y delivery en La Chorrera, Panamá.">
+<meta property="og:title" content="Javier Bear Grill | Menú oficial">
+<meta property="og:description" content="Smash burgers, pollo crujiente y combos para delivery en La Chorrera.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://menujaviergrill.store/">
+<meta name="jbg-version" content="2.2.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="JBG Menú">
+<title>Javier Bear Grill | Menú oficial</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -274,6 +285,47 @@
   .zona-btn-del:hover { background:rgba(200,16,46,0.25); }
   .zona-wa-label { width:76px; text-align:center; font-size:10px; color:var(--muted); padding:6px 4px; flex-shrink:0; }
   .zona-fuera-note { font-size:10px; color:var(--muted); margin-top:4px; margin-left:52px; }
+
+  /* JBG 2.2 — mobile polish */
+  html { scroll-behavior:smooth; }
+  body { padding-bottom:110px; -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility; }
+  button,input,select { -webkit-tap-highlight-color:transparent; }
+  button:focus-visible,input:focus-visible,select:focus-visible { outline:2px solid var(--yellow); outline-offset:2px; }
+  #scheduleBar { min-height:68px; padding:8px 14px; }
+  .header-logo { height:48px; }
+  .header-brand { font-size:17px; }
+  #heroPrice { animation:none !important; }
+  #searchWrap { padding:10px 12px; }
+  #searchInput { min-height:44px; box-shadow:0 3px 14px rgba(61,24,0,.06); }
+  .category-block { scroll-margin-top:118px; }
+  .cat-scroll { gap:9px; padding:5px 12px 15px; }
+  .category-toggle { padding:16px 13px 8px; font-size:19px; }
+  .card { border-radius:15px; box-shadow:0 3px 14px rgba(61,24,0,.08); }
+  .card-name { font-size:12.5px; line-height:1.28; }
+  .card-price { font-size:16px; }
+  #carrito { max-width:760px; margin-left:auto; margin-right:auto; }
+  #floatCart {
+    left:12px; right:12px; bottom:max(12px,env(safe-area-inset-bottom));
+    width:auto; max-width:520px; margin:0 auto; min-height:52px; border-radius:16px; padding:10px 15px;
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
+    opacity:0; transform:translateY(120%); pointer-events:none;
+    transition:transform .25s ease,opacity .25s ease,box-shadow .2s;
+  }
+  #floatCart.has-items { opacity:1; transform:translateY(0); pointer-events:auto; box-shadow:0 10px 30px rgba(61,24,0,.34); }
+  .float-cart-main { display:flex; align-items:center; gap:8px; }
+  .float-cart-count { min-width:24px;height:24px;padding:0 7px;border-radius:999px;background:#fff;color:var(--choco);display:inline-flex;align-items:center;justify-content:center;font-size:12px; }
+  .float-cart-total { font-size:17px; color:#fff; }
+  .trust-strip { display:flex;gap:7px;overflow-x:auto;padding:9px 12px;background:#fff;border-bottom:1px solid var(--border);scrollbar-width:none; }
+  .trust-strip::-webkit-scrollbar { display:none; }
+  .trust-chip { flex:0 0 auto;padding:6px 9px;border-radius:999px;background:var(--surface2);font-size:10px;font-weight:700;color:var(--muted);white-space:nowrap; }
+  @media (min-width:900px) {
+    #hero,#searchWrap,#menuContainer { max-width:1180px; margin-left:auto; margin-right:auto; }
+    .cat-scroll { grid-template-columns:repeat(3,minmax(0,1fr)); }
+  }
+  @media (prefers-reduced-motion:reduce) {
+    *,*::before,*::after { animation-duration:.01ms !important; animation-iteration-count:1 !important; scroll-behavior:auto !important; transition-duration:.01ms !important; }
+  }
+
 </style>
 </head>
 <body>
@@ -320,6 +372,15 @@
   </div>
 </section>
 
+<div class="trust-strip" aria-label="Información del servicio">
+  <span class="trust-chip">🍔 Smash al momento</span>
+  <span class="trust-chip">🥬 Ingredientes frescos</span>
+  <span class="trust-chip">🚚 Solo delivery</span>
+  <span class="trust-chip">💵 Efectivo</span>
+  <span class="trust-chip">📱 Yappy</span>
+  <span class="trust-chip">💳 Tarjeta</span>
+</div>
+
 <!-- BANNER PROMO -->
 <div id="bannerPromoBar"></div>
 
@@ -327,7 +388,7 @@
 <div id="searchWrap">
   <div class="search-container">
     <span id="searchIcon">🔍</span>
-    <input type="search" id="searchInput" placeholder="Buscar producto..." oninput="buscar(this.value)" autocomplete="off">
+    <input type="search" id="searchInput" placeholder="Buscar hamburguesas, combos, pollo..." oninput="buscar(this.value)" autocomplete="off" aria-label="Buscar en el menú">
   </div>
 </div>
 
@@ -338,7 +399,10 @@
 <div id="noResults">😕 No se encontraron productos para "<span id="searchTerm"></span>"</div>
 
 <!-- FLOAT CART -->
-<button id="floatCart" onclick="document.getElementById('carrito').scrollIntoView({behavior:'smooth'})">🛒 PEDIDO (<span id="cartCount">0</span>)</button>
+<button id="floatCart" onclick="document.getElementById('carrito').scrollIntoView({behavior:'smooth'})" aria-label="Ver pedido">
+  <span class="float-cart-main">🛒 Ver pedido <span class="float-cart-count" id="cartCount">0</span></span>
+  <span class="float-cart-total" id="floatCartTotal">$0.00</span>
+</button>
 
 <!-- CARRITO -->
 <div id="carrito">
@@ -349,8 +413,8 @@
     <div style="display:flex;justify-content:space-between;margin-bottom:5px;"><span>Delivery:</span><span id="deliveryVal">$0.00</span></div>
     <div style="display:flex;justify-content:space-between;font-weight:800;font-size:20px;color:var(--yellow);margin-top:5px;border-top:1px solid var(--border);padding-top:8px;"><span>TOTAL:</span><span id="totalVal">$0.00</span></div>
   </div>
-  <div class="form-group"><label>Nombre</label><input type="text" id="nombre" placeholder="Tu nombre"></div>
-  <div class="form-group"><label>Dirección de entrega</label><input type="text" id="direccion" placeholder="Ej: Calle 5, Casa 12, frente al parque"></div>
+  <div class="form-group"><label for="nombre">Nombre</label><input type="text" id="nombre" placeholder="Tu nombre" autocomplete="name"></div>
+  <div class="form-group"><label for="direccion">Dirección de entrega</label><input type="text" id="direccion" placeholder="Ej: Calle 5, Casa 12, frente al parque" autocomplete="street-address"></div>
   <div class="form-group">
     <label>Zona de Entrega</label>
     <select id="zona" onchange="actualizarResumen()"></select>
@@ -410,7 +474,7 @@
     </div>
     <div id="adminControls" style="display:none;">
       <div class="admin-header">
-        <div><h2>⚙️ Panel Admin</h2><p id="adminSyncInfo">Javier Bear Grill</p></div>
+        <div><h2>⚙️ Panel Admin</h2><p id="adminSyncInfo">Javier Bear Grill · v2.2.0</p></div>
         <button class="admin-close-btn" onclick="cerrarAdmin()">✕</button>
       </div>
       <div class="admin-tabs">
@@ -580,9 +644,7 @@
   </div>
   <div class="footer-schedule">
     <p class="footer-section-title">🕐 Horario de atención</p>
-    <p class="footer-hours" id="footerHorarioVie">Viernes: 3:30pm – 12:00am</p>
-    <p class="footer-hours" id="footerHorarioSab">Sábado: 1:00pm – 12:00am</p>
-    <p class="footer-hours" id="footerHorarioDom">Domingo: 1:00pm – 12:00am</p>
+    <div id="footerHorariosLista"></div>
   </div>
   <div class="footer-promo" id="footerPromo" style="display:none;">
     <p class="footer-section-title">🔥 Promoción del momento</p>
@@ -603,29 +665,48 @@
       </div>
     </div>
   </a>
-  <p id="footerCredit">Creada por <strong>Javier el Oso</strong> con la ayuda de <strong>Claude</strong> 🤖</p>
+  <p id="footerCredit">© 2026 <strong>Javier Bear Grill</strong> · Hecho con 🔥 en La Chorrera</p>
 </footer>
 
 <script>
 // ══════════════════════════════════════════
 //  CONFIG
 // ══════════════════════════════════════════
+const APP_VERSION = '2.2.0';
 const SUPABASE_FUNC_URL = 'https://uazonbacmpwuznugirru.supabase.co/functions/v1/loyverse-menu';
+const ADMIN_API_URL = 'https://uazonbacmpwuznugirru.supabase.co/functions/v1/admin-api';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVhem9uYmFjbXB3dXpudWdpcnJ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI2NDYzNTAsImV4cCI6MjA4ODIyMjM1MH0.87QkFnCL1AfI3oUu8bR2NPuUD44n3BfUX1nA-Bb360I';
 const CACHE_REST_URL    = 'https://uazonbacmpwuznugirru.supabase.co/rest/v1/menu_cache?id=eq.1&select=data,updated_at';
 const PEDIDOS_REST_URL  = 'https://uazonbacmpwuznugirru.supabase.co/rest/v1/pedidos';
-const CACHE_KEY         = 'jbg_menu_v2';
-const CACHE_TTL         = 24 * 60 * 60 * 1000;
+const CACHE_KEY         = 'jbg_menu_v3';
+const CACHE_TTL         = 10 * 60 * 1000;
 const CONFIG_REST_URL   = 'https://uazonbacmpwuznugirru.supabase.co/rest/v1/jbg_config?select=key,value';
 const CONFIG_CACHE_KEY  = 'jbg_config_cache';
 const CONFIG_TTL        = 30 * 60 * 1000;
-const ADMIN_PASS        = 'javier2026';
 
 const CAT_ORDER = [
   'Promociones','Pollo','Combo de hamburguesas','Hamburguesas',
   'CARNE Y CERDO','Picadas','Salchipapas y HodDogs','Chorizos',
   'Acompañantes','Bebidas','SALSAS','Niños','Especiales'
 ];
+
+function displayCatName(nombre='') {
+  const n=nombre.replace(/^[\p{Emoji}\s]+/u,'').trim().toLowerCase();
+  if (n.includes('promoc')) return '🔥 Promociones';
+  if (n.includes('combo') && n.includes('hamburg')) return '🍔 Combos';
+  if (n.includes('hamburg')) return '🍔 Hamburguesas';
+  if (n.includes('pollo')) return '🍗 Pollo';
+  if (n.includes('carne') || n.includes('cerdo')) return '🥩 Carne y cerdo';
+  if (n.includes('picada')) return '🍽️ Picadas';
+  if (n.includes('salchipapa') || n.includes('hotdog') || n.includes('hoddog')) return '🌭 Salchipapas & Hotdogs';
+  if (n.includes('choriz')) return '🌭 Chorizos';
+  if (n.includes('acompañ')) return '🍟 Acompañantes';
+  if (n.includes('bebida')) return '🥤 Bebidas';
+  if (n.includes('salsa')) return '🥫 Salsas';
+  if (n.includes('niñ')) return '🧸 Niños';
+  if (n.includes('especial')) return '⭐ Especiales';
+  return nombre;
+}
 
 let carrito    = {};
 let CATEGORIAS = [];
@@ -634,12 +715,20 @@ let csvBadgesData    = null;
 let bannerColorBg    = '#C8102E';
 let bannerColorTxt   = '#fff';
 
-let HORARIOS = {
-  5: { o:[15,30], c:[24,0], nombre:'Viernes' },
-  6: { o:[13,0],  c:[24,0], nombre:'Sábado'  },
-  0: { o:[13,0],  c:[24,0], nombre:'Domingo' },
+const HORARIOS_DEFAULT = {
+  1:{o:[15,30],c:[23,30],nombre:'Lunes'},
+  2:{o:[15,30],c:[23,30],nombre:'Martes'},
+  3:{o:[15,30],c:[23,30],nombre:'Miércoles'},
+  4:{o:[15,30],c:[23,30],nombre:'Jueves'},
+  5:{o:[15,30],c:[23,30],nombre:'Viernes'},
+  6:{o:[13,0],c:[23,30],nombre:'Sábado'},
+  0:{o:[13,0],c:[23,30],nombre:'Domingo'}
 };
-try { const h = JSON.parse(localStorage.getItem('jbg_horarios')); if (h) HORARIOS = h; } catch(e) {}
+let HORARIOS=JSON.parse(JSON.stringify(HORARIOS_DEFAULT));
+try {
+  const h=JSON.parse(localStorage.getItem('jbg_horarios'));
+  if (h && Object.keys(h).length===7) HORARIOS={...HORARIOS,...h};
+} catch(e) {}
 try { productosOcultos = JSON.parse(localStorage.getItem('jbg_ocultos') || '[]'); } catch(e) {}
 
 let bannerConfig = { activo:false, texto:'', emoji:'🔥', bg:'#C8102E', color:'#fff' };
@@ -871,6 +960,20 @@ function aplicarBannerGuardado() {
   }
 }
 
+let adminToken=sessionStorage.getItem('jbg_admin_token')||'';
+
+async function adminRequest(action,payload={}) {
+  const headers={'Content-Type':'application/json'};
+  if(adminToken) headers['Authorization']='Bearer '+adminToken;
+  const res=await fetch(ADMIN_API_URL,{method:'POST',headers,body:JSON.stringify({action,...payload})});
+  const out=await res.json().catch(()=>({}));
+  if(!res.ok){
+    if(res.status===401){adminToken='';sessionStorage.removeItem('jbg_admin_token');}
+    throw new Error(out.error||('HTTP '+res.status));
+  }
+  return out;
+}
+
 // ══════════════════════════════════════════
 //  CONFIG GLOBAL DESDE SUPABASE
 // ══════════════════════════════════════════
@@ -900,62 +1003,58 @@ function aplicarConfig(data) {
   if (data.productos_ocultos) { productosOcultos = data.productos_ocultos; }
 }
 
-async function guardarConfigEnSupabase(key, value) {
-  try {
-    await fetch(
-      `https://uazonbacmpwuznugirru.supabase.co/rest/v1/jbg_config?key=eq.${key}`,
-      {
-        method: 'PATCH',
-        headers: {
-          'apikey': SUPABASE_ANON_KEY,
-          'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
-          'Content-Type': 'application/json',
-          'Prefer': 'return=minimal'
-        },
-        body: JSON.stringify({ value, updated_at: new Date().toISOString() })
-      }
-    );
+async function guardarConfigEnSupabase(key,value){
+  try{
+    await adminRequest('config_update',{key,value});
     localStorage.removeItem(CONFIG_CACHE_KEY);
-  } catch(e) { console.log('Error guardando config:', e); }
+  }catch(e){
+    console.error('Error guardando config:',e.message);
+    throw e;
+  }
 }
 
 // ══════════════════════════════════════════
 //  CARGAR MENÚ
 // ══════════════════════════════════════════
-async function cargarMenu(forzar = false) {
-  const container = document.getElementById('menuContainer');
-  if (!forzar) {
-    try {
-      const raw = localStorage.getItem(CACHE_KEY) || sessionStorage.getItem(CACHE_KEY);
-      if (raw) {
-        const { ts, data } = JSON.parse(raw);
-        if (Date.now() - ts < CACHE_TTL) {
-          CATEGORIAS = sortCats(data);
-          renderMenu(); renderCatNav(); mostrarPromoAleatoria();
-          return;
+function aplicarMenuCargado(data,updatedAt=null,guardar=true){
+  let finalData=data;
+  const badgesGuardados=JSON.parse(localStorage.getItem('jbg_badges')||'null');
+  if(badgesGuardados) finalData=aplicarBadgesAData(data,badgesGuardados);
+  CATEGORIAS=sortCats(finalData);
+  if(guardar){try{localStorage.setItem(CACHE_KEY,JSON.stringify({ts:Date.now(),data}));}catch(e){}}
+  renderMenu();renderCatNav();mostrarPromoAleatoria();sincronizarQtysEnPantalla();
+  if(updatedAt){
+    const upd=new Date(updatedAt),info=document.getElementById('adminSyncInfo');
+    if(info) info.innerText=`v${APP_VERSION} · Última sync: ${upd.toLocaleDateString('es-PA')} ${upd.toLocaleTimeString('es-PA',{hour:'2-digit',minute:'2-digit'})}`;
+  }
+}
+
+async function obtenerMenuRemoto(){
+  const res=await fetch(CACHE_REST_URL+'&apikey='+SUPABASE_ANON_KEY,{cache:'no-store'});
+  if(!res.ok) throw new Error('HTTP '+res.status);
+  const rows=await res.json();
+  if(!rows.length||!Array.isArray(rows[0].data)||!rows[0].data.length) throw new Error('Caché vacía');
+  return rows[0];
+}
+
+async function cargarMenu(forzar=false){
+  const container=document.getElementById('menuContainer');
+  let cacheMostrado=false;
+  if(!forzar){
+    try{
+      const raw=localStorage.getItem(CACHE_KEY)||sessionStorage.getItem(CACHE_KEY);
+      if(raw){
+        const {ts,data}=JSON.parse(raw);
+        if(Array.isArray(data)&&data.length){
+          aplicarMenuCargado(data,null,false);cacheMostrado=true;
+          if(Date.now()-ts<CACHE_TTL) return;
         }
       }
-    } catch(e) { localStorage.removeItem(CACHE_KEY); sessionStorage.removeItem(CACHE_KEY); }
+    }catch(e){localStorage.removeItem(CACHE_KEY);sessionStorage.removeItem(CACHE_KEY);}
   }
-  container.innerHTML = '<div id="loadingMsg"><span class="spinner"></span>Cargando menú...</div>';
-  try {
-    const res = await fetch(CACHE_REST_URL + '&apikey=' + SUPABASE_ANON_KEY);
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    const rows = await res.json();
-    if (!rows.length || !Array.isArray(rows[0].data) || !rows[0].data.length) throw new Error('Caché vacía');
-    let data = rows[0].data;
-    const badgesGuardados = JSON.parse(localStorage.getItem('jbg_badges') || 'null');
-    if (badgesGuardados) data = aplicarBadgesAData(data, badgesGuardados);
-    CATEGORIAS = sortCats(data);
-    try { localStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), data })); } catch(e) {}
-    renderMenu(); renderCatNav(); mostrarPromoAleatoria(); sincronizarQtysEnPantalla();
-    if (rows[0].updated_at) {
-      const upd = new Date(rows[0].updated_at);
-      document.getElementById('adminSyncInfo').innerText = `Última sync: ${upd.toLocaleDateString('es-PA')} ${upd.toLocaleTimeString('es-PA',{hour:'2-digit',minute:'2-digit'})}`;
-    }
-  } catch(e) {
-    container.innerHTML = `<div id="loadingMsg" style="color:var(--red)">⚠️ No se pudo cargar el menú.<br><small>${e.message}</small></div>`;
-  }
+  if(!cacheMostrado) container.innerHTML='<div id="loadingMsg"><span class="spinner"></span>Cargando menú...</div>';
+  try{const row=await obtenerMenuRemoto();aplicarMenuCargado(row.data,row.updated_at,true);}
+  catch(e){if(!cacheMostrado)container.innerHTML=`<div id="loadingMsg" style="color:var(--red)">⚠️ No se pudo cargar el menú.<br><small>${e.message}</small></div>`;}
 }
 
 function aplicarBadgesAData(data, badges) {
@@ -998,7 +1097,7 @@ function renderMenu() {
 
     const toggle = document.createElement('div');
     toggle.className = 'category-toggle';
-    toggle.innerHTML = `${cat.n}`;
+    toggle.innerHTML = displayCatName(cat.n);
 
     const scroll = document.createElement('div');
     scroll.className = 'cat-scroll';
@@ -1072,7 +1171,7 @@ function renderCatNav() {
   const nav = document.getElementById('catNav');
   nav.innerHTML = CATEGORIAS
     .filter(cat => cat.i.some(item => !productosOcultos.includes(item.n)))
-    .map(cat => `<button class="cat-pill" onclick="irACat('${cat.n.replace(/'/g,"\\'")}',this)">${cat.n}</button>`)
+    .map(cat => `<button class="cat-pill" onclick="irACat('${cat.n.replace(/'/g,"\\'")}',this)">${displayCatName(cat.n)}</button>`)
     .join('');
 }
 
@@ -1104,7 +1203,9 @@ function buscar(query) {
     let catOk=false;
     block.querySelectorAll('.card').forEach(card => {
       const nombre=card.querySelector('.card-name')?.textContent.toLowerCase()||'';
-      const match=nombre.includes(q);
+      const descripcion=card.querySelector('.card-desc')?.textContent.toLowerCase()||'';
+      const categoria=(block.dataset.cat||'').toLowerCase();
+      const match=nombre.includes(q)||descripcion.includes(q)||categoria.includes(q);
       card.style.display=match?'':'none';
       if (match) catOk=true;
     });
@@ -1205,8 +1306,11 @@ function actualizarResumen() {
   } else {
     document.getElementById('deliveryVal').innerText = `$${precioDelivery.toFixed(2)}`;
   }
-  document.getElementById('totalVal').innerText = `$${(sub + delivery).toFixed(2)}`;
-  document.getElementById('cartCount').innerText = count;
+  const total=sub+delivery;
+  document.getElementById('totalVal').innerText=`$${total.toFixed(2)}`;
+  document.getElementById('cartCount').innerText=count;
+  document.getElementById('floatCartTotal').innerText=`$${total.toFixed(2)}`;
+  document.getElementById('floatCart').classList.toggle('has-items',count>0);
 }
 
 let clienteUbicacion = null;
@@ -1387,25 +1491,38 @@ function switchTab(tabId, btn) {
   if (tabId==='tab-general')   cargarStatsGenerales();
 }
 
-function abrirAdmin() {
+async function abrirAdmin(){
   document.getElementById('adminOverlay').classList.add('visible');
-  document.getElementById('adminLoginSection').style.display='';
-  document.getElementById('adminControls').style.display='none';
   document.getElementById('adminPass').value='';
   setAdminMsg('adminLoginMsg','');
+  if(adminToken){
+    try{
+      await adminRequest('session');
+      document.getElementById('adminLoginSection').style.display='none';
+      document.getElementById('adminControls').style.display='';
+      cargarStatsGenerales();return;
+    }catch(e){}
+  }
+  document.getElementById('adminLoginSection').style.display='';
+  document.getElementById('adminControls').style.display='none';
   setTimeout(()=>document.getElementById('adminPass').focus(),150);
 }
 
-function cerrarAdmin() { document.getElementById('adminOverlay').classList.remove('visible'); }
+function cerrarAdmin(){document.getElementById('adminOverlay').classList.remove('visible');}
 
-function loginAdmin() {
+async function loginAdmin(){
   const pass=document.getElementById('adminPass').value;
-  if (pass===ADMIN_PASS) {
+  if(!pass)return setAdminMsg('adminLoginMsg','Escribe la clave','error');
+  setAdminMsg('adminLoginMsg','⏳ Verificando...');
+  try{
+    const out=await adminRequest('login',{password:pass});
+    adminToken=out.token;sessionStorage.setItem('jbg_admin_token',adminToken);
+    document.getElementById('adminPass').value='';
     document.getElementById('adminLoginSection').style.display='none';
     document.getElementById('adminControls').style.display='';
-    cargarStatsGenerales();
-  } else {
-    setAdminMsg('adminLoginMsg','❌ Clave incorrecta','error');
+    setAdminMsg('adminLoginMsg','');cargarStatsGenerales();
+  }catch(e){
+    setAdminMsg('adminLoginMsg','❌ '+e.message,'error');
     document.getElementById('adminPass').value='';
   }
 }
@@ -1414,42 +1531,32 @@ document.getElementById('adminOverlay').addEventListener('click', function(e) {
   if (e.target === this) cerrarAdmin();
 });
 
-async function cargarStatsGenerales() {
-  let totalProductos=0, totalCats=0;
-  CATEGORIAS.forEach(cat => { totalCats++; totalProductos+=cat.i.length; });
+async function cargarStatsGenerales(){
+  let totalProductos=0,totalCats=0;
+  CATEGORIAS.forEach(cat=>{totalCats++;totalProductos+=cat.i.length;});
   document.getElementById('statProductos').innerText=totalProductos||'—';
   document.getElementById('statCategorias').innerText=totalCats||'—';
-  try {
-    const hoy=getPanamaDate().toISOString().split('T')[0];
-    const res=await fetch(`${PEDIDOS_REST_URL}?select=total&created_at=gte.${hoy}T00:00:00`,{
-      headers:{'apikey':SUPABASE_ANON_KEY,'Authorization':'Bearer '+SUPABASE_ANON_KEY}
-    });
-    if (res.ok) {
-      const rows=await res.json();
-      const totalVentas=rows.reduce((s,r)=>s+(parseFloat(r.total)||0),0);
-      document.getElementById('statPedidosHoy').innerText=rows.length;
-      document.getElementById('statVentasHoy').innerText='$'+totalVentas.toFixed(2);
-    }
-  } catch(e) {}
+  try{
+    const out=await adminRequest('orders',{days:1,limit:200}),rows=out.orders||[];
+    const totalVentas=rows.reduce((s,r)=>s+(parseFloat(r.total)||0),0);
+    document.getElementById('statPedidosHoy').innerText=rows.length;
+    document.getElementById('statVentasHoy').innerText='$'+totalVentas.toFixed(2);
+  }catch(e){
+    document.getElementById('statPedidosHoy').innerText='—';
+    document.getElementById('statVentasHoy').innerText='$—';
+  }
 }
 
-async function sincronizarAdmin() {
+async function sincronizarAdmin(){
   setAdminMsg('adminMsg','⏳ Sincronizando con Loyverse...');
-  try {
+  try{
     localStorage.removeItem(CACHE_KEY);
-    const res=await fetch(SUPABASE_FUNC_URL+'?sync=true');
-    if (!res.ok) throw new Error('HTTP '+res.status);
-    const data=await res.json();
-    if (!Array.isArray(data)) throw new Error('Respuesta inesperada');
-    let finalData=data;
-    const badgesGuardados=JSON.parse(localStorage.getItem('jbg_badges')||'null');
-    if (badgesGuardados) finalData=aplicarBadgesAData(data,badgesGuardados);
-    CATEGORIAS=sortCats(finalData);
-    try { localStorage.setItem(CACHE_KEY,JSON.stringify({ts:Date.now(),data:finalData})); } catch(e) {}
-    renderMenu(); renderCatNav(); mostrarPromoAleatoria(); sincronizarQtysEnPantalla();
+    const out=await adminRequest('sync'),data=out.data;
+    if(!Array.isArray(data))throw new Error('Respuesta inesperada');
+    aplicarMenuCargado(data,new Date().toISOString(),true);
     setAdminMsg('adminMsg','✓ Menú sincronizado correctamente ('+data.length+' categorías)','ok');
     cargarStatsGenerales();
-  } catch(e) { setAdminMsg('adminMsg','❌ Error: '+e.message,'error'); }
+  }catch(e){setAdminMsg('adminMsg','❌ Error: '+e.message,'error');}
 }
 
 function limpiarCache() {
@@ -1544,33 +1651,23 @@ function aplicarBadgesDesdeCSV() {
   setAdminMsg('csvApplyMsg','✓ Badges aplicados al menú correctamente','ok');
 }
 
-async function cargarPedidos() {
+async function cargarPedidos(){
   const lista=document.getElementById('pedidosList');
   lista.innerHTML='<div style="text-align:center;color:var(--muted);font-size:13px;padding:20px;">Cargando...</div>';
-  try {
-    const res=await fetch(`${PEDIDOS_REST_URL}?select=orden,cliente,zona,total,pago,items,created_at&order=created_at.desc&limit=30`,{
-      headers:{'apikey':SUPABASE_ANON_KEY,'Authorization':'Bearer '+SUPABASE_ANON_KEY}
-    });
-    if (!res.ok) throw new Error('HTTP '+res.status);
-    const rows=await res.json();
-    if (!rows.length) { lista.innerHTML='<div style="text-align:center;color:var(--muted);font-size:13px;padding:20px;">No hay pedidos aún</div>'; return; }
+  try{
+    const out=await adminRequest('orders',{days:30,limit:30}),rows=out.orders||[];
+    if(!rows.length){lista.innerHTML='<div style="text-align:center;color:var(--muted);font-size:13px;padding:20px;">No hay pedidos aún</div>';return;}
     lista.innerHTML=rows.map(r=>{
-      const fecha=new Date(r.created_at);
-      const fechaStr=fecha.toLocaleDateString('es-PA')+' '+fecha.toLocaleTimeString('es-PA',{hour:'2-digit',minute:'2-digit'});
+      const fecha=new Date(r.created_at),fechaStr=fecha.toLocaleDateString('es-PA')+' '+fecha.toLocaleTimeString('es-PA',{hour:'2-digit',minute:'2-digit'});
       const itemsStr=Array.isArray(r.items)?r.items.map(i=>`${i.n} x${i.qty}`).join(', '):'';
-      return `<div class="pedido-row">
-        <div class="pedido-top"><span class="pedido-orden">#${r.orden}</span><span class="pedido-total">$${parseFloat(r.total).toFixed(2)}</span></div>
-        <div class="pedido-meta">👤 ${r.cliente} · 📦 ${r.zona}</div>
-        ${itemsStr?`<div style="font-size:10px;color:#666;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${itemsStr}</div>`:''}
-        <div class="pedido-meta" style="margin-top:2px;">🕐 ${fechaStr}</div>
-      </div>`;
+      return `<div class="pedido-row"><div class="pedido-top"><span class="pedido-orden">#${r.orden}</span><span class="pedido-total">$${parseFloat(r.total).toFixed(2)}</span></div><div class="pedido-meta">👤 ${r.cliente||'—'} · 📦 ${r.zona||'—'}</div>${itemsStr?`<div style="font-size:10px;color:#666;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${itemsStr}</div>`:''}<div class="pedido-meta" style="margin-top:2px;">🕐 ${fechaStr}</div></div>`;
     }).join('');
-  } catch(e) { lista.innerHTML=`<div style="text-align:center;color:var(--red);font-size:12px;padding:20px;">Error: ${e.message}</div>`; }
+  }catch(e){lista.innerHTML=`<div style="text-align:center;color:var(--red);font-size:12px;padding:20px;">Error: ${e.message}</div>`;}
 }
 
 function renderHorariosEditor() {
   const editor=document.getElementById('horariosEditor');
-  const dias=[0,5,6];
+  const dias=[1,2,3,4,5,6,0];
   editor.innerHTML=dias.map(d=>{
     const h=HORARIOS[d];
     const abre=`${String(h.o[0]).padStart(2,'0')}:${String(h.o[1]).padStart(2,'0')}`;
@@ -1586,7 +1683,7 @@ function renderHorariosEditor() {
 
 function guardarHorarios() {
   try {
-    [0,5,6].forEach(d=>{
+    [1,2,3,4,5,6,0].forEach(d=>{
       const abre=document.getElementById(`hor-abre-${d}`).value.split(':');
       const cierra=document.getElementById(`hor-cierra-${d}`).value.split(':');
       const cia=parseInt(cierra[0]), cim=parseInt(cierra[1]);
@@ -1600,12 +1697,18 @@ function guardarHorarios() {
   } catch(e) { setAdminMsg('horariosMsg','❌ Error al guardar','error'); }
 }
 
-function actualizarFooterHorarios() {
+function actualizarFooterHorarios(){
+  const cont=document.getElementById('footerHorariosLista');if(!cont)return;
   const horaFmt=(h,m)=>`${h===0||h===12?12:h>12?h-12:h}:${String(m).padStart(2,'0')}${h<12?'am':'pm'}`;
-  const h5=HORARIOS[5], h6=HORARIOS[6], h0=HORARIOS[0];
-  const el5=document.getElementById('footerHorarioVie'); if(el5) el5.innerText=`Viernes: ${horaFmt(h5.o[0],h5.o[1])} – ${h5.c[0]===24?'12:00am':horaFmt(h5.c[0],h5.c[1])}`;
-  const el6=document.getElementById('footerHorarioSab'); if(el6) el6.innerText=`Sábado: ${horaFmt(h6.o[0],h6.o[1])} – ${h6.c[0]===24?'12:00am':horaFmt(h6.c[0],h6.c[1])}`;
-  const el0=document.getElementById('footerHorarioDom'); if(el0) el0.innerText=`Domingo: ${horaFmt(h0.o[0],h0.o[1])} – ${h0.c[0]===24?'12:00am':horaFmt(h0.c[0],h0.c[1])}`;
+  const fmt=d=>{const h=HORARIOS[d];return `${horaFmt(h.o[0],h.o[1])} – ${h.c[0]===24?'12:00am':horaFmt(h.c[0],h.c[1])}`;};
+  const dias=[1,2,3,4,5,6,0],nombres={1:'Lunes',2:'Martes',3:'Miércoles',4:'Jueves',5:'Viernes',6:'Sábado',0:'Domingo'},grupos=[];
+  dias.forEach(d=>{const firma=JSON.stringify([HORARIOS[d].o,HORARIOS[d].c]),u=grupos[grupos.length-1];if(u&&u.firma===firma)u.dias.push(d);else grupos.push({firma,dias:[d],horario:fmt(d)});});
+  cont.innerHTML=grupos.map(g=>{
+    let e;if(g.dias.length===5&&g.dias[0]===1&&g.dias[4]===5)e='Lunes a viernes';
+    else if(g.dias.length===2&&g.dias[0]===6&&g.dias[1]===0)e='Sábado y domingo';
+    else if(g.dias.length>1)e=`${nombres[g.dias[0]]} a ${nombres[g.dias[g.dias.length-1]]}`;else e=nombres[g.dias[0]];
+    return `<p class="footer-hours">${e}: ${g.horario}</p>`;
+  }).join('');
 }
 
 function renderProductosToggle(filtro='') {
@@ -1687,26 +1790,18 @@ function guardarBanner() {
 
 ['bannerTexto','bannerEmoji'].forEach(id=>{ const el=document.getElementById(id); if(el) el.addEventListener('input',actualizarBannerPreview); });
 
-async function cargarStats() {
+async function cargarStats(){
   setAdminMsg('statsMsg','⏳ Cargando estadísticas...');
-  try {
-    const hace7=new Date(Date.now()-7*24*3600000).toISOString();
-    const res=await fetch(`${PEDIDOS_REST_URL}?select=total,items,created_at&created_at=gte.${hace7}&order=created_at.desc&limit=200`,{
-      headers:{'apikey':SUPABASE_ANON_KEY,'Authorization':'Bearer '+SUPABASE_ANON_KEY}
-    });
-    if (!res.ok) throw new Error('HTTP '+res.status);
-    const rows=await res.json();
+  try{
+    const out=await adminRequest('orders',{days:7,limit:200}),rows=out.orders||[];
     const totalVentas=rows.reduce((s,r)=>s+(parseFloat(r.total)||0),0);
     document.getElementById('statTotal7d').innerText=rows.length;
     document.getElementById('statVentas7d').innerText='$'+totalVentas.toFixed(2);
-    const conteo={};
-    rows.forEach(r=>{ if (!Array.isArray(r.items)) return; r.items.forEach(i=>{ conteo[i.n]=(conteo[i.n]||0)+(i.qty||1); }); });
-    const sorted=Object.entries(conteo).sort((a,b)=>b[1]-a[1]).slice(0,10);
-    const top=document.getElementById('statsTopProductos');
-    if (!sorted.length) { top.innerHTML='<div style="text-align:center;color:var(--muted);font-size:12px;padding:10px;">Sin datos aún</div>'; }
-    else { top.innerHTML=sorted.map(([n,q],i)=>`<div class="stats-rank-item"><span class="stats-rank-num">${i+1}</span><span class="stats-rank-name">${n}</span><span class="stats-rank-qty">${q} uds</span></div>`).join(''); }
+    const conteo={};rows.forEach(r=>{if(Array.isArray(r.items))r.items.forEach(i=>{conteo[i.n]=(conteo[i.n]||0)+(i.qty||1);});});
+    const sorted=Object.entries(conteo).sort((a,b)=>b[1]-a[1]).slice(0,10),top=document.getElementById('statsTopProductos');
+    top.innerHTML=sorted.length?sorted.map(([n,q],i)=>`<div class="stats-rank-item"><span class="stats-rank-num">${i+1}</span><span class="stats-rank-name">${n}</span><span class="stats-rank-qty">${q} uds</span></div>`).join(''):'<div style="text-align:center;color:var(--muted);font-size:12px;padding:10px;">Sin datos aún</div>';
     setAdminMsg('statsMsg','');
-  } catch(e) { setAdminMsg('statsMsg','❌ Error: '+e.message,'error'); }
+  }catch(e){setAdminMsg('statsMsg','❌ Error: '+e.message,'error');}
 }
 
 // ══════════════════════════════════════════
@@ -1720,7 +1815,9 @@ function mostrarPromoAleatoria() {
   if (!CATEGORIAS.length) return;
   const conFoto=CATEGORIAS.flatMap(c=>c.i.filter(i=>i.img&&!productosOcultos.includes(i.n)).map(i=>({...i,cat:c.n})));
   if (!conFoto.length) return;
-  footerPromoItem=conFoto[Math.floor(Math.random()*conFoto.length)];
+  const promosConFoto=CATEGORIAS.filter(c=>(c.n||'').toLowerCase().includes('promoc')).flatMap(c=>c.i.filter(i=>i.img&&!productosOcultos.includes(i.n)).map(i=>({...i,cat:c.n})));
+  const destacados=promosConFoto.length?promosConFoto:conFoto;
+  footerPromoItem=destacados[Math.floor(Math.random()*destacados.length)];
   promoCard.innerHTML=`<div class="promo-card" onclick="footerAgregar()" style="cursor:pointer;">
     <img src="${footerPromoItem.img}" alt="${footerPromoItem.n}" onerror="this.style.display='none'">
     <div class="promo-info">
@@ -1730,10 +1827,10 @@ function mostrarPromoAleatoria() {
     </div>
   </div>`;
   promoDiv.style.display='';
-  heroItems=[...conFoto].sort(()=>Math.random()-0.5);
+  heroItems=[...destacados].sort(()=>Math.random()-0.5);
   heroIdx=0; mostrarHeroItem();
   if (heroTimer) clearInterval(heroTimer);
-  heroTimer=setInterval(()=>{ heroIdx=(heroIdx+1)%heroItems.length; mostrarHeroItem(); }, 10*60*1000);
+  heroTimer=setInterval(()=>{ heroIdx=(heroIdx+1)%heroItems.length; mostrarHeroItem(); }, 18000);
 }
 
 function mostrarHeroItem() {
@@ -1827,6 +1924,8 @@ function modalAgregar() {
 // ══════════════════════════════════════════
 //  INIT
 // ══════════════════════════════════════════
+console.info(`Javier Bear Grill Menu v${APP_VERSION}`);
+try{localStorage.removeItem('jbg_menu_v2');sessionStorage.removeItem('jbg_menu_v2');}catch(e){}
 cargarCarrito();
 cargarConfig().then(() => {
   renderZonaSelect();
