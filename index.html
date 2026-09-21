@@ -186,8 +186,9 @@
   .admin-btn.danger    { background:var(--red); color:#fff; }
   .admin-btn.success   { background:#25D366; color:#fff; }
   .admin-btn:disabled  { opacity:0.4; cursor:not-allowed; }
-  .admin-input { width:100%; padding:10px 14px; background:var(--bg); border:1px solid var(--border); color:#fff; border-radius:8px; font-family:'Nunito'; font-size:14px; margin-bottom:10px; outline:none; }
-  .admin-input:focus { border-color:var(--yellow); }
+  .admin-input { width:100%; padding:10px 14px; background:#fff; border:1px solid var(--border); color:var(--text); -webkit-text-fill-color:var(--text); opacity:1; border-radius:8px; font-family:'Nunito'; font-size:14px; margin-bottom:10px; outline:none; }
+  .admin-input::placeholder { color:#a48778; -webkit-text-fill-color:#a48778; opacity:1; }
+  .admin-input:focus { border-color:var(--yellow); box-shadow:0 0 0 2px rgba(255,135,50,.12); }
   .admin-label { font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px; display:block; }
   .admin-msg { font-size:12px; color:var(--muted); text-align:center; min-height:18px; padding:4px 0; }
   .admin-msg.ok    { color:#25D366; }
@@ -199,7 +200,7 @@
   .pedido-row { background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:10px 12px; margin-bottom:6px; }
   .pedido-top { display:flex; justify-content:space-between; align-items:center; margin-bottom:3px; }
   .pedido-orden { font-family:'Oswald'; font-size:13px; color:var(--yellow); }
-  .pedido-total { font-family:'Oswald'; font-size:14px; color:#fff; }
+  .pedido-total { font-family:'Oswald'; font-size:14px; color:var(--choco); }
   .pedido-meta  { font-size:11px; color:var(--muted); }
   .toggle-row { display:flex; justify-content:space-between; align-items:center; padding:9px 0; border-bottom:1px solid var(--border); }
   .toggle-row:last-child { border-bottom:none; }
@@ -274,11 +275,20 @@
   #footerCredit.tapping { color:rgba(255,255,255,0.5); }
   .zona-admin-row { background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:10px 12px; margin-bottom:6px; transition:opacity 0.2s; }
   .zona-admin-row.inactiva { opacity:0.5; border-color:rgba(255,255,255,0.05); }
-  .zona-admin-row .zona-fields { display:flex; align-items:center; gap:6px; }
-  .zona-field-nombre { flex:1; padding:6px 10px; background:var(--bg); border:1px solid var(--border); border-radius:6px; color:#fff; font-size:13px; font-family:'Nunito'; outline:none; }
-  .zona-field-nombre:focus { border-color:var(--yellow); }
-  .zona-field-precio { width:76px; padding:6px 8px; background:var(--bg); border:1px solid var(--border); border-radius:6px; color:var(--yellow); font-family:'Oswald'; font-size:14px; text-align:center; outline:none; }
-  .zona-field-precio:focus { border-color:var(--yellow); }
+  .zona-admin-row .zona-fields { display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
+  .zona-field-nombre { flex:1 1 170px; min-width:0; padding:8px 10px; background:#fff; border:1px solid var(--border); border-radius:7px; color:var(--text); -webkit-text-fill-color:var(--text); opacity:1; font-size:13px; font-family:'Nunito'; outline:none; }
+  .zona-field-nombre::placeholder { color:#a48778; -webkit-text-fill-color:#a48778; opacity:1; }
+  .zona-field-nombre:focus { border-color:var(--yellow); box-shadow:0 0 0 2px rgba(255,135,50,.10); }
+  .zona-precio-wrap { display:flex; align-items:center; gap:3px; flex-shrink:0; }
+  .zona-field-precio { width:76px; padding:8px 8px; background:#fff; border:1px solid var(--border); border-radius:7px; color:#c45f12; -webkit-text-fill-color:#c45f12; opacity:1; font-family:'Oswald'; font-size:14px; text-align:center; outline:none; }
+  .zona-field-precio:focus { border-color:var(--yellow); box-shadow:0 0 0 2px rgba(255,135,50,.10); }
+  #tab-zonas input, #tab-zonas textarea, #tab-zonas select { opacity:1; }
+  @media (max-width:520px) {
+    .zona-admin-row { padding:10px; }
+    .zona-field-nombre { flex:1 1 calc(100% - 56px); }
+    .zona-precio-wrap { margin-left:46px; }
+    .zona-wa-label { margin-left:46px; width:auto; min-width:86px; text-align:left; }
+  }
   .zona-btn-icon { background:none; border:1px solid var(--border); border-radius:6px; color:var(--muted); padding:5px 8px; font-size:13px; cursor:pointer; flex-shrink:0; transition:all 0.15s; }
   .zona-btn-icon:hover { border-color:var(--yellow); color:var(--yellow); }
   .zona-btn-del { background:rgba(200,16,46,0.12); border:1px solid rgba(200,16,46,0.2); border-radius:6px; color:var(--red); padding:5px 8px; font-size:13px; cursor:pointer; flex-shrink:0; }
@@ -574,10 +584,11 @@
         <p style="font-size:12px;color:var(--muted);margin-bottom:10px;line-height:1.5;">Gestiona las zonas de entrega y sus precios. Los cambios se aplican inmediatamente al carrito.</p>
         <div id="zonasLista" style="margin-bottom:10px;"></div>
         <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:8px;">
-          <p style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">➕ Agregar nueva zona</p>
+          <p style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">➕ Agregar nueva zona</p>
+          <p style="font-size:10px;color:#a06f55;margin-bottom:8px;">Delivery normal: mínimo B/.1.00 · máximo B/.3.00</p>
           <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
             <input type="text" id="nuevaZonaNombre" class="admin-input" style="margin:0;flex:1;min-width:120px;" placeholder="Nombre de la zona">
-            <input type="number" id="nuevaZonaPrecio" class="admin-input" style="margin:0;width:86px;" placeholder="$0.00" min="0" step="0.25">
+            <input type="number" id="nuevaZonaPrecio" class="admin-input" style="margin:0;width:92px;" placeholder="$1.00" min="1" max="3" step="0.25" inputmode="decimal">
             <button class="admin-btn primary" style="margin:0;width:auto;padding:10px 14px;white-space:nowrap;flex-shrink:0;" onclick="agregarZona()">+ Añadir</button>
           </div>
           <div style="display:flex;align-items:center;gap:8px;margin-top:8px;">
@@ -672,7 +683,7 @@
 // ══════════════════════════════════════════
 //  CONFIG
 // ══════════════════════════════════════════
-const APP_VERSION = '2.2.0';
+const APP_VERSION = '2.2.2';
 const SUPABASE_FUNC_URL = 'https://uazonbacmpwuznugirru.supabase.co/functions/v1/loyverse-menu';
 const ADMIN_API_URL = 'https://uazonbacmpwuznugirru.supabase.co/functions/v1/admin-api';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVhem9uYmFjbXB3dXpudWdpcnJ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI2NDYzNTAsImV4cCI6MjA4ODIyMjM1MH0.87QkFnCL1AfI3oUu8bR2NPuUD44n3BfUX1nA-Bb360I';
@@ -681,7 +692,7 @@ const PEDIDOS_REST_URL  = 'https://uazonbacmpwuznugirru.supabase.co/rest/v1/pedi
 const CACHE_KEY         = 'jbg_menu_v3';
 const CACHE_TTL         = 10 * 60 * 1000;
 const CONFIG_REST_URL   = 'https://uazonbacmpwuznugirru.supabase.co/rest/v1/jbg_config?select=key,value';
-const CONFIG_CACHE_KEY  = 'jbg_config_cache_v2';
+const CONFIG_CACHE_KEY  = 'jbg_config_cache_v3';
 const CONFIG_TTL        = 5 * 60 * 1000;
 
 const CAT_ORDER = [
@@ -739,12 +750,28 @@ try { const bc = JSON.parse(localStorage.getItem('jbg_banner')); if (bc) { banne
 //  ZONAS DE DELIVERY
 // ══════════════════════════════════════════
 const ZONAS_DEFAULT = [
-  { nombre: 'La Valdeza',       precio: 1.25, fuera: false, activa: true },
-  { nombre: 'Llano Largo',      precio: 1.25, fuera: false, activa: true },
-  { nombre: 'Las Praderas',     precio: 1.25, fuera: false, activa: true },
-  { nombre: 'Valle Bonito',     precio: 1.25, fuera: false, activa: true },
-  { nombre: 'Villa del Carmen', precio: 1.25, fuera: false, activa: true },
-  { nombre: 'Fuera de zona',    precio: 0,    fuera: true,  activa: true },
+  { nombre:'Villas del Carmen',      precio:1.00, fuera:false, activa:true },
+  { nombre:'La Valdeza',             precio:1.25, fuera:false, activa:true },
+  { nombre:'Las Praderas',           precio:1.25, fuera:false, activa:true },
+  { nombre:'Altos de las Praderas',  precio:1.25, fuera:false, activa:true },
+  { nombre:'Llano Largo',            precio:1.25, fuera:false, activa:true },
+  { nombre:'Valle Bonito',           precio:1.25, fuera:false, activa:true },
+  { nombre:'La Herradura',           precio:1.25, fuera:false, activa:true },
+  { nombre:'Residencial Los Olivos', precio:1.25, fuera:false, activa:true },
+  { nombre:'Altos de La Mitra',      precio:1.25, fuera:false, activa:true },
+  { nombre:'La Mitra',               precio:1.50, fuera:false, activa:true },
+  { nombre:'San Francisco',          precio:1.50, fuera:false, activa:true },
+  { nombre:'Blue Garden',            precio:1.50, fuera:false, activa:true },
+  { nombre:'El Nazareno',            precio:1.75, fuera:false, activa:true },
+  { nombre:'La Pesa',                precio:1.75, fuera:false, activa:true },
+  { nombre:'La Cantera',             precio:1.75, fuera:false, activa:true },
+  { nombre:'El Coco',                precio:2.00, fuera:false, activa:true },
+  { nombre:'Naos',                   precio:2.50, fuera:false, activa:true },
+  { nombre:'El Hatillo',             precio:2.50, fuera:false, activa:true },
+  { nombre:'Las Arboledas',          precio:2.75, fuera:false, activa:true },
+  { nombre:'Costa Verde',            precio:3.00, fuera:false, activa:true },
+  { nombre:'Montelimar',             precio:3.00, fuera:false, activa:true },
+  { nombre:'Fuera de zona',          precio:0,    fuera:true,  activa:true },
 ];
 
 let zonasConfig = [];
@@ -786,10 +813,11 @@ function renderZonasAdmin() {
           onchange="editarZona(${i},'nombre',this.value)" placeholder="Nombre zona">
         ${z.fuera
           ? `<div class="zona-wa-label">Coord. WA</div>`
-          : `<div style="display:flex;align-items:center;gap:3px;">
-              <span style="color:var(--yellow);font-family:'Oswald';font-size:13px;">$</span>
+          : `<div class="zona-precio-wrap">
+              <span style="color:#c45f12;font-family:'Oswald';font-size:13px;">$</span>
               <input type="number" class="zona-field-precio" value="${z.precio.toFixed(2)}"
-                min="0" step="0.25" onchange="editarZona(${i},'precio',parseFloat(this.value)||0)">
+                min="1" max="3" step="0.25" inputmode="decimal"
+                onchange="editarZona(${i},'precio',parseFloat(this.value))">
             </div>`
         }
         <button class="zona-btn-icon" onclick="editarZona(${i},'fuera',${!z.fuera})">${z.fuera ? '💲' : '📱'}</button>
@@ -808,7 +836,18 @@ function guardarZonasStorage() {
 
 function editarZona(i, campo, valor) {
   if (!zonasConfig[i]) return;
+  if (campo === 'precio' && !zonasConfig[i].fuera) {
+    valor = Number(valor);
+    if (!Number.isFinite(valor) || valor < 1 || valor > 3) {
+      setAdminMsg('zonasMsg', '❌ El delivery debe estar entre B/.1.00 y B/.3.00', 'error');
+      renderZonasAdmin();
+      return;
+    }
+  }
   zonasConfig[i][campo] = valor;
+  if (campo === 'fuera' && valor === false && (zonasConfig[i].precio < 1 || zonasConfig[i].precio > 3)) {
+    zonasConfig[i].precio = 1.00;
+  }
   guardarZonasStorage(); renderZonasAdmin();
   setAdminMsg('zonasMsg', '✓ Zona actualizada', 'ok');
 }
@@ -821,10 +860,15 @@ function toggleZona(i, activa) {
 
 function agregarZona() {
   const nombre = document.getElementById('nuevaZonaNombre').value.trim();
-  const precio = parseFloat(document.getElementById('nuevaZonaPrecio').value) || 0;
   const fuera  = document.getElementById('nuevaZonaEsFuera').checked;
+  let precio = parseFloat(document.getElementById('nuevaZonaPrecio').value);
   if (!nombre) { setAdminMsg('zonasMsg', '❌ Escribe el nombre de la zona', 'error'); return; }
   if (zonasConfig.some(z => z.nombre.toLowerCase() === nombre.toLowerCase())) { setAdminMsg('zonasMsg', '❌ Ya existe una zona con ese nombre', 'error'); return; }
+  if (fuera) precio = 0;
+  else if (!Number.isFinite(precio) || precio < 1 || precio > 3) {
+    setAdminMsg('zonasMsg', '❌ El delivery debe estar entre B/.1.00 y B/.3.00', 'error');
+    return;
+  }
   zonasConfig.push({ nombre, precio, fuera, activa: true });
   document.getElementById('nuevaZonaNombre').value = '';
   document.getElementById('nuevaZonaPrecio').value = '';
@@ -999,7 +1043,7 @@ async function cargarConfig() {
 function aplicarConfig(data) {
   if (data.horarios)          { HORARIOS = data.horarios; actualizarFooterHorarios(); checkSchedule(); }
   if (data.banner)            { bannerConfig = data.banner; bannerColorBg = data.banner.bg; bannerColorTxt = data.banner.color; aplicarBannerGuardado(); }
-  if (data.zonas)             { zonasConfig = data.zonas; renderZonaSelect(); }
+  if (data.zonas)             { zonasConfig = data.zonas; localStorage.setItem('jbg_zonas', JSON.stringify(zonasConfig)); renderZonaSelect(); }
   if (data.productos_ocultos) { productosOcultos = data.productos_ocultos; }
 }
 
