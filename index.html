@@ -15,6 +15,8 @@
 <title>Javier Bear Grill | Menú oficial</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://uazonbacmpwuznugirru.supabase.co" crossorigin>
+<link rel="preconnect" href="https://api.loyverse.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -683,13 +685,13 @@
 // ══════════════════════════════════════════
 //  CONFIG
 // ══════════════════════════════════════════
-const APP_VERSION = '2.2.2';
+const APP_VERSION = '2.2.3';
 const SUPABASE_FUNC_URL = 'https://uazonbacmpwuznugirru.supabase.co/functions/v1/loyverse-menu';
 const ADMIN_API_URL = 'https://uazonbacmpwuznugirru.supabase.co/functions/v1/admin-api';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVhem9uYmFjbXB3dXpudWdpcnJ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI2NDYzNTAsImV4cCI6MjA4ODIyMjM1MH0.87QkFnCL1AfI3oUu8bR2NPuUD44n3BfUX1nA-Bb360I';
 const CACHE_REST_URL    = 'https://uazonbacmpwuznugirru.supabase.co/rest/v1/menu_cache?id=eq.1&select=data,updated_at';
 const PEDIDOS_REST_URL  = 'https://uazonbacmpwuznugirru.supabase.co/rest/v1/pedidos';
-const CACHE_KEY         = 'jbg_menu_v3';
+const CACHE_KEY         = 'jbg_menu_v4';
 const CACHE_TTL         = 10 * 60 * 1000;
 const CONFIG_REST_URL   = 'https://uazonbacmpwuznugirru.supabase.co/rest/v1/jbg_config?select=key,value';
 const CONFIG_CACHE_KEY  = 'jbg_config_cache_v3';
@@ -1060,6 +1062,33 @@ async function guardarConfigEnSupabase(key,value){
 // ══════════════════════════════════════════
 //  CARGAR MENÚ
 // ══════════════════════════════════════════
+let imageWarmStarted=false;
+
+function contarImagenesLoyverse(data){
+  let n=0;
+  (data||[]).forEach(cat=>(cat.i||[]).forEach(item=>{
+    if(typeof item.img==='string' && item.img.includes('api.loyverse.com/image/')) n++;
+  }));
+  return n;
+}
+
+function iniciarWarmupImagenes(data){
+  if(imageWarmStarted || contarImagenesLoyverse(data)===0) return;
+  imageWarmStarted=true;
+  fetch(SUPABASE_FUNC_URL+'?warm_images=1',{cache:'no-store'}).catch(()=>{});
+
+  [6000,14000,26000].forEach(delay=>{
+    setTimeout(async()=>{
+      try{
+        const row=await obtenerMenuRemoto();
+        const actuales=contarImagenesLoyverse(CATEGORIAS);
+        const nuevas=contarImagenesLoyverse(row.data);
+        if(nuevas < actuales) aplicarMenuCargado(row.data,row.updated_at,true);
+      }catch(e){}
+    },delay);
+  });
+}
+
 function aplicarMenuCargado(data,updatedAt=null,guardar=true){
   let finalData=data;
   const badgesGuardados=JSON.parse(localStorage.getItem('jbg_badges')||'null');
@@ -1067,6 +1096,7 @@ function aplicarMenuCargado(data,updatedAt=null,guardar=true){
   CATEGORIAS=sortCats(finalData);
   if(guardar){try{localStorage.setItem(CACHE_KEY,JSON.stringify({ts:Date.now(),data}));}catch(e){}}
   renderMenu();renderCatNav();mostrarPromoAleatoria();sincronizarQtysEnPantalla();
+  iniciarWarmupImagenes(finalData);
   if(updatedAt){
     const upd=new Date(updatedAt),info=document.getElementById('adminSyncInfo');
     if(info) info.innerText=`v${APP_VERSION} · Última sync: ${upd.toLocaleDateString('es-PA')} ${upd.toLocaleTimeString('es-PA',{hour:'2-digit',minute:'2-digit'})}`;
@@ -1145,7 +1175,7 @@ function renderMenu() {
 
     const scroll = document.createElement('div');
     scroll.className = 'cat-scroll';
-    scroll.innerHTML = items.map(item => cardHTML(item, cat.n)).join('');
+    scroll.innerHTML = items.map((item, ii) => cardHTML(item, cat.n, ci === 0 && ii < 4)).join('');
 
     block.appendChild(toggle);
     block.appendChild(scroll);
@@ -1154,7 +1184,7 @@ function renderMenu() {
   setTimeout(initLazyImages, 50);
 }
 
-function cardHTML(item, cat) {
+function cardHTML(item, cat, eager = false) {
   const id       = encodeId(item.n);
   const precio   = `$${item.p.toFixed(2)}`;
   const nameEsc  = item.n.replace(/'/g,"\\'").replace(/"/g,'&quot;');
@@ -1164,10 +1194,13 @@ function cardHTML(item, cat) {
     ? `<span class="item-badge estrella">${item.badge}</span>`
     : item.badge ? `<span class="item-badge popular">${item.badge}</span>` : '';
 
+  const imgAttrs = eager
+    ? `src="${item.img}" loading="eager" fetchpriority="high"`
+    : `data-src="${item.img}" loading="lazy" fetchpriority="low"`;
   const imgSection = item.img
     ? `<div class="card-img-wrap">
         <div class="img-placeholder"></div>
-        <img class="card-img" data-src="${item.img}" alt="${nameEsc}"
+        <img class="card-img" ${imgAttrs} alt="${nameEsc}" decoding="async"
           onload="this.classList.add('loaded');this.previousElementSibling.style.opacity='0';setTimeout(()=>this.previousElementSibling.classList.add('hidden'),400)"
           onerror="this.closest('.card-img-wrap').innerHTML='<div class=\\'card-no-img\\' style=\\'font-size:36px;display:flex;align-items:center;justify-content:center;height:100%\\'>🍔</div>'">
       </div>`
@@ -1203,7 +1236,7 @@ function initLazyImages() {
       entries.forEach(e => {
         if (e.isIntersecting) { const img=e.target; img.src=img.dataset.src; img.removeAttribute('data-src'); obs.unobserve(img); }
       });
-    }, { rootMargin:'400px' });
+    }, { rootMargin:'800px 0px' });
     imgs.forEach(img => io.observe(img));
   } else { imgs.forEach(img => { img.src=img.dataset.src; }); }
 }
