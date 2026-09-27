@@ -1,0 +1,23 @@
+name: Security checks
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  security:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          persist-credentials: false
+
+      - name: Secret and security invariant scan
+        run: python3 scripts/security_check.py
+
+      - name: Browser JavaScript syntax
+        run: python3 scripts/check_browser_js.py
