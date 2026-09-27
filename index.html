@@ -51,6 +51,7 @@
   }
 }
 </script>
+<script id="menuJsonLd" type="application/ld+json">{"@context":"https://schema.org","@type":"Menu","name":"Menú oficial de Javier Bear Grill","url":"https://menujaviergrill.store/"}</script>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="JBG Menú">
 <title>Javier Bear Grill | Menú oficial</title>
@@ -511,7 +512,7 @@
 </div>
 
 <!-- ══════════ ADMIN PANEL ══════════ -->
-<div id="adminOverlay">
+<div id="adminOverlay" data-nosnippet>
   <div id="adminBox">
     <div id="adminLoginSection">
       <div class="admin-header">
@@ -527,7 +528,7 @@
     </div>
     <div id="adminControls" style="display:none;">
       <div class="admin-header">
-        <div><h2>⚙️ Panel Admin</h2><p id="adminSyncInfo">Javier Bear Grill · v2.2.0</p></div>
+        <div><h2>⚙️ Panel Admin</h2><p id="adminSyncInfo">Javier Bear Grill · v2.3.0</p></div>
         <button class="admin-close-btn" onclick="cerrarAdmin()">✕</button>
       </div>
       <div class="admin-tabs">
@@ -725,7 +726,7 @@
 // ══════════════════════════════════════════
 //  CONFIG
 // ══════════════════════════════════════════
-const APP_VERSION = '2.2.3';
+const APP_VERSION = '2.3.0';
 const SUPABASE_FUNC_URL = 'https://uazonbacmpwuznugirru.supabase.co/functions/v1/loyverse-menu';
 const ADMIN_API_URL = 'https://uazonbacmpwuznugirru.supabase.co/functions/v1/admin-api';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVhem9uYmFjbXB3dXpudWdpcnJ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI2NDYzNTAsImV4cCI6MjA4ODIyMjM1MH0.87QkFnCL1AfI3oUu8bR2NPuUD44n3BfUX1nA-Bb360I';
@@ -1129,11 +1130,50 @@ function iniciarWarmupImagenes(data){
   });
 }
 
+function actualizarMenuSchema(data) {
+  const script = document.getElementById('menuJsonLd');
+  if (!script) return;
+
+  const sections = (data || []).map(cat => {
+    const items = (cat.i || [])
+      .filter(item => !productosOcultos.includes(item.n))
+      .map(item => ({
+        "@type": "MenuItem",
+        "name": item.n,
+        ...(item.d ? { "description": item.d } : {}),
+        ...(item.img ? { "image": item.img } : {}),
+        "offers": {
+          "@type": "Offer",
+          "priceCurrency": "PAB",
+          "price": Number(item.p).toFixed(2),
+          "availability": "https://schema.org/InStock",
+          "url": "https://menujaviergrill.store/"
+        }
+      }));
+
+    return {
+      "@type": "MenuSection",
+      "name": displayCatName(cat.n).replace(/^[^A-Za-zÁÉÍÓÚÜÑáéíóúüñ0-9]+/u, '').trim(),
+      "hasMenuItem": items
+    };
+  }).filter(section => section.hasMenuItem.length);
+
+  script.textContent = JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "Menu",
+    "@id": "https://menujaviergrill.store/#menu",
+    "name": "Menú oficial de Javier Bear Grill",
+    "url": "https://menujaviergrill.store/",
+    "hasMenuSection": sections
+  });
+}
+
 function aplicarMenuCargado(data,updatedAt=null,guardar=true){
   let finalData=data;
   const badgesGuardados=JSON.parse(localStorage.getItem('jbg_badges')||'null');
   if(badgesGuardados) finalData=aplicarBadgesAData(data,badgesGuardados);
   CATEGORIAS=sortCats(finalData);
+  actualizarMenuSchema(CATEGORIAS);
   if(guardar){try{localStorage.setItem(CACHE_KEY,JSON.stringify({ts:Date.now(),data}));}catch(e){}}
   renderMenu();renderCatNav();mostrarPromoAleatoria();sincronizarQtysEnPantalla();
   iniciarWarmupImagenes(finalData);
