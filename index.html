@@ -1383,8 +1383,8 @@ function renderZonaSelect() {
   sel.innerHTML = zonasConfig
     .filter(z => z.activa)
     .map(z => {
-      const label = z.fuera ? `${z.nombre} (Coord. por WA)` : `${z.nombre} ($${z.precio.toFixed(2)})`;
-      return `<option value="${z.nombre}">${label}</option>`;
+      const label = z.fuera ? `${z.nombre} (Coord. por WA)` : `${z.nombre} (${Number(z.precio).toFixed(2)})`;
+      return `<option value="${escapeHtml(z.nombre)}">${escapeHtml(label)}</option>`;
     }).join('');
   if ([...sel.options].some(o => o.value === prev)) sel.value = prev;
   actualizarResumen();
@@ -1401,7 +1401,7 @@ function renderZonasAdmin() {
           <input type="checkbox" ${z.activa ? 'checked' : ''} onchange="toggleZona(${i},this.checked)">
           <span class="toggle-slider"></span>
         </label>
-        <input type="text" class="zona-field-nombre" value="${z.nombre.replace(/"/g,'&quot;')}"
+        <input type="text" class="zona-field-nombre" value="${escapeHtml(z.nombre)}"
           onchange="editarZona(${i},'nombre',this.value)" placeholder="Nombre zona">
         ${z.fuera
           ? `<div class="zona-wa-label">Coord. WA</div>`
@@ -1590,7 +1590,7 @@ function aplicarBannerGuardado() {
     bar.style.display = 'block';
     bar.style.background = bannerConfig.bg;
     bar.style.color = bannerConfig.color;
-    bar.innerHTML = `${bannerConfig.emoji} ${bannerConfig.texto} ${bannerConfig.emoji}`;
+    bar.textContent = `${bannerConfig.emoji} ${bannerConfig.texto} ${bannerConfig.emoji}`;
   } else {
     bar.style.display = 'none';
   }
@@ -1663,20 +1663,9 @@ function contarImagenesLoyverse(data){
 }
 
 function iniciarWarmupImagenes(data){
-  if(imageWarmStarted || contarImagenesLoyverse(data)===0) return;
+  // Security: image warming is a privileged server operation.
+  // Public browsers no longer trigger it; scheduled/admin sync handles image caching.
   imageWarmStarted=true;
-  fetch(SUPABASE_FUNC_URL+'?warm_images=1',{cache:'no-store'}).catch(()=>{});
-
-  [6000,14000,26000].forEach(delay=>{
-    setTimeout(async()=>{
-      try{
-        const row=await obtenerMenuRemoto();
-        const actuales=contarImagenesLoyverse(CATEGORIAS);
-        const nuevas=contarImagenesLoyverse(row.data);
-        if(nuevas < actuales) aplicarMenuCargado(row.data,row.updated_at,true);
-      }catch(e){}
-    },delay);
-  });
 }
 
 function actualizarMenuSchema(data) {
@@ -1814,33 +1803,39 @@ function renderMenu() {
 }
 
 function cardHTML(item, cat, eager = false) {
-  const id       = encodeId(item.n);
-  const precio   = `$${item.p.toFixed(2)}`;
-  const nameEsc  = item.n.replace(/'/g,"\\'").replace(/"/g,'&quot;');
-  const catClean = (cat||'').replace(/'/g,"\\'");
-  const descClean= (item.d||'').replace(/'/g,"\\'").replace(/"/g,'&quot;');
+  const id       = encodeId(String(item.n||''));
+  const priceNum = Number(item.p)||0;
+  const precio   = `$${priceNum.toFixed(2)}`;
+  const nameAttr = escapeHtml(item.n||'');
+  const catAttr  = escapeHtml(cat||'');
+  const descAttr = escapeHtml(item.d||'');
+  const nameText = escapeHtml(item.n||'');
+  const descText = escapeHtml(item.d||'');
+  const badgeText= escapeHtml(item.badge||'');
+  const imageUrl = item.img ? safeHttpUrl(item.img) : '';
+  const imageAttr= escapeHtml(imageUrl);
   const badgeHTML = item.badge==='⭐ Producto estrella'
-    ? `<span class="item-badge estrella">${item.badge}</span>`
-    : item.badge ? `<span class="item-badge popular">${item.badge}</span>` : '';
+    ? `<span class="item-badge estrella">${badgeText}</span>`
+    : item.badge ? `<span class="item-badge popular">${badgeText}</span>` : '';
 
   const imgAttrs = eager
-    ? `src="${item.img}" loading="eager" fetchpriority="high"`
-    : `data-src="${item.img}" loading="lazy" fetchpriority="low"`;
-  const imgSection = item.img
+    ? `src="${imageAttr}" loading="eager" fetchpriority="high"`
+    : `data-src="${imageAttr}" loading="lazy" fetchpriority="low"`;
+  const imgSection = imageUrl
     ? `<div class="card-img-wrap">
         <div class="img-placeholder"></div>
-        <img class="card-img" ${imgAttrs} alt="${nameEsc}" decoding="async"
+        <img class="card-img" ${imgAttrs} alt="${nameAttr}" decoding="async"
           onload="this.classList.add('loaded');this.previousElementSibling.style.opacity='0';setTimeout(()=>this.previousElementSibling.classList.add('hidden'),400)"
           onerror="this.closest('.card-img-wrap').innerHTML='<div class=\\'card-no-img\\' style=\\'font-size:36px;display:flex;align-items:center;justify-content:center;height:100%\\'>🍔</div>'">
       </div>`
     : `<div class="card-img-wrap no-img"><div class="card-no-img">🍔</div></div>`;
 
-  return `<div class="card" data-n="${nameEsc}" data-p="${item.p}" data-img="${item.img||''}" data-d="${descClean}" data-cat="${catClean}" onclick="abrirModalDesdeCard(this)">
+  return `<div class="card" data-n="${nameAttr}" data-p="${priceNum}" data-img="${imageAttr}" data-d="${descAttr}" data-cat="${catAttr}" onclick="abrirModalDesdeCard(this)">
     ${imgSection}
     <div class="card-body">
       ${badgeHTML}
-      <span class="card-name">${item.n}</span>
-      ${item.d?`<span class="card-desc">${item.d}</span>`:''}
+      <span class="card-name">${nameText}</span>
+      ${item.d?`<span class="card-desc">${descText}</span>`:''}
     </div>
     <div class="card-footer">
       <span class="card-price">${precio}</span>
@@ -1850,12 +1845,17 @@ function cardHTML(item, cat, eager = false) {
 }
 
 function qtyHTML(id, item) {
-  const nameEsc = item.n.replace(/'/g,"\\'");
-  return `<div class="qty-controls" onclick="event.stopPropagation()">
-    <button class="qty-btn" onclick="update('${id}','${nameEsc}',${item.p},-1)">−</button>
-    <div class="qty-val" id="qty-${id}">0</div>
-    <button class="qty-btn plus" onclick="update('${id}','${nameEsc}',${item.p},1)">+</button>
+  return `<div class="qty-controls" data-id="${escapeHtml(id)}" data-name="${escapeHtml(item.n||'')}" data-price="${Number(item.p)||0}" onclick="event.stopPropagation()">
+    <button class="qty-btn" onclick="updateFromQty(this,-1)">−</button>
+    <div class="qty-val" id="qty-${escapeHtml(id)}">0</div>
+    <button class="qty-btn plus" onclick="updateFromQty(this,1)">+</button>
   </div>`;
+}
+
+function updateFromQty(btn, delta) {
+  const controls=btn.closest('.qty-controls');
+  if(!controls) return;
+  update(controls.dataset.id||'',controls.dataset.name||'',Number(controls.dataset.price)||0,delta);
 }
 
 function initLazyImages() {
@@ -2617,9 +2617,27 @@ function abrirModal(itemN,itemP,itemImg,itemD,catName) {
   document.getElementById('modalDesc').style.display=itemD?'':'none';
   document.getElementById('modalQtyVal').innerText=modalQty;
   const wrap=document.getElementById('modalImgWrap');
-  wrap.innerHTML=itemImg
-    ?`<img id="modalImg" src="${itemImg}" alt="${itemN}" onerror="this.parentElement.innerHTML='<div id=\\'modalNoImg\\'>🍽️</div>'">`
-    :`<div id="modalNoImg">🍽️</div>`;
+  wrap.replaceChildren();
+  const safeImg=itemImg?safeHttpUrl(itemImg):'';
+  if(safeImg){
+    const img=document.createElement('img');
+    img.id='modalImg';
+    img.src=safeImg;
+    img.alt=String(itemN||'');
+    img.onerror=()=>{
+      wrap.replaceChildren();
+      const fallback=document.createElement('div');
+      fallback.id='modalNoImg';
+      fallback.textContent='🍽️';
+      wrap.appendChild(fallback);
+    };
+    wrap.appendChild(img);
+  }else{
+    const fallback=document.createElement('div');
+    fallback.id='modalNoImg';
+    fallback.textContent='🍽️';
+    wrap.appendChild(fallback);
+  }
   document.getElementById('productModal').classList.add('visible');
   document.body.style.overflow='hidden';
 }
