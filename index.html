@@ -1267,7 +1267,7 @@ const SUPABASE_FUNC_URL = 'https://uazonbacmpwuznugirru.supabase.co/functions/v1
 const ADMIN_API_URL = 'https://uazonbacmpwuznugirru.supabase.co/functions/v1/admin-api';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVhem9uYmFjbXB3dXpudWdpcnJ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI2NDYzNTAsImV4cCI6MjA4ODIyMjM1MH0.87QkFnCL1AfI3oUu8bR2NPuUD44n3BfUX1nA-Bb360I';
 const CACHE_REST_URL    = 'https://uazonbacmpwuznugirru.supabase.co/rest/v1/menu_cache?id=eq.1&select=data,updated_at';
-const PEDIDOS_REST_URL  = 'https://uazonbacmpwuznugirru.supabase.co/rest/v1/pedidos';
+const ORDER_API_URL     = 'https://uazonbacmpwuznugirru.supabase.co/functions/v1/order-api';
 const CACHE_KEY         = 'jbg_menu_v4';
 const CACHE_TTL         = 10 * 60 * 1000;
 const CONFIG_REST_URL   = 'https://uazonbacmpwuznugirru.supabase.co/rest/v1/jbg_config?select=key,value';
@@ -2050,12 +2050,20 @@ function getNumeroOrden() {
 
 async function guardarPedidoEnSupabase(p) {
   try {
-    await fetch(PEDIDOS_REST_URL, {
+    const res=await fetch(ORDER_API_URL, {
       method:'POST',
-      headers:{'apikey':SUPABASE_ANON_KEY,'Authorization':'Bearer '+SUPABASE_ANON_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
-      body:JSON.stringify({orden:p.orden,cliente:p.nom,zona:p.zona,direccion:p.direccion,pago:p.pago,items:p.items,subtotal:parseFloat(p.sub),delivery:parseFloat(p.delivery),total:parseFloat(p.total)})
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        orden:p.orden,
+        cliente:p.nom,
+        zona:p.zona,
+        direccion:p.direccion,
+        pago:p.pago,
+        items:p.items.map(i=>({n:i.n,qty:i.qty}))
+      })
     });
-  } catch(e) { console.log('Error guardando pedido:', e); }
+    if(!res.ok) console.warn('No se pudo registrar el pedido para estadísticas:',res.status);
+  } catch(e) { console.warn('No se pudo registrar el pedido para estadísticas. El pedido por WhatsApp no se afecta.'); }
 }
 
 let metodoPago = 'efectivo';
