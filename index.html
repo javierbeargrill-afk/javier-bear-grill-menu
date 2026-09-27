@@ -1003,13 +1003,13 @@
     <div style="display:flex;justify-content:space-between;margin-bottom:5px;"><span>Delivery:</span><span id="deliveryVal">$0.00</span></div>
     <div style="display:flex;justify-content:space-between;font-weight:800;font-size:20px;color:var(--yellow);margin-top:5px;border-top:1px solid var(--border);padding-top:8px;"><span>TOTAL:</span><span id="totalVal">$0.00</span></div>
   </div>
-  <div class="form-group"><label for="nombre">Nombre</label><input type="text" id="nombre" placeholder="Tu nombre" autocomplete="name"></div>
-  <div class="form-group"><label for="direccion">Dirección de entrega</label><input type="text" id="direccion" placeholder="Ej: Calle 5, Casa 12, frente al parque" autocomplete="street-address"></div>
+  <div class="form-group"><label for="nombre">Nombre</label><input type="text" id="nombre" placeholder="Tu nombre" autocomplete="name" maxlength="80"></div>
+  <div class="form-group"><label for="direccion">Dirección de entrega</label><input type="text" id="direccion" placeholder="Ej: Calle 5, Casa 12, frente al parque" autocomplete="street-address" maxlength="250"></div>
   <div class="form-group">
     <label>Zona de Entrega</label>
     <select id="zona" onchange="actualizarResumen()"></select>
   </div>
-  <div class="form-group"><label>Notas</label><input type="text" id="notas" placeholder="Ej. Sin cebolla, casa amarilla..."></div>
+  <div class="form-group"><label>Notas</label><input type="text" id="notas" placeholder="Ej. Sin cebolla, casa amarilla..." maxlength="300"></div>
 
   <!-- UBICACIÓN -->
   <div class="form-group">
@@ -1267,7 +1267,7 @@ const SUPABASE_FUNC_URL = 'https://uazonbacmpwuznugirru.supabase.co/functions/v1
 const ADMIN_API_URL = 'https://uazonbacmpwuznugirru.supabase.co/functions/v1/admin-api';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVhem9uYmFjbXB3dXpudWdpcnJ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI2NDYzNTAsImV4cCI6MjA4ODIyMjM1MH0.87QkFnCL1AfI3oUu8bR2NPuUD44n3BfUX1nA-Bb360I';
 const CACHE_REST_URL    = 'https://uazonbacmpwuznugirru.supabase.co/rest/v1/menu_cache?id=eq.1&select=data,updated_at';
-const PEDIDOS_REST_URL  = 'https://uazonbacmpwuznugirru.supabase.co/rest/v1/pedidos';
+const ORDER_API_URL     = 'https://uazonbacmpwuznugirru.supabase.co/functions/v1/order-api';
 const CACHE_KEY         = 'jbg_menu_v4';
 const CACHE_TTL         = 10 * 60 * 1000;
 const CONFIG_REST_URL   = 'https://uazonbacmpwuznugirru.supabase.co/rest/v1/jbg_config?select=key,value';
@@ -1279,6 +1279,19 @@ const CAT_ORDER = [
   'CARNE Y CERDO','Picadas','Salchipapas y HodDogs','Chorizos',
   'Acompañantes','Bebidas','SALSAS','Niños','Especiales'
 ];
+
+function escapeHtml(value='') {
+  return String(value).replace(/[&<>"']/g, ch => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  }[ch]));
+}
+
+function safeHttpUrl(value='') {
+  try {
+    const u = new URL(String(value), location.origin);
+    return (u.protocol === 'https:' || u.protocol === 'http:') ? u.href : '';
+  } catch { return ''; }
+}
 
 function displayCatName(nombre='') {
   const n=nombre.replace(/^[\p{Emoji}\s]+/u,'').trim().toLowerCase();
@@ -1787,7 +1800,7 @@ function renderMenu() {
 
     const toggle = document.createElement('div');
     toggle.className = 'category-toggle';
-    toggle.innerHTML = displayCatName(cat.n);
+    toggle.textContent = displayCatName(cat.n);
 
     const scroll = document.createElement('div');
     scroll.className = 'cat-scroll';
@@ -1864,8 +1877,11 @@ function renderCatNav() {
   const nav = document.getElementById('catNav');
   nav.innerHTML = CATEGORIAS
     .filter(cat => cat.i.some(item => !productosOcultos.includes(item.n)))
-    .map(cat => `<button class="cat-pill" onclick="irACat('${cat.n.replace(/'/g,"\\'")}',this)">${displayCatName(cat.n)}</button>`)
+    .map(cat => `<button class="cat-pill" data-cat="${escapeHtml(cat.n)}">${escapeHtml(displayCatName(cat.n))}</button>`)
     .join('');
+  nav.querySelectorAll('.cat-pill').forEach(btn => {
+    btn.addEventListener('click', () => irACat(btn.dataset.cat || '', btn));
+  });
 }
 
 function irACat(catName, pillEl) {
@@ -2034,12 +2050,20 @@ function getNumeroOrden() {
 
 async function guardarPedidoEnSupabase(p) {
   try {
-    await fetch(PEDIDOS_REST_URL, {
+    const res=await fetch(ORDER_API_URL, {
       method:'POST',
-      headers:{'apikey':SUPABASE_ANON_KEY,'Authorization':'Bearer '+SUPABASE_ANON_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
-      body:JSON.stringify({orden:p.orden,cliente:p.nom,zona:p.zona,direccion:p.direccion,pago:p.pago,items:p.items,subtotal:parseFloat(p.sub),delivery:parseFloat(p.delivery),total:parseFloat(p.total)})
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        orden:p.orden,
+        cliente:p.nom,
+        zona:p.zona,
+        direccion:p.direccion,
+        pago:p.pago,
+        items:p.items.map(i=>({n:i.n,qty:i.qty}))
+      })
     });
-  } catch(e) { console.log('Error guardando pedido:', e); }
+    if(!res.ok) console.warn('No se pudo registrar el pedido para estadísticas:',res.status);
+  } catch(e) { console.warn('No se pudo registrar el pedido para estadísticas. El pedido por WhatsApp no se afecta.'); }
 }
 
 let metodoPago = 'efectivo';
@@ -2352,10 +2376,17 @@ async function cargarPedidos(){
     if(!rows.length){lista.innerHTML='<div style="text-align:center;color:var(--muted);font-size:13px;padding:20px;">No hay pedidos aún</div>';return;}
     lista.innerHTML=rows.map(r=>{
       const fecha=new Date(r.created_at),fechaStr=fecha.toLocaleDateString('es-PA')+' '+fecha.toLocaleTimeString('es-PA',{hour:'2-digit',minute:'2-digit'});
-      const itemsStr=Array.isArray(r.items)?r.items.map(i=>`${i.n} x${i.qty}`).join(', '):'';
-      return `<div class="pedido-row"><div class="pedido-top"><span class="pedido-orden">#${r.orden}</span><span class="pedido-total">$${parseFloat(r.total).toFixed(2)}</span></div><div class="pedido-meta">👤 ${r.cliente||'—'} · 📦 ${r.zona||'—'}</div>${itemsStr?`<div style="font-size:10px;color:#666;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${itemsStr}</div>`:''}<div class="pedido-meta" style="margin-top:2px;">🕐 ${fechaStr}</div></div>`;
+      const itemsStr=Array.isArray(r.items)
+        ? r.items.map(i=>`${escapeHtml(i?.n||'Producto')} x${Number(i?.qty)||0}`).join(', ')
+        : '';
+      const orden=escapeHtml(r.orden||'—');
+      const cliente=escapeHtml(r.cliente||'—');
+      const zona=escapeHtml(r.zona||'—');
+      const total=Number(r.total);
+      const totalTxt=Number.isFinite(total)?total.toFixed(2):'0.00';
+      return `<div class="pedido-row"><div class="pedido-top"><span class="pedido-orden">#${orden}</span><span class="pedido-total">${totalTxt}</span></div><div class="pedido-meta">👤 ${cliente} · 📦 ${zona}</div>${itemsStr?`<div style="font-size:10px;color:#666;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${itemsStr}</div>`:''}<div class="pedido-meta" style="margin-top:2px;">🕐 ${escapeHtml(fechaStr)}</div></div>`;
     }).join('');
-  }catch(e){lista.innerHTML=`<div style="text-align:center;color:var(--red);font-size:12px;padding:20px;">Error: ${e.message}</div>`;}
+  }catch(e){lista.innerHTML=`<div style="text-align:center;color:var(--red);font-size:12px;padding:20px;">Error: ${escapeHtml(e.message)}</div>`;}
 }
 
 function renderHorariosEditor() {
