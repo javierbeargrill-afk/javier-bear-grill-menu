@@ -2,7 +2,6 @@
 const ALLOWED_ORIGINS = new Set([
   "https://menujaviergrill.store",
   "https://www.menujaviergrill.store",
-  "https://javierbeargrill-afk.github.io",
 ]);
 
 function cors(req: Request) {
