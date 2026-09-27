@@ -15,15 +15,15 @@ The audit found one high-impact stored-XSS path and several abuse/hardening issu
 | Severity | Finding | Status |
 |---|---|---|
 | Critical | Historical hard-coded admin password exists in old public Git history | Current credential verified different; historical value remains permanently compromised |
-| High | Anonymous order insert + unescaped Admin order rendering allowed stored XSS in the Admin origin | Fixed in security branch; order rendering escapes attacker-controlled fields |
-| High | Anyone with the public anon key could insert valid-looking fake orders and pollute statistics | Migrating to validated/rate-limited `order-api`; direct anon insert to be revoked after frontend deployment |
+| High | Anonymous order insert + unescaped Admin order rendering allowed stored XSS in the Admin origin | Fixed and deployed; order rendering escapes attacker-controlled fields |
+| High | Anyone with the public anon key could insert valid-looking fake orders and pollute statistics | Fixed and deployed: validated/rate-limited `order-api`; direct anon INSERT revoked |
 | High | Admin login had no real attempt throttling | Fixed in `admin-api` v2: per-IP temporary blocking |
 | Medium | `warm_images=1` could be triggered without authorization, causing server work | Fixed in `loyverse-menu` v40 |
 | Medium | Public Meta feed performs live Loyverse/API/image work and can be requested by anyone | Open: refactor to cached/pre-generated feed or protected feed URL without breaking Meta |
 | Medium | Several menu/admin components still build HTML from dynamic trusted-source data | Partially mitigated; continue replacing raw `innerHTML` with safe DOM/text rendering |
 | Medium | Public order endpoint lacked strong server-side schema/price validation | New `order-api` validates items against current menu and delivery zones |
 | Medium | Storage image bucket had no per-bucket MIME/size restrictions | Fixed: image MIME allowlist + 10 MB limit |
-| Medium | GitHub Action dependency used floating `actions/checkout@v4` | Fix prepared: pin to reviewed checkout commit |
+| Medium | GitHub Action dependency used floating `actions/checkout@v4` | Fixed and deployed: checkout pinned to exact reviewed commit |
 | Low | Supabase Advisor warns `pg_net` is in `public` | Open; currently required by cron. Change only after compatibility test |
 | Low | Supabase leaked-password protection is disabled | Low relevance to current custom admin auth; enable before relying on Supabase Auth users |
 | Privacy | Current source removed the old residential address, but external/search caches may retain old content | Monitor/request reindex/removal where needed |
