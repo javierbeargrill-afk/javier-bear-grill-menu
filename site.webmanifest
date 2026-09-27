@@ -1,0 +1,19 @@
+{
+  "name": "Javier Bear Grill - Menú",
+  "short_name": "JBG Menú",
+  "description": "Menú oficial de Javier Bear Grill en La Chorrera.",
+  "lang": "es-PA",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#faf7f4",
+  "theme_color": "#3d1800",
+  "icons": [
+    {
+      "src": "https://uazonbacmpwuznugirru.supabase.co/storage/v1/object/public/menu-images/IMG-20230315-WA0300_20250520_112619_0000.png",
+      "sizes": "any",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
