@@ -40,7 +40,9 @@ Javier Bear Grill opera **solo por delivery**. La web pública muestra zona de s
 
 ## Google Business Profile
 
-Existe un proyecto separado de Google Cloud para integrar el menú local con Google Business Profile. El acceso a la API fue aprobado, según confirmación del propietario. El adaptador de menús ya está preparado; faltan conexión OAuth, comprobación de elegibilidad y piloto real antes de activar publicación.
+El menú nativo se publicó y depuró el **14-oct-2026** desde el catálogo de Loyverse: **1 menú, 10 categorías y 37 productos**, con precios locales en PAB. Dos lecturas posteriores de Google verificaron **35 productos con fotos**, vinculados a 34 imágenes únicas. Quedan pendientes la foto de Coca-Cola 355 ml (original de resolución insuficiente) y la de Pernil por encargo (Kg) (sin imagen de origen).
 
-Ver [integración de Google Business Profile](docs/GOOGLE-BUSINESS-PROFILE.md).
+La publicación y la carga de fotos se ejecutaron con herramientas locales; la sincronización automática con Google sigue pendiente. El workflow de este repositorio solo previsualiza y no publica. La respuesta de la API confirma los datos y asociaciones, pero no la visibilidad inmediata de las fotos en Search/Maps.
+
+Ver [integración de Google Business Profile](docs/GOOGLE-BUSINESS-PROFILE.md) y [log de cambios](docs/LOG-CAMBIOS.md).
 
