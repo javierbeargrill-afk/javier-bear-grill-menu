@@ -2,9 +2,21 @@
 
 ## Estado
 
-Acceso API aprobado según confirmación del propietario y el seguimiento anterior. Adaptador implementado y probado con el caché actual de Loyverse. **OAuth, elegibilidad del perfil y publicación real aún no verificados.** La aprobación de Google Cloud no concede por sí sola acceso al Perfil de Negocio. No se publica ninguna credencial ni identificador privado en el repositorio.
+Acceso API aprobado según confirmación del propietario y el seguimiento anterior. Adaptador implementado y probado con el caché actual de Loyverse. **OAuth manual y elegibilidad del perfil confirmados el 13-oct-2026; publicación del menú nativo y automatización todavía pendientes.** La aprobación de Google Cloud no concede por sí sola acceso al Perfil de Negocio. No se publica ninguna credencial ni identificador privado en el repositorio.
 
 Loyverse sigue siendo la fuente del catálogo. Se usa el mismo caché público que alimenta la web, con precios locales (no PEYA). No se cambia el frontend, POS, inventario, pedidos, horarios ni dirección residencial.
+
+
+## Verificación real con Google — 13-oct-2026
+
+- Se completó manualmente el consentimiento OAuth `business.manage` con cuenta de prueba y se obtuvo `200 OK` en My Business Account Management API v1.
+- La consulta de ubicaciones Business Information API v1 usando `accounts/-/locations` devolvió la ficha de **Javier Bear Grill — Hamburguesas y Parrilla en La Chorrera**.
+- `locations.get` confirmó `metadata.canHaveFoodMenus: true` para esa ubicación.
+- `locations/{locationId}/attributes` devolvió `200 OK` y **`attributes/url_menu` ya configurado exactamente como `https://menujaviergrill.store/`**. No reescribir el atributo: ya está correcto.
+- La lista de atributos disponibles también incluye `url_menu` de tipo URL.
+- Google My Business API v4 consta como habilitada, con cuota general 3000 solicitudes/minuto. Sin embargo, los intentos manuales `GET /v4/accounts/{accountId}/locations` y `GET /v4/accounts/{accountId}/locations/{locationId}/foodMenus` devolvieron **404**. No se ha podido leer ni modificar el menú gastronómico nativo; investigar limitación/relación de cuenta en v4 antes de un PATCH. Que la URL del menú exista **no** demuestra sincronización de los artículos en Google.
+- **Seguridad:** un client secret OAuth y un access token se expusieron en la conversación/capturas. Antes de configurar automatización, revocar autorización/tokens comprometidos, rotar secreto y configurar nuevas credenciales solo en gestor de secretos; no pedir que se peguen en el chat ni en GitHub.
+- **Estado de publicación:** ninguna escritura realizada en Google. La URL pública ya enlaza correctamente al menú web; queda pendiente el piloto del menú nativo.
 
 ## Componentes
 
