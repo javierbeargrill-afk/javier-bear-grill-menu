@@ -1,0 +1,35 @@
+name: Google menu preview
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '30 8 * * *'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: google-menu-preview
+  cancel-in-progress: false
+
+jobs:
+  preview:
+    if: github.event_name == 'workflow_dispatch' || vars.GOOGLE_MENU_PREVIEW_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: google-business-profile
+    steps:
+      - name: Checkout
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          persist-credentials: false
+      - name: Test adapter
+        run: python3 -m unittest discover -s tests -v
+      - name: Preview eligible menu without publishing
+        env:
+          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+          GOOGLE_REFRESH_TOKEN: ${{ secrets.GOOGLE_REFRESH_TOKEN }}
+          GOOGLE_ACCOUNT_ID: ${{ secrets.GOOGLE_ACCOUNT_ID }}
+          GOOGLE_LOCATION_ID: ${{ secrets.GOOGLE_LOCATION_ID }}
+        run: python3 scripts/google_food_menu.py --mode preview

@@ -40,4 +40,7 @@ Javier Bear Grill opera **solo por delivery**. La web pública muestra zona de s
 
 ## Google Business Profile
 
-Existe un proyecto separado de Google Cloud para integrar el menú local con Google Business Profile. El acceso a la API está pendiente de aprobación por Google.
+Existe un proyecto separado de Google Cloud para integrar el menú local con Google Business Profile. El acceso a la API fue aprobado, según confirmación del propietario. El adaptador de menús ya está preparado; faltan conexión OAuth, comprobación de elegibilidad y piloto real antes de activar publicación.
+
+Ver [integración de Google Business Profile](docs/GOOGLE-BUSINESS-PROFILE.md).
+
