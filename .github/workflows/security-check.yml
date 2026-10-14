@@ -21,3 +21,7 @@ jobs:
 
       - name: Browser JavaScript syntax
         run: python3 scripts/check_browser_js.py
+
+
+      - name: Google menu adapter tests
+        run: python3 -m unittest discover -s tests -v
