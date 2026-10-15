@@ -44,5 +44,7 @@ El menú nativo se publicó y depuró el **14-oct-2026** desde el catálogo de L
 
 La publicación y la carga de fotos se ejecutaron con herramientas locales; la sincronización automática con Google sigue pendiente. El workflow de este repositorio solo previsualiza y no publica. La respuesta de la API confirma los datos y asociaciones, pero no la visibilidad inmediata de las fotos en Search/Maps.
 
+El **15-oct-2026** también se actualizaron por API la descripción, los horarios y las categorías; se confirmó atención por delivery y retiro, sin consumo en el local, con WhatsApp como chat principal y enlace de pedidos a la web. Horario: lunes a viernes 15:30–23:30 y fines de semana 13:00–23:30 (Panamá).
+
 Ver [integración de Google Business Profile](docs/GOOGLE-BUSINESS-PROFILE.md) y [log de cambios](docs/LOG-CAMBIOS.md).
 
