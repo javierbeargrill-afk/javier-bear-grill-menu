@@ -4,10 +4,29 @@
 
 **Menú nativo publicado y verificado por API el 14-oct-2026: 1 menú, 10 categorías, 37 artículos y 35 artículos con fotos.** Se usó OAuth autorizado por el propietario y el catálogo vigente de Loyverse. La sincronización automática con Google continúa pendiente. La última verificación de las fotos fue a las 17:01:06 de Panamá (22:01:06 UTC), mediante dos lecturas posteriores.
 
+La descripción, horarios, categorías y atributos de atención también se actualizaron y verificaron el **15-oct-2026**; ver el registro siguiente.
+
 Este documento distingue el estado real en Google, el adaptador ya incorporado al repositorio y las herramientas operativas que permanecen locales. No se publican credenciales, identificadores privados ni respaldos de Google.
 
 Loyverse sigue siendo la fuente del catálogo. Se usa el mismo caché público que alimenta la web, con precios locales (no PEYA). No se cambia el frontend, POS, inventario, pedidos, horarios ni dirección residencial.
 
+
+## Información del negocio actualizada por API
+
+**Estado: aplicado y verificado por dos lecturas posteriores a las 08:47:15 de Panamá (13:47:15 UTC).**
+
+- Descripción actualizada al catálogo actual y a la operación con delivery local y retiro coordinado.
+- Horario regular: lunes a viernes 15:30–23:30; sábado y domingo 13:00–23:30, hora de Panamá. Se corrigieron cierres y tramos nocturnos antiguos.
+- Categoría principal conservada: Hamburguesería. Categorías adicionales: Comida a domicilio y Restaurante de comida rápida. Se retiraron Tienda de aves de corral, Comida hindú para llevar y Restaurante especializado en chuletas.
+- El propietario confirmó que no hay consumo en el local. Se desactivaron Comer allí y Servicio en mesa, conservando delivery y comida para llevar.
+- WhatsApp quedó configurado como chat principal y se añadió el enlace de pedidos anticipados a https://menujaviergrill.store/.
+- Teléfono, web, enlace de menú, WhatsApp e Instagram ya coincidían con las fuentes vigentes y se verificaron sin reemplazarlos.
+
+La propuesta de descripción, horarios y categorías pasó primero por `validateOnly=true`. Se conservaron respaldos privados y se comprobaron los campos no seleccionados. `getGoogleUpdated` devolvió `pendingMask` y `diffMask` vacíos al verificar; esto no sustituye una comprobación visual de Search/Maps.
+
+La consulta separada de Place Actions devolvió 403; no se alteraron enlaces de proveedores desde esa API. El atributo disponible `url_order_ahead` sí permitió guardar y verificar el enlace propio. No se inventaron horarios festivos ni otros servicios sin confirmación. La sesión OAuth fue temporal, con credenciales solo en memoria; no se instaló sincronización automática.
+
+Las herramientas locales de la sesión pasaron 8 pruebas de límites de solicitudes. Esta entrada registra una operación real; no incorpora esas herramientas al código versionado.
 
 ## Antecedentes — 13-oct-2026 (registro histórico)
 
