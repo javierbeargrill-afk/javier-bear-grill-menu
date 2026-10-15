@@ -12,6 +12,7 @@ Este registro conserva cambios comprobados. Documentar un resultado operativo no
 - El propietario confirmó que no hay consumo en el local. Se desactivaron Comer allí y Servicio en mesa, conservando delivery y comida para llevar.
 - WhatsApp quedó configurado como chat principal y se añadió el enlace de pedidos anticipados a https://menujaviergrill.store/.
 - Teléfono, web, enlace de menú, WhatsApp e Instagram ya coincidían con las fuentes vigentes y se verificaron sin reemplazarlos.
+- **Confirmación posterior del propietario:** El propietario confirmó el 15-oct-2026 que son correctos el estacionamiento propio gratuito y el acceso de perros al interior y exterior. Esos atributos ya estaban activos en la lectura verificada y se conservaron; no se realizó una nueva escritura en Google ni se renovó OAuth por esta confirmación.
 
 La propuesta de descripción, horarios y categorías pasó primero por `validateOnly=true`. Se conservaron respaldos privados y se comprobaron los campos no seleccionados. `getGoogleUpdated` devolvió `pendingMask` y `diffMask` vacíos al verificar; esto no sustituye una comprobación visual de Search/Maps.
 
