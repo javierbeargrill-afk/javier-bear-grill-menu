@@ -2,6 +2,23 @@
 
 Este registro conserva cambios comprobados. Documentar un resultado operativo no implica que todas las herramientas utilizadas estén incorporadas al repositorio.
 
+## 2026-10-15 — Información del negocio actualizada por API
+
+**Estado: aplicado y verificado por dos lecturas posteriores a las 08:47:15 de Panamá (13:47:15 UTC).**
+
+- Descripción actualizada al catálogo actual y a la operación con delivery local y retiro coordinado.
+- Horario regular: lunes a viernes 15:30–23:30; sábado y domingo 13:00–23:30, hora de Panamá. Se corrigieron cierres y tramos nocturnos antiguos.
+- Categoría principal conservada: Hamburguesería. Categorías adicionales: Comida a domicilio y Restaurante de comida rápida. Se retiraron Tienda de aves de corral, Comida hindú para llevar y Restaurante especializado en chuletas.
+- El propietario confirmó que no hay consumo en el local. Se desactivaron Comer allí y Servicio en mesa, conservando delivery y comida para llevar.
+- WhatsApp quedó configurado como chat principal y se añadió el enlace de pedidos anticipados a https://menujaviergrill.store/.
+- Teléfono, web, enlace de menú, WhatsApp e Instagram ya coincidían con las fuentes vigentes y se verificaron sin reemplazarlos.
+
+La propuesta de descripción, horarios y categorías pasó primero por `validateOnly=true`. Se conservaron respaldos privados y se comprobaron los campos no seleccionados. `getGoogleUpdated` devolvió `pendingMask` y `diffMask` vacíos al verificar; esto no sustituye una comprobación visual de Search/Maps.
+
+La consulta separada de Place Actions devolvió 403; no se alteraron enlaces de proveedores desde esa API. El atributo disponible `url_order_ahead` sí permitió guardar y verificar el enlace propio. No se inventaron horarios festivos ni otros servicios sin confirmación. La sesión OAuth fue temporal, con credenciales solo en memoria; no se instaló sincronización automática.
+
+Las herramientas locales de la sesión pasaron 8 pruebas de límites de solicitudes. Esta entrada registra una operación real; no incorpora esas herramientas al código versionado.
+
 ## 2026-10-14 — Menú nativo publicado, depurado y con fotos
 
 **Estado: aplicado y verificado por API.**
