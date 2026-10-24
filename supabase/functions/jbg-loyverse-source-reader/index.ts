@@ -20,7 +20,7 @@ Deno.serve(async (req:Request) => {
   }
   let source:Response;try{source=await fetch(url,{headers:{Authorization:`Bearer ${token}`},signal:AbortSignal.timeout(25000)});}catch{return json({error:'source_request_failed'},502);}
   if(!source.ok)return json({error:'source_rejected',source_status:source.status},502);
-  const data=await source.json();const records=data[resource];if(!Array.isArray(records))return json({error:'unexpected_source_shape'},502);
+  const data=await source.json();const records=data[resource==='inventory'?'inventory_levels':resource];if(!Array.isArray(records))return json({error:'unexpected_source_shape'},502);
   const fetchedAt=new Date().toISOString();
   const scope={resource,created_at_min:input.created_at_min||null,created_at_max:input.created_at_max||null,cursor:input.cursor||null};
   const hash=new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify(scope))));const pageKey=Array.from(hash,b=>b.toString(16).padStart(2,'0')).join('');
