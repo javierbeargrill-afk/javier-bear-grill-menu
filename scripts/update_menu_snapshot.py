@@ -6,6 +6,10 @@ import urllib.request
 from datetime import datetime
 from pathlib import Path
 from zoneinfo import ZoneInfo
+import xml.etree.ElementTree as ET
+import sys
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from build_local_pages import build_pages, ORIGIN
 
 ROOT = Path(__file__).resolve().parents[1]
 INDEX = ROOT / "index.html"
@@ -133,13 +137,37 @@ def main():
     cfg_rows = api_get("/rest/v1/jbg_config?key=eq.productos_ocultos&select=value", anon_key)
     hidden = set(cfg_rows[0].get("value") or []) if cfg_rows else set()
 
+    zones_rows = api_get("/rest/v1/jbg_config?key=eq.zonas&select=value", anon_key)
+    if not zones_rows or not isinstance(zones_rows[0].get("value"), list):
+        raise SystemExit("La configuración de zonas está vacía; se conserva la publicación anterior")
+    pages = build_pages(menu, hidden, zones_rows[0]["value"])
+    changed = set()
     updated = update_documents(source, menu, hidden)
     if updated != source:
         INDEX.write_text(updated, encoding="utf-8")
-        sitemap = ROOT / "sitemap.xml"
-        today = datetime.now(ZoneInfo("America/Panama")).date().isoformat()
-        sitemap.write_text(re.sub(r"<lastmod>.*?</lastmod>", f"<lastmod>{today}</lastmod>",
-                                  sitemap.read_text(encoding="utf-8")), encoding="utf-8")
+        changed.add(ORIGIN + "/")
+    for route, content in pages.items():
+        path = ROOT / route / "index.html"
+        if not path.exists() or path.read_text(encoding="utf-8") != content:
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(content, encoding="utf-8")
+            changed.add(f"{ORIGIN}/{route}/")
+    update_sitemap(ROOT / "sitemap.xml", changed, [ORIGIN + "/"] + [f"{ORIGIN}/{r}/" for r in pages])
+
+
+def update_sitemap(path, changed, urls):
+    ns = "http://www.sitemaps.org/schemas/sitemap/0.9"
+    old = ET.fromstring(path.read_text(encoding="utf-8"))
+    dates = {el.findtext(f"{{{ns}}}loc"): el.findtext(f"{{{ns}}}lastmod") for el in old}
+    today = datetime.now(ZoneInfo("America/Panama")).date().isoformat()
+    lines = ['<?xml version="1.0" encoding="UTF-8"?>', f'<urlset xmlns="{ns}">']
+    for url in urls:
+        date = today if url in changed or not dates.get(url) else dates[url]
+        lines.append(f'  <url><loc>{esc(url)}</loc><lastmod>{date}</lastmod></url>')
+    lines.append('</urlset>')
+    content = "\n".join(lines) + "\n"
+    if path.read_text(encoding="utf-8") != content:
+        path.write_text(content, encoding="utf-8")
 
 if __name__ == "__main__":
     main()

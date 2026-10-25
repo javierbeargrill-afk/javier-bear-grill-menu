@@ -53,3 +53,6 @@ El **15-oct-2026** también se actualizaron por API la descripción, los horario
 
 Ver [integración de Google Business Profile](docs/GOOGLE-BUSINESS-PROFILE.md) y [log de cambios](docs/LOG-CAMBIOS.md).
 
+
+
+Las páginas locales `/hamburguesas-la-chorrera/` y `/delivery-la-chorrera/` se generan junto al snapshot con `python3 scripts/update_menu_snapshot.py`. No editar manualmente sus precios o zonas: proceden del catálogo y de `jbg_config.zonas`. CSS compartido en `assets/local-pages.css`. El sitemap conserva fechas por URL cuando no hay cambios.
