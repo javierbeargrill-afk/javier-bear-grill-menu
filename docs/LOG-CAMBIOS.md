@@ -64,3 +64,10 @@ Detalles: [Google Business Profile](GOOGLE-BUSINESS-PROFILE.md).
 ## 2026-10-13 — Adaptador inicial y comprobaciones de acceso
 
 El [PR #9](https://github.com/javierbeargrill-afk/javier-bear-grill-menu/pull/9) incorporó el adaptador y un workflow de previsualización. Se registraron OAuth manual, elegibilidad del perfil y URL de menú correcta. Al cierre de esas pruebas FoodMenus devolvía 404 y no había publicación nativa. Ese corte histórico no describe el estado operativo posterior del 14-oct.
+
+
+### 2026-10-24 — SEO-003: páginas locales y reseñas
+- Páginas de hamburguesas y delivery/retiro con datos del catálogo y configuración existentes.
+- Enlaces internos, sitemap de tres URLs y actualización diaria idempotente.
+- Enlace oficial de reseñas con invitación neutral. Sin cambios a precios, stock, DB, horarios ni datos privados.
+- 20 pruebas locales y controles de seguridad/JS aprobados; despliegue por PR.

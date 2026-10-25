@@ -24,12 +24,12 @@ jobs:
 
       - name: Commit only when menu changed
         run: |
-          if git diff --quiet -- index.html sitemap.xml; then
+          if git diff --quiet -- index.html sitemap.xml hamburguesas-la-chorrera/index.html delivery-la-chorrera/index.html; then
             echo "No menu changes."
             exit 0
           fi
           git config user.name "jbg-menu-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add index.html sitemap.xml
+          git add index.html sitemap.xml hamburguesas-la-chorrera/index.html delivery-la-chorrera/index.html
           git commit -m "Sync menu snapshot from Loyverse"
           git push
