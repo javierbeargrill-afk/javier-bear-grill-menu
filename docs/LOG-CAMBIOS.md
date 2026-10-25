@@ -2,6 +2,10 @@
 
 Este registro conserva cambios comprobados. Documentar un resultado operativo no implica que todas las herramientas utilizadas estén incorporadas al repositorio.
 
+## 2026-10-24 — Primer bloque de SEO local
+
+Preparadas mejoras de título/descripción local, delivery y retiro coordinado, texto visible de servicio y menú JSON-LD completo desde el HTML inicial. La generación diaria actualiza también el schema y la fecha real de cambio del sitemap. Productos, precios, recetas y pedidos conservados. Seguridad, sintaxis JavaScript y 18 pruebas locales aprobadas. Search Console requiere acceso del propietario; no se han leído métricas ni enviado sitemaps. Estado de publicación y verificaciones posteriores: consultar PR y Bitácora. Detalle en [auditoría SEO](SEO-2026-10-24.md).
+
 ## 2026-10-15 — Información del negocio actualizada por API
 
 **Estado: aplicado y verificado por dos lecturas posteriores a las 08:47:15 de Panamá (13:47:15 UTC).**

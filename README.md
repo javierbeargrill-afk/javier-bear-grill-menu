@@ -26,10 +26,15 @@ El sitio incluye:
 - datos estructurados Schema.org para `Restaurant` y `Menu`.
 - Open Graph.
 - menú visible en el HTML inicial para facilitar indexación y mejorar la primera carga.
+- título y descripción centrados en hamburguesas smash en La Chorrera, delivery y retiro coordinado.
+- menú JSON-LD generado junto con el snapshot, usando los mismos productos y precios visibles.
+- fecha `lastmod` del sitemap actualizada cuando cambia el snapshot, no en cada ejecución sin cambios.
+
+La medición de clics, consultas e indexación requiere acceso autorizado a Search Console. La conexión de Drive/Gmail y la API de Business Profile no conceden ese acceso por sí solas. Ver [auditoría y siguientes pasos](docs/SEO-2026-10-24.md).
 
 ## Privacidad
 
-Javier Bear Grill opera **solo por delivery**. La web pública muestra zona de servicio y no publica la dirección residencial exacta.
+Javier Bear Grill ofrece **delivery y retiro coordinado, sin consumo en el local**. La web pública muestra zona de servicio y no publica la dirección residencial exacta. El punto y la hora de retiro se coordinan por WhatsApp.
 
 ## Seguridad
 
