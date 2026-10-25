@@ -3,7 +3,9 @@ import html
 import json
 import re
 import urllib.request
+from datetime import datetime
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 ROOT = Path(__file__).resolve().parents[1]
 INDEX = ROOT / "index.html"
@@ -74,6 +76,48 @@ def render_snapshot(menu, hidden):
         return '  <div id="loadingMsg"><span class="spinner"></span>Cargando menú...</div>'
     return "\n".join(out)
 
+def render_menu_schema(menu, hidden):
+    sections = []
+    for cat in menu:
+        items = []
+        for item in cat.get("i") or []:
+            if item.get("n") in hidden:
+                continue
+            entry = {
+                "@type": "MenuItem", "name": str(item.get("n") or ""),
+                "offers": {"@type": "Offer", "priceCurrency": "PAB",
+                           "price": f'{float(item.get("p") or 0):.2f}',
+                           "availability": "https://schema.org/InStock",
+                           "url": "https://menujaviergrill.store/"},
+            }
+            if item.get("d"):
+                entry["description"] = item["d"]
+            if item.get("img"):
+                entry["image"] = item["img"]
+            items.append(entry)
+        if items:
+            sections.append({"@type": "MenuSection", "name": str(cat.get("n") or "Menú"),
+                             "hasMenuItem": items})
+    data = {"@context": "https://schema.org", "@type": "Menu",
+            "@id": "https://menujaviergrill.store/#menu",
+            "name": "Menú oficial de Javier Bear Grill", "url": "https://menujaviergrill.store/",
+            "hasMenuSection": sections}
+    # JSON inside a script element must never contain a literal closing tag.
+    return json.dumps(data, ensure_ascii=False, separators=(",", ":")).replace("<", "\\u003c").replace(">", "\\u003e").replace("&", "\\u0026")
+
+def update_documents(source, menu, hidden):
+    start, end = "<!-- MENU_SNAPSHOT_START -->", "<!-- MENU_SNAPSHOT_END -->"
+    pattern = re.compile(re.escape(start) + r".*?" + re.escape(end), re.S)
+    replacement = start + "\n" + render_snapshot(menu, hidden) + "\n" + end
+    updated, count = pattern.subn(lambda _: replacement, source, count=1)
+    if count != 1:
+        raise ValueError("No se encontraron los marcadores MENU_SNAPSHOT en index.html")
+    updated, count = re.subn(r'(<script id="menuJsonLd" type="application/ld\+json">).*?(</script>)',
+                             lambda m: m[1] + render_menu_schema(menu, hidden) + m[2], updated, count=1, flags=re.S)
+    if count != 1:
+        raise ValueError("No se encontró menuJsonLd en index.html")
+    return updated
+
 def main():
     source = INDEX.read_text(encoding="utf-8")
     key_match = re.search(r"const SUPABASE_ANON_KEY\s*=\s*'([^']+)'", source)
@@ -89,15 +133,13 @@ def main():
     cfg_rows = api_get("/rest/v1/jbg_config?key=eq.productos_ocultos&select=value", anon_key)
     hidden = set(cfg_rows[0].get("value") or []) if cfg_rows else set()
 
-    snapshot = render_snapshot(menu, hidden)
-    start = "<!-- MENU_SNAPSHOT_START -->"
-    end = "<!-- MENU_SNAPSHOT_END -->"
-    pattern = re.compile(re.escape(start) + r".*?" + re.escape(end), re.S)
-    replacement = start + "\n" + snapshot + "\n" + end
-    updated, count = pattern.subn(replacement, source, count=1)
-    if count != 1:
-        raise SystemExit("No se encontraron los marcadores MENU_SNAPSHOT en index.html")
-    INDEX.write_text(updated, encoding="utf-8")
+    updated = update_documents(source, menu, hidden)
+    if updated != source:
+        INDEX.write_text(updated, encoding="utf-8")
+        sitemap = ROOT / "sitemap.xml"
+        today = datetime.now(ZoneInfo("America/Panama")).date().isoformat()
+        sitemap.write_text(re.sub(r"<lastmod>.*?</lastmod>", f"<lastmod>{today}</lastmod>",
+                                  sitemap.read_text(encoding="utf-8")), encoding="utf-8")
 
 if __name__ == "__main__":
     main()
