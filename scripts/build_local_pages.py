@@ -10,7 +10,7 @@ ROUTES = ('hamburguesas-la-chorrera', 'delivery-la-chorrera')
 
 
 def esc(value):
-    return html.escape(str(value or ''), quote=True)
+    return html.escape(html.unescape(str(value or '')), quote=True)
 
 
 def safe_image(value):
@@ -38,11 +38,11 @@ def shell(route, title, description, body):
 
 def build_pages(menu, hidden, zones):
     cards = []
-    for cat in menu:
+    for cat in sorted(menu, key=lambda c: "combo" in str(c.get("n", "")).lower()):
         if 'hamburgues' not in str(cat.get('n', '')).lower():
             continue
         for item in cat.get('i') or []:
-            if item.get('n') in hidden:
+            if item.get('n') in hidden or 'extra' in str(item.get('n', '')).lower():
                 continue
             image = safe_image(item.get('img'))
             picture = f'<img src="{esc(image)}" alt="{esc(item.get("n"))}" width="640" height="480" loading="lazy">' if image else ''

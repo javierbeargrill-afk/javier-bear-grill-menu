@@ -10,7 +10,7 @@ class LocalPagesTests(unittest.TestCase):
     def test_catalogue_hidden_items_and_active_zones(self):
         menu = [{'n': '🍔 Hamburguesas', 'i': [
             {'n': 'Visible <img>', 'd': '<script>bad</script>', 'p': 4.25, 'img': 'javascript:bad'},
-            {'n': 'Oculta', 'p': 99}]}]
+            {'n': 'Oculta', 'p': 99}, {'n': 'Tocino extra', 'p': 1}]}]
         zones = [{'nombre': 'Zona & uno', 'precio': 1.25, 'activa': True},
                  {'nombre': 'Inactiva', 'precio': 3, 'activa': False},
                  {'nombre': 'Fuera', 'fuera': True, 'precio': 0}]
@@ -21,6 +21,7 @@ class LocalPagesTests(unittest.TestCase):
         self.assertNotIn('<script>bad', burger)
         self.assertNotIn('javascript:bad', burger)
         self.assertNotIn('Oculta', burger)
+        self.assertNotIn('Tocino extra', burger)
         self.assertNotIn('Inactiva', delivery)
         self.assertIn('Zona &amp; uno', delivery)
         self.assertIn('B/.1.25', delivery)
