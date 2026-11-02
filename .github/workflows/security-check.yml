@@ -25,3 +25,6 @@ jobs:
 
       - name: Google menu adapter tests
         run: python3 -m unittest discover -s tests -v
+
+      - name: Loyverse image cache regression
+        run: node tests/test_image_cache.mjs
