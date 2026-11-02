@@ -51,36 +51,31 @@ async function cacheImagen(
   serviceKey: string
 ): Promise<string> {
   try {
-    // Loyverse cambia el identificador de imagen cuando cambia la foto.
-    // Lo incluimos en el path para evitar fotos viejas en CDN.
-    const rawKey = loyverseUrl.split("/").pop()?.split("?")[0] || "image"
-    const sourceKey = rawKey.replace(/[^a-zA-Z0-9_-]/g, "").slice(0, 80) || "image"
-
-    const baseName = `loyverse/${sourceKey}`
-
-    // Primero probamos los formatos más comunes sin descargar desde Loyverse.
-    for (const ext of ["jpg", "png", "webp", "gif", "avif"]) {
-      const candidate = `${supabaseUrl}/storage/v1/object/public/menu-images/${baseName}.${ext}`
-      const exists = await fetch(candidate, { method: "HEAD", cache: "no-store" })
-      if (exists.ok) return candidate
-    }
-
+    // Loyverse puede conservar image_url al sustituir una foto.
+    // Versionar por contenido evita reutilizar bytes antiguos del CDN.
     const imgRes = await fetch(loyverseUrl, {
+      cache: "no-store",
       headers: { "Accept": "image/avif,image/webp,image/apng,image/*,*/*;q=0.8" }
     })
     if (!imgRes.ok) return loyverseUrl
 
-    const contentType = (imgRes.headers.get("content-type") || "image/jpeg").split(";")[0].trim()
+    const contentType = (imgRes.headers.get("content-type") || "").split(";")[0].trim()
+    if (!contentType.startsWith("image/")) return loyverseUrl
     const ext = contentType.includes("png") ? "png"
       : contentType.includes("webp") ? "webp"
       : contentType.includes("gif") ? "gif"
       : contentType.includes("avif") ? "avif"
       : "jpg"
 
-    const fileName = `${baseName}.${ext}`
-    const publicUrl = `${supabaseUrl}/storage/v1/object/public/menu-images/${fileName}`
     const bytes = new Uint8Array(await imgRes.arrayBuffer())
     if (!bytes.byteLength) return loyverseUrl
+    const digest = await crypto.subtle.digest("SHA-256", bytes)
+    const contentHash = Array.from(new Uint8Array(digest))
+      .map(b => b.toString(16).padStart(2, "0")).join("")
+    const fileName = `loyverse/content/${contentHash}.${ext}`
+    const publicUrl = `${supabaseUrl}/storage/v1/object/public/menu-images/${fileName}`
+    const exists = await fetch(publicUrl, { method: "HEAD", cache: "no-store" })
+    if (exists.ok) return publicUrl
 
     const supabase = createClient(supabaseUrl, serviceKey, {
       auth: { persistSession: false, autoRefreshToken: false }
