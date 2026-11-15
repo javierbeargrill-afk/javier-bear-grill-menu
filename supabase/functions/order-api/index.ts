@@ -1,7 +1,6 @@
 const ALLOWED_ORIGINS = new Set([
   "https://menujaviergrill.store",
   "https://www.menujaviergrill.store",
-  "https://javierbeargrill-afk.github.io",
 ]);
 
 function cors(req: Request) {
@@ -115,27 +114,33 @@ Deno.serve(async (req: Request) => {
   const menu = Array.isArray(menuRows?.[0]?.data) ? menuRows[0].data : [];
   const zones = Array.isArray(zoneRows?.[0]?.value) ? zoneRows[0].value : [];
 
-  const priceByName = new Map<string, number>();
+  const productsByName = new Map<string, { price: number; friesUpgrade?: string }>();
   for (const cat of menu) {
     for (const item of (cat?.i || [])) {
       if (typeof item?.n === "string" && Number.isFinite(Number(item?.p))) {
-        priceByName.set(item.n, Number(item.p));
+        productsByName.set(item.n, { price: Number(item.p), friesUpgrade: item.friesUpgrade });
       }
     }
   }
 
   const safeItems: Array<{n:string,qty:number,p:number}> = [];
   let subtotal = 0;
+  let includedFries = 0;
+  let friesUpgrades = 0;
   for (const raw of body.items) {
     const name = cleanText(raw?.n, 120, true);
     const qty = Number(raw?.qty);
-    if (!name || !Number.isInteger(qty) || qty < 1 || qty > 20 || !priceByName.has(name)) {
+    const product = name ? productsByName.get(name) : undefined;
+    if (!name || !product || !Number.isInteger(qty) || qty < 1 || qty > 20) {
       return json(req, { error: "Invalid items" }, 400);
     }
-    const price = Number(priceByName.get(name));
+    const { price, friesUpgrade } = product;
     safeItems.push({ n: name, qty, p: price });
     subtotal += price * qty;
+    if (friesUpgrade === "included") includedFries += qty;
+    if (friesUpgrade === "addon") friesUpgrades += qty;
   }
+  if (friesUpgrades > includedFries) return json(req, { error: "Fries upgrade requires a combo with fries" }, 400);
 
   const zone = zones.find((z: any) => z?.activa !== false && String(z?.nombre || "") === zona);
   if (!zone) return json(req, { error: "Invalid delivery zone" }, 400);
