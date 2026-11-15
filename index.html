@@ -1302,13 +1302,13 @@
 // ══════════════════════════════════════════
 //  CONFIG
 // ══════════════════════════════════════════
-const APP_VERSION = '2.3.0';
+const APP_VERSION = '2.4.0';
 const SUPABASE_FUNC_URL = 'https://uazonbacmpwuznugirru.supabase.co/functions/v1/loyverse-menu';
 const ADMIN_API_URL = 'https://uazonbacmpwuznugirru.supabase.co/functions/v1/admin-api';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVhem9uYmFjbXB3dXpudWdpcnJ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI2NDYzNTAsImV4cCI6MjA4ODIyMjM1MH0.87QkFnCL1AfI3oUu8bR2NPuUD44n3BfUX1nA-Bb360I';
 const CACHE_REST_URL    = 'https://uazonbacmpwuznugirru.supabase.co/rest/v1/menu_cache?id=eq.1&select=data,updated_at';
 const ORDER_API_URL     = 'https://uazonbacmpwuznugirru.supabase.co/functions/v1/order-api';
-const CACHE_KEY         = 'jbg_menu_v5';
+const CACHE_KEY         = 'jbg_menu_v6';
 const CACHE_TTL         = 10 * 60 * 1000;
 const CONFIG_REST_URL   = 'https://uazonbacmpwuznugirru.supabase.co/rest/v1/jbg_config?select=key,value';
 const CONFIG_CACHE_KEY  = 'jbg_config_cache_v3';
@@ -1353,6 +1353,8 @@ function displayCatName(nombre='') {
 
 let carrito    = {};
 let CATEGORIAS = [];
+let cambioPapas = null;
+let combosConPapas = new Set();
 let productosOcultos = [];
 let csvBadgesData    = null;
 let bannerColorBg    = '#C8102E';
@@ -1751,6 +1753,9 @@ function aplicarMenuCargado(data,updatedAt=null,guardar=true){
   const badgesGuardados=JSON.parse(localStorage.getItem('jbg_badges')||'null');
   if(badgesGuardados) finalData=aplicarBadgesAData(data,badgesGuardados);
   CATEGORIAS=sortCats(finalData);
+  const items = CATEGORIAS.flatMap(cat => cat.i);
+  cambioPapas = items.find(item => item.friesUpgrade === 'addon') || null;
+  combosConPapas = new Set(items.filter(item => item.friesUpgrade === 'included').map(item => item.n));
   actualizarMenuSchema(CATEGORIAS);
   if(guardar){try{localStorage.setItem(CACHE_KEY,JSON.stringify({ts:Date.now(),data}));}catch(e){}}
   renderMenu();renderCatNav();mostrarPromoAleatoria();sincronizarQtysEnPantalla();
@@ -1969,45 +1974,62 @@ function buscar(query) {
 // ══════════════════════════════════════════
 function encodeId(name) { return name.replace(/\W/g,'_'); }
 
-function update(id, name, price, delta) {
-  if (!carrito[id]) carrito[id]={name,price,qty:0};
-  carrito[id].qty += delta;
-  if (carrito[id].qty<=0) delete carrito[id];
-  const el=document.getElementById('qty-'+id);
-  if (el) el.innerText=carrito[id]?carrito[id].qty:0;
-  actualizarResumen();
-  const btn=document.getElementById('floatCart');
-  btn.classList.remove('bump'); void btn.offsetWidth; btn.classList.add('bump');
+function cantidadPapasDeCombo() {
+  return Object.values(carrito).reduce((total, item) =>
+    total + (combosConPapas.has(item.name) ? item.qty : 0), 0);
 }
 
-// ── Nueva función: cambiar cantidad desde el carrito ──
-function cartUpdate(id, delta) {
-  if (!carrito[id]) return;
-  carrito[id].qty += delta;
-  if (carrito[id].qty <= 0) {
-    delete carrito[id];
-    // resetear contador en la card del menú
-    const el = document.getElementById('qty-'+id);
-    if (el) el.innerText = '0';
-  } else {
-    // sincronizar con la card del menú
-    const el = document.getElementById('qty-'+id);
-    if (el) el.innerText = carrito[id].qty;
+function fijarCantidadCarrito(id, name, price, qty) {
+  const esCambio = name === cambioPapas?.n || carrito[id]?.friesUpgrade === 'addon';
+  if (esCambio && qty > 0 && (name !== cambioPapas?.n || qty > cantidadPapasDeCombo())) {
+    alert('Puedes agregar un cambio por cada combo con papas en tu carrito.');
+    return false;
   }
+  if (qty <= 0) {
+    delete carrito[id];
+  } else {
+    carrito[id] = esCambio
+      ? {name, price: cambioPapas.p, qty, friesUpgrade: 'addon'}
+      : {name, price, qty};
+  }
+  const el = document.getElementById('qty-'+id);
+  if (el) el.innerText = carrito[id]?.qty || 0;
   actualizarResumen();
   const btn = document.getElementById('floatCart');
   btn.classList.remove('bump'); void btn.offsetWidth; btn.classList.add('bump');
+  return true;
 }
 
-// ── Nueva función: eliminar item completo del carrito ──
+function update(id, name, price, delta) {
+  const anterior = carrito[id];
+  return fijarCantidadCarrito(id, anterior?.name ?? name, anterior?.price ?? price, (anterior?.qty || 0) + delta);
+}
+
+function cartUpdate(id, delta) {
+  const item = carrito[id];
+  if (item) update(id, item.name, item.price, delta);
+}
+
 function cartDelete(id) {
-  if (!carrito[id]) return;
-  delete carrito[id];
-  const el = document.getElementById('qty-'+id);
-  if (el) el.innerText = '0';
-  actualizarResumen();
-  const btn = document.getElementById('floatCart');
-  btn.classList.remove('bump'); void btn.offsetWidth; btn.classList.add('bump');
+  const item = carrito[id];
+  if (item) fijarCantidadCarrito(id, item.name, item.price, 0);
+}
+
+function ajustarCambiosDePapas() {
+  if (!CATEGORIAS.length) return;
+  const limite = cantidadPapasDeCombo();
+  for (const [id, item] of Object.entries(carrito)) {
+    if (item.friesUpgrade !== 'addon') continue;
+    const qty = item.name === cambioPapas?.n ? Math.min(item.qty, limite) : 0;
+    if (qty > 0) {
+      item.qty = qty;
+      item.price = cambioPapas.p;
+    } else {
+      delete carrito[id];
+    }
+    const el = document.getElementById('qty-'+id);
+    if (el) el.innerText = qty;
+  }
 }
 
 function guardarCarrito() {
@@ -2019,6 +2041,7 @@ function cargarCarrito() {
 }
 
 function actualizarResumen() {
+  ajustarCambiosDePapas();
   guardarCarrito();
   const lista = document.getElementById('listaItems');
   let sub = 0, count = 0;
@@ -2137,6 +2160,10 @@ function enviarPedido() {
   const notas=document.getElementById('notas').value.trim();
   const direccion=document.getElementById('direccion').value.trim();
   if (!nom||Object.keys(carrito).length===0) return alert('Nombre y productos requeridos');
+  const cambios = Object.values(carrito).filter(item => item.friesUpgrade === 'addon');
+  if (cambios.some(item => item.name !== cambioPapas?.n || item.qty > cantidadPapasDeCombo())) {
+    return alert('Revisa las porciones de papas de tu combo antes de enviar el pedido.');
+  }
 
   const orden=getNumeroOrden();
   const ahora=getPanamaDate();
@@ -2617,12 +2644,7 @@ function heroVerDetalle() {
 function heroAgregar() {
   if (!heroItems.length) return;
   const item=heroItems[heroIdx];
-  const id=encodeId(item.n);
-  if (!carrito[id]) carrito[id]={name:item.n,price:item.p,qty:0};
-  carrito[id].qty++;
-  const el=document.getElementById('qty-'+id); if(el) el.innerText=carrito[id].qty;
-  actualizarResumen();
-  const btn=document.getElementById('floatCart'); btn.classList.remove('bump'); void btn.offsetWidth; btn.classList.add('bump');
+  if (!update(encodeId(item.n), item.n, item.p, 1)) return;
   const heroBtn=document.getElementById('heroBtn');
   heroBtn.innerText='✓ Agregado'; heroBtn.style.background='#25D366';
   setTimeout(()=>{ heroBtn.innerText='🛒 Agregar'; heroBtn.style.background=''; },1500);
@@ -2630,12 +2652,7 @@ function heroAgregar() {
 
 function footerAgregar() {
   if (!footerPromoItem) return;
-  const id=encodeId(footerPromoItem.n);
-  if (!carrito[id]) carrito[id]={name:footerPromoItem.n,price:footerPromoItem.p,qty:0};
-  carrito[id].qty++;
-  const el=document.getElementById('qty-'+id); if(el) el.innerText=carrito[id].qty;
-  actualizarResumen();
-  const btn=document.getElementById('floatCart'); btn.classList.remove('bump'); void btn.offsetWidth; btn.classList.add('bump');
+  update(encodeId(footerPromoItem.n), footerPromoItem.n, footerPromoItem.p, 1);
 }
 
 // ══════════════════════════════════════════
@@ -2694,13 +2711,7 @@ function modalDelta(delta) {
 
 function modalAgregar() {
   if (!modalItem) return;
-  const id=encodeId(modalItem.n);
-  if (modalQty===0) { delete carrito[id]; }
-  else { carrito[id]={name:modalItem.n,price:modalItem.p,qty:modalQty}; }
-  const el=document.getElementById('qty-'+id); if(el) el.innerText=modalQty||0;
-  actualizarResumen();
-  const btn=document.getElementById('floatCart'); btn.classList.remove('bump'); void btn.offsetWidth; btn.classList.add('bump');
-  cerrarModal();
+  if (fijarCantidadCarrito(encodeId(modalItem.n), modalItem.n, modalItem.p, modalQty)) cerrarModal();
 }
 
 // ══════════════════════════════════════════
