@@ -41,6 +41,12 @@ const CAT_ORDER = [
 
 const STORE_ID = "982e8d09-b15d-42fd-af07-c64abed4b073"
 const MENU_URL = "https://menujaviergrill.store/"
+const PAPAS_CHEDDAR_SKU = "10228"
+const CAMBIO_PAPAS_SKU = "10229"
+const COMBOS_CON_CAMBIO_PAPAS = new Set([
+  "10005", "10007", "10040", "10088", "10102", "10134", "10137",
+  "10164", "10185", "10203", "10204", "28", "CMB009-A", "JBG-OSITA-CMB-001",
+])
 
 // ─── Caché de imagen ──────────────────────────────────────────────────────────
 
@@ -448,6 +454,7 @@ serve(async (req) => {
       const price = parseFloat(store.price ?? item.variants[0].default_price ?? "0")
       if (!price || isNaN(price)) return false
       if (!item.item_name?.trim()) return false
+      if (String(item.variants[0].sku) === CAMBIO_PAPAS_SKU) return price > 0
       const cat = (item.category_id && catMap[item.category_id])
         ? catMap[item.category_id]
         : (item.category_name?.trim() || "Sin categoría")
@@ -456,8 +463,10 @@ serve(async (req) => {
 
     // 4️⃣ Procesar imágenes en lotes de 10
     const procesarItem = async (item: any) => {
-      const store     = item.variants[0].stores[0]
-      const price     = parseFloat(store.price ?? item.variants[0].default_price ?? "0")
+      const variant = item.variants[0]
+      const sku = String(variant.sku)
+      const store = variant.stores[0]
+      const price = parseFloat(store.price ?? variant.default_price ?? "0")
       const catNombre = (item.category_id && catMap[item.category_id])
         ? catMap[item.category_id]
         : (item.category_name?.trim() || "Sin categoría")
@@ -473,7 +482,16 @@ serve(async (req) => {
         if (!desc) desc = null
       }
 
-      return { cat: catNombre, item: { n: item.item_name.trim(), p: price, img: imgUrl, d: desc } }
+      const esCambio = sku === CAMBIO_PAPAS_SKU
+      const friesUpgrade = esCambio ? "addon" : COMBOS_CON_CAMBIO_PAPAS.has(sku) ? "included" : undefined
+      if (esCambio) {
+        desc = "Cambia las papas de tu combo por papas con cheddar y tocino. Suplemento por porción."
+      }
+      return {
+        sku,
+        cat: esCambio ? "Acompañantes" : catNombre,
+        item: { n: item.item_name.trim(), p: price, img: imgUrl, d: desc, friesUpgrade },
+      }
     }
 
     const resultados: any[] = []
@@ -485,7 +503,9 @@ serve(async (req) => {
 
     // 5️⃣ Agrupar por categoría
     const grupos: Record<string, any[]> = {}
+    const fotoPapasCheddar = resultados.find(({ sku }) => sku === PAPAS_CHEDDAR_SKU)?.item.img
     for (const { cat, item } of resultados) {
+      if (item.friesUpgrade === "addon" && !item.img) item.img = fotoPapasCheddar ?? null
       if (!grupos[cat]) grupos[cat] = []
       grupos[cat].push(item)
     }
