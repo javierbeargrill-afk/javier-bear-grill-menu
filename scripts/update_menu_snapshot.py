@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import html
+import unicodedata
 import json
 import re
 import urllib.request
@@ -122,6 +123,21 @@ def update_documents(source, menu, hidden):
         raise ValueError("No se encontró menuJsonLd en index.html")
     return updated
 
+def apply_display_overrides(source, menu):
+    matches = re.search(r'<script id="menuDisplayOverrides" type="application/json">(.*?)</script>', source, re.S)
+    overrides = json.loads(matches[1]) if matches else {}
+    result = []
+    for category in menu:
+        items = []
+        for original in category.get("i") or []:
+            name = unicodedata.normalize("NFC", str(original.get("n") or "").strip())
+            item = {**original, **overrides.get(name, {})}
+            if item.get("d"):
+                item["d"] = html.unescape(str(item["d"]))
+            items.append(item)
+        result.append({**category, "i": items})
+    return result
+
 def main():
     source = INDEX.read_text(encoding="utf-8")
     key_match = re.search(r"const SUPABASE_ANON_KEY\s*=\s*'([^']+)'", source)
@@ -132,7 +148,7 @@ def main():
     menu_rows = api_get("/rest/v1/menu_cache?id=eq.1&select=data", anon_key)
     if not menu_rows or not isinstance(menu_rows[0].get("data"), list):
         raise SystemExit("menu_cache está vacío")
-    menu = menu_rows[0]["data"]
+    menu = apply_display_overrides(source, menu_rows[0]["data"])
 
     cfg_rows = api_get("/rest/v1/jbg_config?key=eq.productos_ocultos&select=value", anon_key)
     hidden = set(cfg_rows[0].get("value") or []) if cfg_rows else set()
