@@ -7,7 +7,7 @@ from pathlib import Path
 html = Path("index.html").read_text(encoding="utf-8")
 scripts=[]
 for attrs, body in re.findall(r"<script([^>]*)>([\s\S]*?)</script>", html, re.I):
-    if "application/ld+json" in attrs.lower():
+    if re.search(r"application/(?:ld\+)?json", attrs, re.I):
         continue
     if body.strip():
         scripts.append(body)
